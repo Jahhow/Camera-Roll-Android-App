@@ -1,6 +1,6 @@
 <resources>
     <!--error messages-->
-    <string name="read_permission_denied">Camera Roll needs the permission access your Storage to depict your pictures.</string>
+    <string name="read_permission_denied">Camera Roll needs permission to access your Storage to be able to depict your pictures.</string>
     <string name="grant_removable_storage_permission">Grant removable Storage Permission</string>
     <string name="grant_removable_storage_permission_message">Please select the root folder of your removable Storage device (e.g. SD Card) on the next screen.</string>
     <!--general-->
@@ -61,7 +61,7 @@
     <string name="move">Move</string>
     <string name="move_item_to">Move %1$d Item to:</string>
     <string name="move_items_to">Move %1$d Items to:</string>
-    <string name="move_error">Moving files to/from removable Storage doesn\'t work. Please just copy and delete the file</string>
+    <string name="move_error">Moving files to/from removable Storage doesn\'t work. Please just copy and delete the file.</string>
     <string name="copy">Copy</string>
     <string name="copy_item_to">Copy %1$d Item to:</string>
     <string name="copy_items_to">Copy %1$d Items to:</string>
@@ -73,6 +73,7 @@
     <string name="successfully_renamed_file">successfully renamed file</string>
     <!--FileExplorerActivity-->
     <string name="no_files">no files</string>
+    <string name="storage_roots">Storage roots</string>
     <string name="storage">Storage</string>
     <string name="scan">Scan</string>
     <string name="scanning">Scanning…</string>
@@ -89,22 +90,29 @@
     <string name="column_count">Column Count</string>
     <string name="other">Other</string>
     <string name="media_retriever">MediaRetriever</string>
-    <string name="media_retriever_summary">Manually search the storage for media instead of relying on the MediaStore Api. This might help if you are missing some picture.</string>
+    <string name="media_retriever_summary">Manually search the storage for media instead of relying on the MediaStore API. This might help if you are missing some pictures.</string>
     <string name="use_8_bit_color">8-Bit Color</string>
-    <string name="use_8_bit_color_summary">Use 8-Bit Color, when displaying images. Images might take longer to load. This also increases the amount of memory is used, when the app is running.</string>
+    <string name="use_8_bit_color_summary">Use 8-Bit Color when displaying images. Images might take longer to load. This also increases the amount of memory used when the app is running.</string>
     <string name="show_animations">Show Animations</string>
     <string name="show_animations_summary">Disable the SharedElementTransition and the PageTransformer</string>
     <string name="show_videos">Show Videos</string>
     <string name="show_videos_summary">Show videos in gallery</string>
     <string name="maximum_brightness">Maximum Brightness</string>
-    <string name="maximum_brightness_summary">Set Screen Brightness to maximum when viewing images.</string>
+    <string name="maximum_brightness_summary">Set Screen Brightness to maximum when viewing images</string>
     <!--EditImageActivity-->
+    <string name="resize">Resize</string>
     <string name="rotate">Rotate</string>
     <string name="restore">Restore</string>
     <string name="save_edit">Save</string>
     <string name="export">Export</string>
     <string name="editing_file_format_not_supported">This file format is not supported for editing</string>
     <string name="success">Success!</string>
+    <string name="aspect_ratio_free">Free</string>
+    <string name="aspect_ratio_original">Original</string>
+    <string name="aspect_ratio_square">Square</string>
+    <string name="aspect_ratio_3_2" translatable="false">3:2</string>
+    <string name="aspect_ratio_4_3" translatable="false">4:3</string>
+    <string name="aspect_ratio_16_9" translatable="false">16:9</string>
     <!--SetWallpaperActivity-->
     <string name="wallpaper">Wallpaper</string>
     <string name="set_wallpaper">Set Wallpaper</string>
@@ -118,6 +126,7 @@
     <string name="save">Save</string>
     <string name="changes_saved">Changes saved</string>
     <string name="clear_exif_data">Clear Exif Data</string>
+    <string name="exif_file_format_not_supported">Editing Exif values is only supported for JPEG images</string>
     <!--ExcludedPathsActivity-->
     <string name="excluded_paths">Excluded Paths</string>
     <!--VirtualAlbumsActivity-->
@@ -149,4 +158,5 @@
     <string name="info_iso">ISO: </string>
     <string name="info_frame_rate">Frame rate: </string>
     <string name="copied_to_clipboard">Copied to Clipboard</string>
+    <string name="unknown">Unknown</string>
 </resources>

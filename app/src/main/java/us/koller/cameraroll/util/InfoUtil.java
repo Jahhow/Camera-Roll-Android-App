@@ -178,7 +178,7 @@ public class InfoUtil {
     }
 
     public static InfoItem retrieveExposure(Context context, ExifInterface exif) {
-        Object exposureObject = String.valueOf(ExifUtil.getCastValue(exif, ExifInterface.TAG_EXPOSURE_TIME));
+        Object exposureObject = ExifUtil.getCastValue(exif, ExifInterface.TAG_EXPOSURE_TIME);
         String exposure;
         if (exposureObject != null) {
             exposure = Parser.parseExposureTime(String.valueOf(exposureObject));
@@ -204,7 +204,7 @@ public class InfoUtil {
         Object apertureObject = ExifUtil.getCastValue(exif, ExifInterface.TAG_F_NUMBER);
         String aperture;
         if (apertureObject != null) {
-            aperture = "f/" + String.valueOf(apertureObject);
+            aperture = "ƒ/" + String.valueOf(apertureObject);
         } else {
             aperture = ExifUtil.NO_DATA;
         }
@@ -240,7 +240,7 @@ public class InfoUtil {
             if (addresses.size() > 0) {
                 return addresses.get(0);
             }
-        } catch (IOException e) {
+        } catch (IOException | IllegalArgumentException e) {
             e.printStackTrace();
         }
         return null;

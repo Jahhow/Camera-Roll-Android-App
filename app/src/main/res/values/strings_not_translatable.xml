@@ -10,20 +10,21 @@
         <![CDATA[
             © 2017 Lukas Koller, Munich, Germany<br/>
             <br/>
-            <a href=\"https://github.com/kollerlukas/Camera-Roll-Android-App\">Source Code</a> for this App<br/>
+            <b><a href=\"https://github.com/kollerlukas/Camera-Roll-Android-App\">Source Code</a></b> for this App<br/>
+            <b><a href=\"https://github.com/kollerlukas/Camera-Roll-Android-App/blob/master/PRIVACY.md\">Privacy Policy</a></b><br/>
             <br/>
             <br/>
             <b>Licenses:</b><br/>
             <br/>
             Libraries:<br/>
             <br>
-                <a href=\"https://github.com/bumptech/glide\">Glide</a><br/>
+                <b><a href=\"https://github.com/bumptech/glide\">Glide</a></b><br/>
                 An image loading and caching library for Android focused on smooth scrolling.<br/>
                 <a href=\"https://github.com/bumptech/glide/blob/master/LICENSE\">LICENSE</a>
             <br>
             <br/>
             <br>
-                <a href=\"https://github.com/davemorrissey/subsampling-scale-image-view\">Subsampling Scale Image View</a><br/>
+                <b><a href=\"https://github.com/davemorrissey/subsampling-scale-image-view\">Subsampling Scale Image View</a></b><br/>
                 Highly configurable, easily extendable view with pan and zoom gestures for displaying huge images without loss of detail. Perfect for photo galleries, maps, building plans etc.<br/>
                 <a href=\"https://github.com/davemorrissey/subsampling-scale-image-view/blob/master/LICENSE\">LICENSE</a>
             <br>
@@ -47,9 +48,8 @@
             <br>
             <br/>
             <br>
-                <b><a href=\"https://github.com/DavidPacioianu/InkPageIndicator\">InkPageIndicator</a></b><br/>
-                InkPageIndicator created by @nickbutcher for Plaid https://github.com/nickbutcher/plaid and backported by me for API 14+ (4.0+)<br/>
-                <a href=\"https://github.com/DavidPacioianu/InkPageIndicator/blob/master/LICENSE\">LICENSE</a>
+                <b><a href=\"https://github.com/romandanylyk/PageIndicatorView\">PageIndicatorView</a></b><br/>
+                An page indicator for Android ViewPager<br/>
             <br>
             <br/>
             <br>
@@ -82,6 +82,7 @@
                 Portuguese: <a href=\"https://github.com/marciozomb13\">Marcio Zomb13</a><br>
                 Chinese: Yixuan Wang<br>
                 Ukrainian: <a href=\"https://vlad2.carrd.co/\">Владислав Книжник</a><br>
+                Hungarian: nvi9<br>
             <br>
         ]]>
     </string>
