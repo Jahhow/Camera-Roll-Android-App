@@ -74,6 +74,7 @@
     <string name="successfully_renamed_file">已重新命名</string>
     <!--FileExplorerActivity-->
     <string name="no_files">: )</string>
+    <string name="storage_roots">儲存裝置</string>
     <string name="storage">內部儲存空間</string>
     <string name="scan">重新掃描檔案</string>
     <string name="scanning">正在掃描…</string>
@@ -100,12 +101,16 @@
     <string name="maximum_brightness">將螢幕設定至最大亮度</string>
     <string name="maximum_brightness_summary">瀏覽項目時，將螢幕設定至最大亮度</string>
     <!--EditImageActivity-->
+    <string name="resize">裁剪</string>
     <string name="rotate">旋轉</string>
     <string name="restore">重置</string>
     <string name="save_edit">儲存</string>
     <string name="export">匯出</string>
     <string name="editing_file_format_not_supported">不支援編輯此檔案類型</string>
     <string name="success">完成</string>
+    <string name="aspect_ratio_free">任意</string>
+    <string name="aspect_ratio_original">原始</string>
+    <string name="aspect_ratio_square">正方形</string>
     <!--SetWallpaperActivity-->
     <string name="wallpaper">桌布</string>
     <string name="set_wallpaper">使用此桌布</string>
@@ -119,6 +124,7 @@
     <string name="save">儲存</string>
     <string name="changes_saved">已儲存變更</string>
     <string name="clear_exif_data">清除 EXIF 資料</string>
+    <string name="exif_file_format_not_supported">目前僅支援編輯 JPEG 圖片的 EXIF 資料</string>
     <!--ExcludedPathsActivity-->
     <string name="excluded_paths">已忽略的項目</string>
     <!--VirtualAlbumsActivity-->
@@ -150,4 +156,5 @@
     <string name="info_iso">ISO</string>
     <string name="info_frame_rate">框架速度:</string>
     <string name="copied_to_clipboard">已複製</string>
+    <string name="unknown">未知</string>
 </resources>
