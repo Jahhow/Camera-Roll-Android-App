@@ -132,12 +132,14 @@ public class ItemActivity extends ThemeableActivity {
             = new SimpleTransitionListener() {
         @Override
         public void onTransitionStart(@NonNull Transition transition) {
-            //hide toolbar & statusbar
-            float toolbar_translationY = -(toolbar.getHeight());
-            float bottomBar_translationY = ((View) bottomBar.getParent()).getHeight();
-            toolbar.setTranslationY(toolbar_translationY);
-            ((View) bottomBar.getParent()).setTranslationY(bottomBar_translationY);
-            super.onTransitionStart(transition);
+            if (!isReturning) {
+                //hide toolbar & statusbar
+                float toolbar_translationY = -(toolbar.getHeight());
+                float bottomBar_translationY = ((View) bottomBar.getParent()).getHeight();
+                toolbar.setTranslationY(toolbar_translationY);
+                ((View) bottomBar.getParent()).setTranslationY(bottomBar_translationY);
+                super.onTransitionStart(transition);
+            }
         }
 
         @Override
