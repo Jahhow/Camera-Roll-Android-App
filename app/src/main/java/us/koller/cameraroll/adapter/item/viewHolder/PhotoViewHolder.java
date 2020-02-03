@@ -1,6 +1,7 @@
 package us.koller.cameraroll.adapter.item.viewHolder;
 
 import android.annotation.SuppressLint;
+import android.graphics.PointF;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -23,6 +24,8 @@ import us.koller.cameraroll.util.ItemViewUtil;
 public class PhotoViewHolder extends ViewHolder {
 
     private boolean imageViewWasBound = false;
+    private boolean onSharedElementExit_called = false;
+    private float initialSubsamplingScale;
 
     public PhotoViewHolder(AlbumItem albumItem, int position) {
         super(albumItem, position);
@@ -51,7 +54,6 @@ public class PhotoViewHolder extends ViewHolder {
             view.setVisibility(View.VISIBLE);
             bindImageView(view, transitionView);
         } else {
-            transitionView.setTranslationX(0);
             view.setVisibility(View.INVISIBLE);
             transitionView.setVisibility(View.VISIBLE);
         }
@@ -107,8 +109,11 @@ public class PhotoViewHolder extends ViewHolder {
                 new SubsamplingScaleImageView.DefaultOnImageEventListener() {
                     @Override
                     public void onImageLoaded() {
-                        super.onImageLoaded();
-                        transitionView.setVisibility(View.INVISIBLE);
+                        // onImageLoaded() might be called after onSharedElementExit()
+                        if (!onSharedElementExit_called)
+                            transitionView.setVisibility(View.INVISIBLE);
+
+                        initialSubsamplingScale = imageView.getScale();
                         imageViewWasBound = true;
                         PhotoViewHolder.this.onImageLoaded();
                     }
@@ -147,12 +152,23 @@ public class PhotoViewHolder extends ViewHolder {
 
     @Override
     public void onSharedElementExit(final ItemActivity.Callback callback) {
-        scaleDown(new ItemActivity.Callback() {
-            @Override
-            public void done() {
-                callback.done();
-            }
-        });
+        //scaleDown(callback);
+        onSharedElementExit_called = true;
+
+        if (imageViewWasBound) {
+            final SubsamplingScaleImageView view = itemView.findViewById(R.id.subsampling);
+            final ImageView transitionView = itemView.findViewById(R.id.image);
+
+            PointF center = view.sourceToViewCoord(view.getSWidth() / 2f, view.getSHeight() / 2f);
+            transitionView.setTranslationX(center.x - view.getWidth() / 2f);
+            transitionView.setTranslationY(center.y - view.getHeight() / 2f);
+
+            float scaleXY = view.getScale() / initialSubsamplingScale;
+            transitionView.setScaleX(scaleXY);
+            transitionView.setScaleY(scaleXY);
+        }
+        swapView(true);
+        callback.done();
     }
 
     @Override

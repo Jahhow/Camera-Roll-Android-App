@@ -452,7 +452,6 @@ public class AlbumActivity extends ThemeableActivity
                 recyclerView.scrollToPosition(sharedElementReturnPosition);
             }
         }
-        /*super.onActivityReenter(requestCode, data);*/
     }
 
     @Override

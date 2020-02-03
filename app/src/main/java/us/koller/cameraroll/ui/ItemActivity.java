@@ -132,14 +132,14 @@ public class ItemActivity extends ThemeableActivity {
             = new SimpleTransitionListener() {
         @Override
         public void onTransitionStart(@NonNull Transition transition) {
-            if (!isReturning) {
+            /*if (!isReturning) {
                 //hide toolbar & statusbar
                 float toolbar_translationY = -(toolbar.getHeight());
                 float bottomBar_translationY = ((View) bottomBar.getParent()).getHeight();
                 toolbar.setTranslationY(toolbar_translationY);
                 ((View) bottomBar.getParent()).setTranslationY(bottomBar_translationY);
                 super.onTransitionStart(transition);
-            }
+            }*/
         }
 
         @Override
@@ -156,7 +156,7 @@ public class ItemActivity extends ThemeableActivity {
 
             super.onTransitionEnd(transition);
             albumItem.isSharedElement = false;
-            showUI(!isReturning);
+            //showUI(!isReturning);
         }
     };
 
@@ -906,7 +906,7 @@ public class ItemActivity extends ThemeableActivity {
                 setResultAndFinish();
                 return;
             }
-            showUI(false);
+            //showUI(false);
             if (viewPager != null && viewPager.getAdapter() != null && albumItem != null) {
                 ViewHolder viewHolder = ((ItemAdapter)
                         viewPager.getAdapter()).findViewHolderByTag(albumItem.getPath());
