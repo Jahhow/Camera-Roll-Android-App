@@ -90,9 +90,9 @@ public class PhotoViewHolder extends ViewHolder {
                 = new GestureDetector(imageView.getContext(),
                 new GestureDetector.SimpleOnGestureListener() {
                     @Override
-                    public boolean onSingleTapUp(MotionEvent e) {
+                    public boolean onSingleTapConfirmed(MotionEvent e) {
                         PhotoViewHolder.super.imageOnClick(imageView);
-                        return super.onSingleTapUp(e);
+                        return super.onSingleTapConfirmed(e);
                     }
                 });
         view.setOnTouchListener(new View.OnTouchListener() {
