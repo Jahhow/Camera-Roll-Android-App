@@ -4,13 +4,14 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Handler;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.v4.view.ViewCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.ViewCompat;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
@@ -18,8 +19,6 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.load.resource.gif.GifDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
-import com.davemorrissey.labs.subscaleview.ImageSource;
-import com.davemorrissey.labs.subscaleview.ImageViewState;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
 import us.koller.cameraroll.R;
@@ -40,18 +39,16 @@ public class ItemViewUtil {
     }
 
     public static void bindSubsamplingImageView(SubsamplingScaleImageView imageView, Photo photo,
-                                                SubsamplingScaleImageView.DefaultOnImageEventListener onImageEventListener) {
+                                                SubsamplingScaleImageView.OnImageEventListener onImageEventListener) {
         imageView.recycle();
 
-        ImageViewState imageViewState = null;
+        /*ImageViewState imageViewState = null;
         if (photo.getImageViewSavedState() != null) {
             imageViewState = (ImageViewState) photo.getImageViewSavedState();
             photo.putImageViewSavedState(null);
-        }
+        }*/
 
-        imageView.setImage(
-                ImageSource.uri(photo.getUri(imageView.getContext())),
-                imageViewState);
+        imageView.setImage(photo.getPath());
 
         if (onImageEventListener != null) {
             imageView.setOnImageEventListener(onImageEventListener);

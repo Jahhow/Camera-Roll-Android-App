@@ -3,7 +3,7 @@ package us.koller.cameraroll.util.animators;
 import android.content.Context;
 import android.graphics.ColorMatrix;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.RequiresApi;
 import android.util.Property;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;

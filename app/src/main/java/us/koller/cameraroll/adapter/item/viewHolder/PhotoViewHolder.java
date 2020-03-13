@@ -1,6 +1,5 @@
 package us.koller.cameraroll.adapter.item.viewHolder;
 
-import android.annotation.SuppressLint;
 import android.graphics.PointF;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -9,8 +8,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
-import com.davemorrissey.labs.subscaleview.decoder.ImageDecoder;
-import com.davemorrissey.labs.subscaleview.decoder.ImageRegionDecoder;
 
 import us.koller.cameraroll.R;
 import us.koller.cameraroll.data.models.AlbumItem;
@@ -70,12 +67,11 @@ public class PhotoViewHolder extends ViewHolder {
             return;
         }
 
-        final SubsamplingScaleImageView imageView
-                = (SubsamplingScaleImageView) view;
+        final SubsamplingScaleImageView imageView = (SubsamplingScaleImageView) view;
 
         // use custom decoders
-        imageView.setBitmapDecoderClass(getImageDecoderClass());
-        imageView.setRegionDecoderClass(getBitmapRegionDecoderClass());
+        imageView.setBitmapDecoderFactory(CustomImageDecoder::new);
+        imageView.setRegionDecoderFactory(CustomRegionDecoder::new);
 
         imageView.setMinimumTileDpi(196);
         imageView.setMinimumDpi(80);
@@ -95,13 +91,7 @@ public class PhotoViewHolder extends ViewHolder {
                         return super.onSingleTapConfirmed(e);
                     }
                 });
-        view.setOnTouchListener(new View.OnTouchListener() {
-            @SuppressLint("ClickableViewAccessibility")
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                return gestureDetector.onTouchEvent(motionEvent);
-            }
-        });
+        view.setOnTouchListener((view1, motionEvent) -> gestureDetector.onTouchEvent(motionEvent));
 
         ItemViewUtil.bindSubsamplingImageView(
                 imageView,
@@ -120,31 +110,6 @@ public class PhotoViewHolder extends ViewHolder {
                 });
     }
 
-    private void scaleDown(final ItemActivity.Callback callback) {
-        final SubsamplingScaleImageView imageView = itemView.findViewById(R.id.subsampling);
-        if (imageView != null) {
-            try {
-                imageView.animateScale(0.0f)
-                        .withDuration(300)
-                        .withOnAnimationEventListener(
-                                new SubsamplingScaleImageView.DefaultOnAnimationEventListener() {
-                                    @Override
-                                    public void onComplete() {
-                                        super.onComplete();
-                                        swapView(true);
-                                        callback.done();
-                                        //imageView.recycle();
-                                    }
-                                })
-                        .start();
-            } catch (NullPointerException e) {
-                swapView(true);
-                callback.done();
-                //imageView.recycle();
-            }
-        }
-    }
-
     @Override
     public void onSharedElementEnter() {
         swapView(false);
@@ -159,7 +124,7 @@ public class PhotoViewHolder extends ViewHolder {
             final SubsamplingScaleImageView view = itemView.findViewById(R.id.subsampling);
             final ImageView transitionView = itemView.findViewById(R.id.image);
 
-            PointF center = view.sourceToViewCoord(view.getSWidth() / 2f, view.getSHeight() / 2f);
+            PointF center = view.sourceToViewCoord(new PointF(view.getSWidth() / 2f, view.getSHeight() / 2f));
             transitionView.setTranslationX(center.x - view.getWidth() / 2f);
             transitionView.setTranslationY(center.y - view.getHeight() / 2f);
 
@@ -178,16 +143,6 @@ public class PhotoViewHolder extends ViewHolder {
             imageView.recycle();
         }
         super.onDestroy();
-    }
-
-
-    @SuppressWarnings("WeakerAccess")
-    public Class<? extends ImageDecoder> getImageDecoderClass() {
-        return CustomImageDecoder.class;
-    }
-
-    public Class<? extends ImageRegionDecoder> getBitmapRegionDecoderClass() {
-        return CustomRegionDecoder.class;
     }
 
     public void onImageLoaded() {

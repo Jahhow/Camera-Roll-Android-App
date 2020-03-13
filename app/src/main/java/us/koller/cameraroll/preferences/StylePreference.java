@@ -1,8 +1,9 @@
 package us.koller.cameraroll.preferences;
 
 import android.content.Context;
-import android.support.v7.preference.DialogPreference;
 import android.util.AttributeSet;
+
+import androidx.preference.DialogPreference;
 
 import us.koller.cameraroll.R;
 import us.koller.cameraroll.data.Settings;

@@ -8,7 +8,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.net.Uri;
 
-import com.davemorrissey.labs.subscaleview.decoder.ImageRegionDecoder;
+import com.davemorrissey.labs.subscaleview.ImageRegionDecoder;
 
 import java.io.File;
 import java.io.FileOutputStream;

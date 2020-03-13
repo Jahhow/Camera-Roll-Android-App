@@ -1,28 +1,39 @@
 package us.koller.cameraroll.imageDecoder;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 
-import com.davemorrissey.labs.subscaleview.decoder.ImageDecoder;
+import androidx.annotation.NonNull;
 
-import java.io.InputStream;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DecodeFormat;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.FutureTarget;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
+import com.davemorrissey.labs.subscaleview.ImageDecoder;
 
 import us.koller.cameraroll.data.Settings;
 
-//simple ImageDecoder to have control over Bitmap.Config
 public class CustomImageDecoder implements ImageDecoder {
 
     @Override
-    public Bitmap decode(Context context, Uri uri) throws Exception {
+    @NonNull
+    public Bitmap decode(@NonNull Context context, @NonNull Uri uri) throws Exception {
         boolean use8BitColor = Settings.getInstance(context).use8BitColor();
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inPreferredConfig = use8BitColor ? Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565;
 
-        ContentResolver resolver = context.getContentResolver();
-        InputStream inputStream = resolver.openInputStream(uri);
-        return BitmapFactory.decodeStream(inputStream, null, options);
+        RequestOptions options = new RequestOptions()
+                .format(use8BitColor ? DecodeFormat.PREFER_ARGB_8888 : DecodeFormat.PREFER_RGB_565)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .fitCenter();
+
+        FutureTarget<Bitmap> builder = Glide.with(context)
+                .asBitmap()
+                .load(uri)
+                .apply(options)
+                .submit(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL);
+
+        return builder.get();
     }
 }

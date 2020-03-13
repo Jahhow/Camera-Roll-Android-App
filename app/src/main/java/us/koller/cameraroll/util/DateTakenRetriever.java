@@ -5,8 +5,9 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
-import android.support.media.ExifInterface;
 import android.util.Log;
+
+import androidx.exifinterface.media.ExifInterface;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

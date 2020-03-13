@@ -3,7 +3,7 @@ package us.koller.cameraroll.data.fileOperations;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.v4.provider.DocumentFile;
+import androidx.documentfile.provider.DocumentFile;
 
 import java.io.File;
 

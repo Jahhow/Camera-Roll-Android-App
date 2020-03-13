@@ -10,10 +10,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +19,11 @@ import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageButton;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
+
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -30,7 +31,6 @@ import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.extractor.ExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
@@ -39,14 +39,13 @@ import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
-import com.google.android.exoplayer2.ui.PlaybackControlView;
+import com.google.android.exoplayer2.ui.PlayerControlView;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
 import us.koller.cameraroll.R;
-import us.koller.cameraroll.data.Settings;
 
 public class VideoPlayerActivity extends ThemeableActivity {
 
@@ -100,11 +99,11 @@ public class VideoPlayerActivity extends ThemeableActivity {
         setWindowInsets();
 
         //hide & show Nav-/StatusBar together with controls
-        final PlaybackControlView playbackControlView = (PlaybackControlView)
+        final PlayerControlView playbackControlView = (PlayerControlView)
                 findViewById(R.id.playback_control_view).getParent();
         final View bottomBarControls = findViewById(R.id.controls);
         playbackControlView.setVisibilityListener(
-                new PlaybackControlView.VisibilityListener() {
+                new PlayerControlView.VisibilityListener() {
                     @Override
                     public void onVisibilityChange(final int i) {
                         //animate Toolbar & controls
@@ -253,7 +252,7 @@ public class VideoPlayerActivity extends ThemeableActivity {
         DefaultRenderersFactory renderersFactory = new DefaultRenderersFactory(this);
 
         // Create the player
-        player = ExoPlayerFactory.newSimpleInstance(renderersFactory,
+        player = ExoPlayerFactory.newSimpleInstance(this, renderersFactory,
                 new DefaultTrackSelector(new AdaptiveTrackSelection.Factory(null)),
                 new DefaultLoadControl());
 
@@ -345,45 +344,28 @@ public class VideoPlayerActivity extends ThemeableActivity {
     }
 
     public static class SimpleEventListener implements Player.EventListener {
-
-        @Override
-        public void onTimelineChanged(Timeline timeline, Object manifest) {
-
-        }
-
         @Override
         public void onTracksChanged(TrackGroupArray trackGroupArray, TrackSelectionArray trackSelectionArray) {
-
         }
 
         @Override
         public void onLoadingChanged(boolean isLoading) {
-
         }
 
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-
         }
 
         @Override
         public void onRepeatModeChanged(int repeatMode) {
-
         }
 
         @Override
         public void onPlayerError(ExoPlaybackException error) {
-
-        }
-
-        @Override
-        public void onPositionDiscontinuity() {
-
         }
 
         @Override
         public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
-
         }
     }
 }

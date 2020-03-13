@@ -18,16 +18,17 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ProgressBar;
 
-import com.davemorrissey.labs.subscaleview.ImageSource;
+import androidx.core.content.ContextCompat;
+
+import com.davemorrissey.labs.subscaleview.DecoderFactory;
+import com.davemorrissey.labs.subscaleview.ImageRegionDecoder;
 import com.davemorrissey.labs.subscaleview.ImageViewState;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
@@ -150,12 +151,12 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
     }
 
     private void init() {
-        setZoomEnabled(false);
-        setPanEnabled(false);
-        setPanLimit(PAN_LIMIT_CENTER);
+        //setZoomEnabled(false);
+        //setPanEnabled(false);
+        //setPanLimit(PAN_LIMIT_CENTER);
         setOrientation(0);
-        setMinScale(0.01f);
-        setMinimumScaleType(SCALE_TYPE_CUSTOM);
+        //setMinScale(0.01f);
+        //setMinimumScaleType(SCALE_TYPE_CUSTOM);
 
         setOnTouchListener(this);
 
@@ -206,32 +207,30 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
 
         String mimeType = MediaType.getMimeType(getContext(), imageUri);
         if (MediaType.checkRAWMimeType(mimeType)) {
-            setRegionDecoderClass(RAWImageBitmapRegionDecoder.class);
+            setRegionDecoderFactory(new DecoderFactory<ImageRegionDecoder>() {
+                @Override
+                public ImageRegionDecoder make() {
+                    return new RAWImageBitmapRegionDecoder();
+                }
+            });
         } else {
-            setRegionDecoderClass(CustomRegionDecoder.class);
+            setRegionDecoderFactory(new DecoderFactory<ImageRegionDecoder>() {
+                @Override
+                public ImageRegionDecoder make() {
+                    return new CustomRegionDecoder();
+                }
+            });
         }
 
         if (state != null) {
             cropRect = state.getCropRect();
             setAspectRatio(state.getAspectRatio());
         }
-        setImage(ImageSource.uri(uri), state);
+        setImage(uri.toString());
     }
 
     public Uri getImageUri() {
         return imageUri;
-    }
-
-    @Override
-    protected void onImageLoaded() {
-        super.onImageLoaded();
-        if (cropRect == null) {
-            cropRect = getMaxCenteredCropRect();
-            Log.d("CropImageView", "onImageLoaded: " + cropRect);
-        }
-        autoZoom(false);
-
-        setProgressBarVisibility(GONE);
     }
 
     /**
@@ -405,11 +404,9 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
         //auto-zoom
         float scale = getNewScale();
         PointF center = getCenterOfCropRect();
+        PointF sCenter = viewToSourceCoord(center, center);
         if (animate) {
-            animateScaleAndCenter(scale, center)
-                    .withDuration(300)
-                    .withInterruptible(false)
-                    .start();
+            new AnimationBuilder(sCenter,scale).start();
         } else {
             setScaleAndCenter(scale, center);
         }
@@ -965,7 +962,7 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
      * @return max centered cropRect; might be null if no image was loaded
      **/
     private Rect getMaxCenteredCropRect() {
-        if (!isImageLoaded()) {
+        if (!isReady()) {
             return null;
         }
         if (aspectRatio < 0.0) {

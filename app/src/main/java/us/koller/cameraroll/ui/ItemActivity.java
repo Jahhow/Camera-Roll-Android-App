@@ -9,26 +9,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ShareCompat;
-import android.support.v4.app.SharedElementCallback;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.print.PrintHelper;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.transition.Transition;
@@ -46,8 +30,21 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.davemorrissey.labs.subscaleview.ImageViewState;
-import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.ShareCompat;
+import androidx.core.app.SharedElementCallback;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.print.PrintHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -56,25 +53,24 @@ import java.util.Map;
 
 import us.koller.cameraroll.R;
 import us.koller.cameraroll.adapter.item.InfoRecyclerViewAdapter;
-import us.koller.cameraroll.adapter.item.viewHolder.ViewHolder;
 import us.koller.cameraroll.adapter.item.ItemAdapter;
+import us.koller.cameraroll.adapter.item.viewHolder.ViewHolder;
+import us.koller.cameraroll.data.Settings;
+import us.koller.cameraroll.data.fileOperations.FileOperation;
 import us.koller.cameraroll.data.fileOperations.Move;
+import us.koller.cameraroll.data.fileOperations.Rename;
 import us.koller.cameraroll.data.models.Album;
 import us.koller.cameraroll.data.models.AlbumItem;
-import us.koller.cameraroll.data.fileOperations.FileOperation;
-import us.koller.cameraroll.data.fileOperations.Rename;
 import us.koller.cameraroll.data.models.File_POJO;
 import us.koller.cameraroll.data.models.Gif;
 import us.koller.cameraroll.data.models.Photo;
-import us.koller.cameraroll.data.models.RAWImage;
-import us.koller.cameraroll.data.provider.MediaProvider;
-import us.koller.cameraroll.data.Settings;
 import us.koller.cameraroll.data.models.Video;
-import us.koller.cameraroll.util.ParallaxTransformer;
-import us.koller.cameraroll.util.animators.ColorFade;
+import us.koller.cameraroll.data.provider.MediaProvider;
 import us.koller.cameraroll.util.MediaType;
+import us.koller.cameraroll.util.ParallaxTransformer;
 import us.koller.cameraroll.util.SimpleTransitionListener;
 import us.koller.cameraroll.util.Util;
+import us.koller.cameraroll.util.animators.ColorFade;
 
 public class ItemActivity extends ThemeableActivity {
 
@@ -287,12 +283,6 @@ public class ItemActivity extends ThemeableActivity {
                 }
             } else {
                 albumItem = savedInstanceState.getParcelable(ALBUM_ITEM);
-                if (albumItem != null && albumItem instanceof Photo) {
-                    Photo photo = (Photo) albumItem;
-                    ImageViewState imageViewState
-                            = (ImageViewState) savedInstanceState.getSerializable(IMAGE_VIEW_SAVED_STATE);
-                    photo.putImageViewSavedState(imageViewState);
-                }
                 if (savedInstanceState.getBoolean(INFO_DIALOG_SHOWN, false)) {
                     showInfoDialog();
                 }
@@ -869,19 +859,6 @@ public class ItemActivity extends ThemeableActivity {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (albumItem instanceof Photo) {
-            View itemView = viewPager.findViewWithTag(albumItem.getPath());
-            if (itemView != null) {
-                View view = itemView.findViewById(R.id.subsampling);
-                if (view instanceof SubsamplingScaleImageView) {
-                    SubsamplingScaleImageView imageView = (SubsamplingScaleImageView) view;
-                    ImageViewState state = imageView.getState();
-                    if (state != null) {
-                        outState.putSerializable(IMAGE_VIEW_SAVED_STATE, state);
-                    }
-                }
-            }
-        }
         //outState.putParcelable(ALBUM, album);
         outState.putParcelable(ALBUM_ITEM, albumItem);
         outState.putBoolean(WAS_SYSTEM_UI_HIDDEN, !systemUiVisible);

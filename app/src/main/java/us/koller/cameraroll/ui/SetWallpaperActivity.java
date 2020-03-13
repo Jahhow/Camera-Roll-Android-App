@@ -8,12 +8,6 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,7 +15,15 @@ import android.view.ViewTreeObserver;
 import android.view.WindowInsets;
 import android.widget.Toast;
 
-import com.davemorrissey.labs.subscaleview.ImageSource;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
+import com.davemorrissey.labs.subscaleview.DecoderFactory;
+import com.davemorrissey.labs.subscaleview.ImageRegionDecoder;
 import com.davemorrissey.labs.subscaleview.ImageViewState;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
@@ -75,9 +77,14 @@ public class SetWallpaperActivity extends AppCompatActivity {
         imageView.setMinimumTileDpi(196);
 
         // use custom decoders
-        imageView.setRegionDecoderClass(CustomRegionDecoder.class);
+        imageView.setRegionDecoderFactory(new DecoderFactory<ImageRegionDecoder>() {
+            @Override
+            public ImageRegionDecoder make() {
+                return new CustomRegionDecoder();
+            }
+        });
 
-        imageView.setImage(ImageSource.uri(imageUri), imageViewState);
+        imageView.setImage(imageUri.toString());
         imageView.setMinimumScaleType(SubsamplingScaleImageView.SCALE_TYPE_CENTER_CROP);
 
         if (imageViewState == null) {

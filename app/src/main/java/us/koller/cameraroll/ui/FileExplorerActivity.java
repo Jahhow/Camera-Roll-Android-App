@@ -17,16 +17,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.RequiresApi;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.transition.Fade;
 import android.transition.Slide;
@@ -46,23 +36,35 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+
 import java.util.ArrayList;
 
 import us.koller.cameraroll.R;
-import us.koller.cameraroll.data.models.VirtualAlbum;
-import us.koller.cameraroll.themes.Theme;
 import us.koller.cameraroll.adapter.fileExplorer.FileExplorerAdapter;
 import us.koller.cameraroll.data.fileOperations.Copy;
 import us.koller.cameraroll.data.fileOperations.Delete;
 import us.koller.cameraroll.data.fileOperations.FileOperation;
 import us.koller.cameraroll.data.fileOperations.Move;
 import us.koller.cameraroll.data.models.File_POJO;
+import us.koller.cameraroll.data.models.StorageRoot;
+import us.koller.cameraroll.data.models.VirtualAlbum;
 import us.koller.cameraroll.data.provider.FilesProvider;
 import us.koller.cameraroll.data.provider.Provider;
-import us.koller.cameraroll.data.models.StorageRoot;
+import us.koller.cameraroll.themes.Theme;
 import us.koller.cameraroll.ui.widget.SwipeBackCoordinatorLayout;
-import us.koller.cameraroll.util.animators.ColorFade;
 import us.koller.cameraroll.util.Util;
+import us.koller.cameraroll.util.animators.ColorFade;
 
 public class FileExplorerActivity extends ThemeableActivity
         implements SwipeBackCoordinatorLayout.OnSwipeListener, FileExplorerAdapter.Callback {

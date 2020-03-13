@@ -6,10 +6,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
-import com.davemorrissey.labs.subscaleview.decoder.ImageRegionDecoder;
-
 import us.koller.cameraroll.data.models.AlbumItem;
-import us.koller.cameraroll.imageDecoder.RAWImageBitmapRegionDecoder;
 
 public class RAWImageViewHolder extends PhotoViewHolder {
 
@@ -18,11 +15,6 @@ public class RAWImageViewHolder extends PhotoViewHolder {
 
     public RAWImageViewHolder(AlbumItem albumItem, int position) {
         super(albumItem, position);
-    }
-
-    @Override
-    public Class<? extends ImageRegionDecoder> getBitmapRegionDecoderClass() {
-        return RAWImageBitmapRegionDecoder.class;
     }
 
     @Override
