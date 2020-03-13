@@ -705,8 +705,7 @@ public class ItemActivity extends ThemeableActivity {
                 }
             });
         }
-        infoDialog = builder.create();
-        infoDialog.show();
+        infoDialog = builder.show();
         //noinspection ConstantConditions
         /*infoDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
                 | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);*/

@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.Nullable;
 import androidx.exifinterface.media.ExifInterface;
 
 import java.io.IOException;
@@ -631,6 +632,7 @@ public class ExifUtil {
         return exifValues;
     }
 
+    @Nullable
     public static Object getCastValue(ExifInterface exif, String tag)
             throws NumberFormatException, NullPointerException {
         String value = exif.getAttribute(tag);

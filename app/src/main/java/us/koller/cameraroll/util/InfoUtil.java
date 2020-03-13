@@ -126,7 +126,7 @@ public class InfoUtil {
         /*Exif not supported/working for this image*/
         int[] imageDimens = albumItem.getImageDimens(context);
         return new InfoItem(context.getString(R.string.info_dimensions),
-                String.valueOf(imageDimens[0]) + " x " + String.valueOf(imageDimens[1]));
+                imageDimens[0] + " x " + imageDimens[1]);
     }
 
     public static InfoItem retrieveFormattedDate(Context context, ExifInterface exif, AlbumItem albumItem) {
@@ -149,14 +149,14 @@ public class InfoUtil {
         if (exif != null) {
             Object latitudeObject = ExifUtil.getCastValue(exif, ExifInterface.TAG_GPS_LATITUDE);
             Object longitudeObject = ExifUtil.getCastValue(exif, ExifInterface.TAG_GPS_LONGITUDE);
-            if (latitudeObject != null && longitudeObject != null) {
-                boolean positiveLat = ExifUtil.getCastValue(exif, ExifInterface.TAG_GPS_LATITUDE_REF).equals("N");
+            Object ns = ExifUtil.getCastValue(exif, ExifInterface.TAG_GPS_LATITUDE_REF);
+            Object ew = ExifUtil.getCastValue(exif, ExifInterface.TAG_GPS_LONGITUDE_REF);
+            if (latitudeObject != null && longitudeObject != null && ns != null && ew != null) {
+                boolean positiveLat = ns.equals("N");
+                boolean positiveLong = ew.equals("E");
                 double latitude = Double.parseDouble(Parser.parseGPSLongOrLat(String.valueOf(latitudeObject), positiveLat));
-
-                boolean positiveLong = ExifUtil.getCastValue(exif, ExifInterface.TAG_GPS_LONGITUDE_REF).equals("E");
                 double longitude = Double.parseDouble(Parser.parseGPSLongOrLat(String.valueOf(longitudeObject), positiveLong));
                 String locationString = latitude + "," + longitude;
-
                 return new LocationItem(context.getString(R.string.info_location), locationString);
             }
         }
@@ -170,7 +170,7 @@ public class InfoUtil {
             focalLength = String.valueOf(focalLengthObject);
             Rational r = Rational.parseRational(focalLength);
             if (r != null) {
-                focalLength = String.valueOf(r.floatValue()) + " mm";
+                focalLength = r.floatValue() + " mm";
             }
         } else {
             focalLength = ExifUtil.NO_DATA;
@@ -194,7 +194,7 @@ public class InfoUtil {
         Object modelObject = ExifUtil.getCastValue(exif, ExifInterface.TAG_MODEL);
         String model;
         if (makeObject != null && modelObject != null) {
-            model = String.valueOf(makeObject) + " " + String.valueOf(modelObject);
+            model = makeObject + " " + modelObject;
         } else {
             model = ExifUtil.NO_DATA;
         }
@@ -205,7 +205,7 @@ public class InfoUtil {
         Object apertureObject = ExifUtil.getCastValue(exif, ExifInterface.TAG_F_NUMBER);
         String aperture;
         if (apertureObject != null) {
-            aperture = "ƒ/" + String.valueOf(apertureObject);
+            aperture = "ƒ/" + apertureObject;
         } else {
             aperture = ExifUtil.NO_DATA;
         }
@@ -227,7 +227,7 @@ public class InfoUtil {
         int frameRate = ((Video) albumItem).retrieveFrameRate();
         String frameRateString;
         if (frameRate != -1) {
-            frameRateString = String.valueOf(frameRate) + " fps";
+            frameRateString = frameRate + " fps";
         } else {
             frameRateString = ExifUtil.NO_DATA;
         }
@@ -271,10 +271,10 @@ public class InfoUtil {
             if (input == null || input.equals("null")) {
                 return ExifUtil.NO_DATA;
             }
-            float f = Float.valueOf(input);
+            float f = Float.parseFloat(input);
             try {
                 int i = Math.round(1 / f);
-                return String.valueOf(1 + "/" + i) + " sec";
+                return 1 + "/" + i + " sec";
             } catch (NumberFormatException e) {
                 return input;
             }
