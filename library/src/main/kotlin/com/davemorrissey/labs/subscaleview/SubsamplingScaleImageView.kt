@@ -26,10 +26,10 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
     companion object {
         const val FILE_SCHEME = "file://"
         const val ASSET_PREFIX = "$FILE_SCHEME/android_asset/"
+        const val debug = true
 
-        private val TAG = SubsamplingScaleImageView::class.java.simpleName
+        private val TAG = SubsamplingScaleImageView::class.simpleName
 
-        private const val ORIENTATION_USE_EXIF = -1
         private const val ORIENTATION_0 = 0
         private const val ORIENTATION_90 = 90
         private const val ORIENTATION_180 = 180
@@ -51,7 +51,6 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
     var rotationEnabled = true
     var triggeredRotation = false
     var eagerLoadingEnabled = false
-    var debug = false
     var onImageEventListener: OnImageEventListener? = null
     var doubleTapZoomScale = 1f
     var bitmapDecoderFactory: DecoderFactory<out ImageDecoder> = CompatDecoderFactory(SkiaImageDecoder::class.java)
@@ -156,13 +155,14 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         return false
     }
 
-    private fun getRequiredRotation() = if (orientation == ORIENTATION_USE_EXIF) sOrientation else orientation
+    private fun getRequiredRotation() = orientation
 
     fun getCenter(): PointF? {
         return viewToSourceCoord(vCenterX, vCenterY)
     }
 
-    fun setImage(path: String) {
+    @JvmOverloads
+    fun setImage(path: String, tile: Boolean = true) {
         reset(true)
 
         var newPath = path
@@ -184,8 +184,10 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         }
 
         uri = Uri.parse(newPath)
-        val task = TilesInitTask(this, context, regionDecoderFactory, uri!!)
-        execute(task)
+        execute(
+                if (tile) TilesInitTask(this, context, regionDecoderFactory, uri!!)
+                else BitmapLoadTask(this, context, bitmapDecoderFactory, uri!!)
+        )
     }
 
     private fun reset(newImage: Boolean) {
@@ -645,7 +647,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
             degrees = getRotationDegrees()
             // Find out where the focal point is at this scale/rotation then adjust its position to follow the animation path
             val vFocus = sourceToViewCoord(anim!!.sFocus!!)
-            var dX = vFocus!!.x - newVFocusX
+            var dX = vFocus.x - newVFocusX
             var dY = vFocus.y - newVFocusY
             if (isPanning) {
                 dX -= diffMove.x
@@ -1331,7 +1333,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         override fun onPostExecute(orientation: Int?) {
             val subsamplingScaleImageView = viewRef.get()
             if (bitmap != null && orientation != null) {
-                subsamplingScaleImageView?.onImageLoaded(bitmap, orientation)
+                subsamplingScaleImageView?.onImageLoaded(bitmap!!, orientation)
             } else if (exception != null) {
                 subsamplingScaleImageView?.onImageEventListener?.onImageLoadError(exception!!)
             }
@@ -1339,15 +1341,15 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
     }
 
     @Synchronized
-    private fun onImageLoaded(bitmap: Bitmap?, sOrientation: Int) {
+    private fun onImageLoaded(bitmap: Bitmap, sOrientation: Int) {
         debug("onImageLoaded")
-        if (sWidth > 0 && sHeight > 0 && (sWidth != bitmap!!.width || sHeight != bitmap.height)) {
+        if (sWidth > 0 && sHeight > 0 && (sWidth != bitmap.width || sHeight != bitmap.height)) {
             reset(false)
         }
 
         this.bitmap?.recycle()
         this.bitmap = bitmap
-        sWidth = bitmap!!.width
+        sWidth = bitmap.width
         sHeight = bitmap.height
         this.sOrientation = sOrientation
         val ready = checkReady()
@@ -1476,7 +1478,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
     fun sourceToViewCoord(sxy: PointF) = sourceToViewCoord(sxy.x, sxy.y, PointF())
 
     @JvmOverloads
-    fun sourceToViewCoord(sx: Float, sy: Float, vTarget: PointF = PointF()): PointF? {
+    fun sourceToViewCoord(sx: Float, sy: Float, vTarget: PointF = PointF()): PointF {
         var xPreRotate = sourceToViewX(sx)
         var yPreRotate = sourceToViewY(sy)
 

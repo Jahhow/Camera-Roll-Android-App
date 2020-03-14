@@ -19,12 +19,10 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.load.resource.gif.GifDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
-import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
 import us.koller.cameraroll.R;
 import us.koller.cameraroll.adapter.item.viewHolder.GifViewHolder;
 import us.koller.cameraroll.data.models.AlbumItem;
-import us.koller.cameraroll.data.models.Photo;
 
 public class ItemViewUtil {
 
@@ -36,23 +34,6 @@ public class ItemViewUtil {
     public static ViewGroup inflateVideoView(ViewGroup container) {
         return (ViewGroup) LayoutInflater.from(container.getContext())
                 .inflate(R.layout.video_view, container, false);
-    }
-
-    public static void bindSubsamplingImageView(SubsamplingScaleImageView imageView, Photo photo,
-                                                SubsamplingScaleImageView.OnImageEventListener onImageEventListener) {
-        imageView.recycle();
-
-        /*ImageViewState imageViewState = null;
-        if (photo.getImageViewSavedState() != null) {
-            imageViewState = (ImageViewState) photo.getImageViewSavedState();
-            photo.putImageViewSavedState(null);
-        }*/
-
-        imageView.setImage(photo.getPath());
-
-        if (onImageEventListener != null) {
-            imageView.setOnImageEventListener(onImageEventListener);
-        }
     }
 
     public static void bindTransitionView(final ImageView imageView, final AlbumItem albumItem) {

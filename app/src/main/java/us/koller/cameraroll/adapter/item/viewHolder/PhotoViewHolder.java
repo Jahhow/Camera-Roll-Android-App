@@ -1,11 +1,11 @@
 package us.koller.cameraroll.adapter.item.viewHolder;
 
 import android.graphics.PointF;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
+import androidx.annotation.NonNull;
 
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
@@ -19,6 +19,7 @@ import us.koller.cameraroll.util.ExifUtil;
 import us.koller.cameraroll.util.ItemViewUtil;
 
 public class PhotoViewHolder extends ViewHolder {
+    static final String TAG = PhotoViewHolder.class.getSimpleName();
 
     private boolean imageViewWasBound = false;
     private boolean onSharedElementExit_called = false;
@@ -73,41 +74,40 @@ public class PhotoViewHolder extends ViewHolder {
         imageView.setBitmapDecoderFactory(CustomImageDecoder::new);
         imageView.setRegionDecoderFactory(CustomRegionDecoder::new);
 
-        imageView.setMinimumTileDpi(196);
-        imageView.setMinimumDpi(80);
+        //imageView.setMinimumTileDpi(196);
+        //imageView.setMinimumDpi(80);
         //imageView.setDoubleTapZoomDpi(196);
-        imageView.setDoubleTapZoomScale(1.0f);
+        //imageView.setDoubleTapZoomScale(1.0f);
 
-        //imageView.setOrientation(SubsamplingScaleImageView.ORIENTATION_USE_EXIF);
         int orientation = ExifUtil.getExifOrientationAngle(view.getContext(), albumItem);
         imageView.setOrientation(orientation);
 
-        final GestureDetector gestureDetector
-                = new GestureDetector(imageView.getContext(),
-                new GestureDetector.SimpleOnGestureListener() {
-                    @Override
-                    public boolean onSingleTapConfirmed(MotionEvent e) {
-                        PhotoViewHolder.super.imageOnClick(imageView);
-                        return super.onSingleTapConfirmed(e);
-                    }
-                });
-        view.setOnTouchListener((view1, motionEvent) -> gestureDetector.onTouchEvent(motionEvent));
+        imageView.setOnClickListener(PhotoViewHolder.this::imageOnClick);
 
-        ItemViewUtil.bindSubsamplingImageView(
-                imageView,
-                (Photo) albumItem,
-                new SubsamplingScaleImageView.DefaultOnImageEventListener() {
-                    @Override
-                    public void onImageLoaded() {
-                        // onImageLoaded() might be called after onSharedElementExit()
-                        if (!onSharedElementExit_called)
-                            transitionView.setVisibility(View.INVISIBLE);
+        /*ImageViewState imageViewState = null;
+        if (photo.getImageViewSavedState() != null) {
+            imageViewState = (ImageViewState) photo.getImageViewSavedState();
+            photo.putImageViewSavedState(null);
+        }*/
 
-                        initialSubsamplingScale = imageView.getScale();
-                        imageViewWasBound = true;
-                        PhotoViewHolder.this.onImageLoaded();
-                    }
-                });
+        imageView.setImage(albumItem.getPath(), tileEnabled());
+        imageView.setOnImageEventListener(new SubsamplingScaleImageView.DefaultOnImageEventListener() {
+            @Override
+            public void onImageLoaded() {
+                // onImageLoaded() might be called after onSharedElementExit()
+                if (!onSharedElementExit_called)
+                    transitionView.setVisibility(View.INVISIBLE);
+
+                initialSubsamplingScale = imageView.getScale();
+                imageViewWasBound = true;
+                PhotoViewHolder.this.onImageLoaded();
+            }
+
+            @Override
+            public void onImageLoadError(@NonNull Exception e) {
+                PhotoViewHolder.this.onImageLoadError();
+            }
+        });
     }
 
     @Override
@@ -117,7 +117,6 @@ public class PhotoViewHolder extends ViewHolder {
 
     @Override
     public void onSharedElementExit(final ItemActivity.Callback callback) {
-        //scaleDown(callback);
         onSharedElementExit_called = true;
 
         if (imageViewWasBound) {
@@ -145,7 +144,13 @@ public class PhotoViewHolder extends ViewHolder {
         super.onDestroy();
     }
 
-    public void onImageLoaded() {
+    void onImageLoaded() {
+    }
 
+    void onImageLoadError() {
+    }
+
+    boolean tileEnabled(){
+        return true;
     }
 }

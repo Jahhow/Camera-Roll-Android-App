@@ -8,6 +8,8 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.net.Uri;
 
+import androidx.annotation.NonNull;
+
 import com.davemorrissey.labs.subscaleview.ImageRegionDecoder;
 
 import java.io.InputStream;
@@ -23,7 +25,8 @@ public class CustomRegionDecoder implements ImageRegionDecoder {
     private final Object decoderLock = new Object();
 
     @Override
-    public Point init(Context context, Uri uri) throws Exception {
+    @NonNull
+    public Point init(Context context, @NonNull Uri uri) throws Exception {
         InputStream inputStream = context.getContentResolver().openInputStream(uri);
         decoder = BitmapRegionDecoder.newInstance(inputStream, false);
         options = new BitmapFactory.Options();
@@ -33,7 +36,8 @@ public class CustomRegionDecoder implements ImageRegionDecoder {
     }
 
     @Override
-    public Bitmap decodeRegion(Rect rect, int sampleSize) {
+    @NonNull
+    public Bitmap decodeRegion(@NonNull Rect rect, int sampleSize) {
         synchronized (this.decoderLock) {
             options.inSampleSize = sampleSize;
             Bitmap bitmap = this.decoder.decodeRegion(rect, options);

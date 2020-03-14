@@ -24,9 +24,13 @@ public class RAWImageViewHolder extends PhotoViewHolder {
     }
 
     @Override
-    public void onImageLoaded() {
-        super.onImageLoaded();
+    void onImageLoaded() {
         imageLoaded = true;
+        removeProgressBar();
+    }
+
+    @Override
+    void onImageLoadError() {
         removeProgressBar();
     }
 
@@ -47,5 +51,10 @@ public class RAWImageViewHolder extends PhotoViewHolder {
             itemView.removeView(progressBar);
             progressBar = null;
         }
+    }
+
+    @Override
+    boolean tileEnabled() {
+        return false;
     }
 }

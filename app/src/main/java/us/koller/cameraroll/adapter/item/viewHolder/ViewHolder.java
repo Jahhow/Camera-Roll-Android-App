@@ -3,6 +3,8 @@ package us.koller.cameraroll.adapter.item.viewHolder;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+
 import us.koller.cameraroll.data.models.AlbumItem;
 import us.koller.cameraroll.ui.ItemActivity;
 import us.koller.cameraroll.util.ItemViewUtil;
@@ -36,7 +38,7 @@ public abstract class ViewHolder {
         return v;
     }
 
-    void imageOnClick(View view) {
+    void imageOnClick(@NonNull View view) {
         try {
             ((ItemActivity) view.getContext()).imageOnClick();
         } catch (ClassCastException e) {

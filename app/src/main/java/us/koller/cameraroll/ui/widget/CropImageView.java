@@ -27,8 +27,6 @@ import android.widget.ProgressBar;
 
 import androidx.core.content.ContextCompat;
 
-import com.davemorrissey.labs.subscaleview.DecoderFactory;
-import com.davemorrissey.labs.subscaleview.ImageRegionDecoder;
 import com.davemorrissey.labs.subscaleview.ImageViewState;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
@@ -207,19 +205,9 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
 
         String mimeType = MediaType.getMimeType(getContext(), imageUri);
         if (MediaType.checkRAWMimeType(mimeType)) {
-            setRegionDecoderFactory(new DecoderFactory<ImageRegionDecoder>() {
-                @Override
-                public ImageRegionDecoder make() {
-                    return new RAWImageBitmapRegionDecoder();
-                }
-            });
+            setRegionDecoderFactory(RAWImageBitmapRegionDecoder::new);
         } else {
-            setRegionDecoderFactory(new DecoderFactory<ImageRegionDecoder>() {
-                @Override
-                public ImageRegionDecoder make() {
-                    return new CustomRegionDecoder();
-                }
-            });
+            setRegionDecoderFactory(CustomRegionDecoder::new);
         }
 
         if (state != null) {

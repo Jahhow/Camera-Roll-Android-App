@@ -17,6 +17,7 @@ import java.util.List;
 import us.koller.cameraroll.data.models.AlbumItem;
 
 public class ExifUtil {
+    static final String TAG = ExifUtil.class.getSimpleName();
 
     public static final String NO_DATA = "Unknown";
 
