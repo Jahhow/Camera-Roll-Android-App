@@ -516,8 +516,9 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                                 val edgeXSwipe = atXEdge && dxA > dyA
                                 val edgeYSwipe = atYEdge && dyA > dxA
                                 if (edgeXSwipe || edgeYSwipe || (anim != null && anim!!.scaleEnd <= getFullScale())) {
-                                    vTranslate.x = if (atXEdge) satTemp.vTranslate.x else lastX
-                                    vTranslate.y = if (atYEdge) satTemp.vTranslate.y else lastY
+                                    vTranslate.x = lastX
+                                    vTranslate.y = lastY
+                                    animateToBounds()
                                     maxTouchCount = 0
                                     parent?.requestDisallowInterceptTouchEvent(false)
                                 } else {
