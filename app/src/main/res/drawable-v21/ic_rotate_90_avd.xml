@@ -62,7 +62,7 @@
                     android:duration="100"
                     android:interpolator="@android:anim/accelerate_decelerate_interpolator"
                     android:propertyName="translateX"
-                    android:valueFrom="0.86"
+                    android:valueFrom="-3.86"
                     android:valueTo="3"
                     android:valueType="floatType" />
 
@@ -79,8 +79,8 @@
                     android:interpolator="@android:anim/accelerate_decelerate_interpolator"
                     android:propertyName="rotation"
                     android:startOffset="100"
-                    android:valueFrom="0"
-                    android:valueTo="90"
+                    android:valueFrom="90"
+                    android:valueTo="0"
                     android:valueType="floatType" />
 
                 <objectAnimator
@@ -89,7 +89,7 @@
                     android:propertyName="translateX"
                     android:startOffset="300"
                     android:valueFrom="3"
-                    android:valueTo="-3.86"
+                    android:valueTo="0.86"
                     android:valueType="floatType" />
 
                 <objectAnimator

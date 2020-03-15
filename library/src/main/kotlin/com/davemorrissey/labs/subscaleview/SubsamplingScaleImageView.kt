@@ -60,6 +60,8 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
     var sHeight = 0
     var orientation = ORIENTATION_0
     var minimumScaleType = 0;
+    var retainXSwipe = true
+    var retainYSwipe = false
 
     private var vCenterX = 0f
     private var vCenterY = 0f
@@ -508,14 +510,23 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                                     vCenterBefore.set(event.x, event.y)
                                 }
                             } else {
-                                fitToBounds(false)
-                                val degrees = Math.toDegrees(rotationRadian.toDouble())
-                                val rightAngle = getClosestRightAngle(degrees)
-                                val atXEdge = if (rightAngle == 90.0 || rightAngle == 270.0) newY != satTemp.vTranslate.y else newX != satTemp.vTranslate.x
-                                val atYEdge = if (rightAngle == 90.0 || rightAngle == 270.0) newX != satTemp.vTranslate.x else newY != satTemp.vTranslate.y
-                                val edgeXSwipe = atXEdge && dxA > dyA
-                                val edgeYSwipe = atYEdge && dyA > dxA
-                                if (edgeXSwipe || edgeYSwipe || (anim != null && anim!!.scaleEnd <= getFullScale())) {
+                                val fullScale = getFullScale()
+                                val leFullScale = (anim != null && anim!!.scaleEnd <= fullScale) || (anim == null && scale <= fullScale)
+                                var edgeXSwipe: Boolean = dxA > dyA
+                                var edgeYSwipe: Boolean = dyA > dxA
+                                if (!leFullScale) {
+                                    fitToBounds(false)
+                                    val degrees = Math.toDegrees(rotationRadian.toDouble())
+                                    val rightAngle = getClosestRightAngle(degrees)
+                                    val atXEdge = if (rightAngle == 90.0 || rightAngle == 270.0) newY != satTemp.vTranslate.y else newX != satTemp.vTranslate.x
+                                    val atYEdge = if (rightAngle == 90.0 || rightAngle == 270.0) newX != satTemp.vTranslate.x else newY != satTemp.vTranslate.y
+                                    edgeXSwipe = edgeXSwipe && atXEdge
+                                    edgeYSwipe = edgeYSwipe && atYEdge
+                                }
+                                edgeXSwipe = edgeXSwipe && retainXSwipe
+                                edgeYSwipe = edgeYSwipe && retainYSwipe
+
+                                if (edgeXSwipe || edgeYSwipe) {
                                     vTranslate.x = lastX
                                     vTranslate.y = lastY
                                     animateToBounds()
@@ -1099,14 +1110,17 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
     private fun getFullScale(): Float {
         val degrees = Math.toDegrees(rotationRadian.toDouble()) + orientation
         val rightAngle = getClosestRightAngle(degrees) % 360
-        val innerWidth = width - paddingLeft - paddingRight
-        val innerHeight = height - paddingTop - paddingBottom
+        val innerWidth = getInnerWidth()
+        val innerHeight = getInnerHeight()
         return if (rightAngle == 0.0 || rightAngle == 180.0) {
             Math.min(innerWidth / sWidth.toFloat(), innerHeight / sHeight.toFloat())
         } else {
             Math.min(innerWidth / sHeight.toFloat(), innerHeight / sWidth.toFloat())
         }
     }
+
+    fun getInnerWidth() = width - paddingLeft - paddingRight
+    fun getInnerHeight() = height - paddingTop - paddingBottom
 
     private fun getCenterCropScale(): Float {
         val degrees = Math.toDegrees(rotationRadian.toDouble()) + orientation

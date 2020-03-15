@@ -65,6 +65,10 @@
         android:title="@string/anti_alias"
         app:showAsAction="never" />
     <item
+        android:id="@+id/moveToTarget"
+        android:title="@string/moveToTarget"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/restore"
         android:title="@string/restore"
         app:showAsAction="never" />

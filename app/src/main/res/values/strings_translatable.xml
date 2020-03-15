@@ -103,6 +103,7 @@
     <string name="resize">Resize</string>
     <string name="rotate">Rotate</string>
     <string name="restore">Restore</string>
+    <string name="moveToTarget">Move to Target</string>
     <string name="anti_alias">Anti Alias</string>
     <string name="save_edit">Save</string>
     <string name="export">Export</string>

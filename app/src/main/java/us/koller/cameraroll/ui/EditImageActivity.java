@@ -370,6 +370,9 @@ public class EditImageActivity extends AppCompatActivity {
                 item.setChecked(true);
                 imageView.setAspectRatio(16.0 / 9.0);
                 break;
+            case R.id.moveToTarget:
+                imageView.autoZoom(true);
+                break;
             case R.id.restore:
                 imageView.restore();
                 break;

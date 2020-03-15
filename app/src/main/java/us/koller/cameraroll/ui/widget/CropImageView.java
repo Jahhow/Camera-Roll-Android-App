@@ -19,7 +19,6 @@ import android.graphics.RectF;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -161,6 +160,7 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
         //setMinScale(0.01f);
         //setMinimumScaleType(SCALE_TYPE_CUSTOM);
         setRotationEnabled(false);
+        setRetainXSwipe(false);
 
         setOnTouchListener(this);
 
@@ -244,9 +244,9 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
      **/
     public void rotate90Degree() {
         cropRect = rotateRect90Degree(cropRect);
-        int orientation = getOrientation() + 90;
-        if (orientation >= 360) {
-            orientation = orientation % 360;
+        int orientation = getOrientation() - 90;
+        if (orientation < 0) {
+            orientation += 360;
         }
         setOrientation(orientation);
         // invert the aspectRatio
@@ -352,7 +352,10 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
                 }
                 case MotionEvent.ACTION_UP:
                     if (cropRect != null) {
-                        //autoZoom(touchedCorner != NO_CORNER);
+                        float widthRatio = cropRect.width() * getScale() / getWidth();
+                        float heightRatio = cropRect.height() * getScale() / getHeight();
+                        if (widthRatio < 1 && heightRatio < 1)
+                            autoZoom(touchedCorner != NO_CORNER);
                         touching = false;
                         touchedCorner = NO_CORNER;
                     }
@@ -366,9 +369,10 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
         if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
             StartCropRect.set(cropRect);
             touchedCorner = getTouchedCorner(motionEvent);
-            touching = true;
-            if (touchedCorner != NO_CORNER)
+            if (touchedCorner != NO_CORNER) {
+                touching = true;
                 return true;
+            }
         }
 
         return super.onTouchEvent(motionEvent);
@@ -405,8 +409,8 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
     /**
      * Set if the ImageView should zoom in and out according to the current cropRect
      **/
-    private void autoZoom(boolean animate) {
-        Log.i(TAG, "autoZoom");
+    public void autoZoom(boolean animate) {
+        //Log.i(TAG, "autoZoom");
         //auto-zoom
         float scale = getNewScale();
         PointF center = getCenterOfCropRect();
