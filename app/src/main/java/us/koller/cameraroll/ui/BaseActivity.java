@@ -53,8 +53,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     //snackbar to notify user Camera Roll is missing the storage permission
     private Snackbar snackbar;
 
-    private boolean enterTransitionPostponed = false;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -171,7 +169,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        Log.d("BaseActivity", "onDestroy() called " + this);
+       //Log.d("BaseActivity", "onDestroy() called " + this);
         //unregister LocalBroadcastReceivers
         for (int i = 0; i < broadcastReceivers.size(); i++) {
             BroadcastReceiver broadcastReceiver = broadcastReceivers.get(i);
@@ -203,7 +201,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         return new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Log.d("BaseActivity", "onReceive: " + intent.getAction() + ", " + BaseActivity.this);
+               //Log.d("BaseActivity", "onReceive: " + intent.getAction() + ", " + BaseActivity.this);
                 switch (intent.getAction()) {
                     case FileOperation.NEED_REMOVABLE_STORAGE_PERMISSION:
                         final Intent workIntent = intent.getParcelableExtra(FileOperation.WORK_INTENT);
@@ -240,22 +238,6 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     public IntentFilter getBroadcastIntentFilter() {
         return new IntentFilter();
-    }
-
-    @Override
-    public void postponeEnterTransition() {
-        enterTransitionPostponed = true;
-        super.postponeEnterTransition();
-    }
-
-    @Override
-    public void startPostponedEnterTransition() {
-        enterTransitionPostponed = false;
-        super.startPostponedEnterTransition();
-    }
-
-    boolean enterTransitionPostponed() {
-        return enterTransitionPostponed;
     }
 
     boolean showAnimations() {

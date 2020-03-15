@@ -12,7 +12,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -50,7 +49,6 @@ import us.koller.cameraroll.data.Settings;
 import us.koller.cameraroll.data.fileOperations.FileOperation;
 import us.koller.cameraroll.data.models.Album;
 import us.koller.cameraroll.data.provider.MediaProvider;
-import us.koller.cameraroll.styles.NestedRecyclerView;
 import us.koller.cameraroll.styles.Style;
 import us.koller.cameraroll.themes.Theme;
 import us.koller.cameraroll.ui.widget.FastScrollerRecyclerView;
@@ -269,12 +267,7 @@ public class MainActivity extends ThemeableActivity {
         });
 
         final FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                fabClicked(view);
-            }
-        });
+        fab.setOnClickListener(this::fabClicked);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Drawable d = ContextCompat.getDrawable(this,
                     R.drawable.ic_camera_lens_avd);
@@ -304,11 +297,11 @@ public class MainActivity extends ThemeableActivity {
                 public WindowInsets onApplyWindowInsets(View view, WindowInsets insets) {
                     // clear this listener so insets aren't re-applied
                     rootView.setOnApplyWindowInsetsListener(null);
-                    Log.d("MainActivity", "onApplyWindowInsets()"
-                            + "[" + insets.getSystemWindowInsetLeft() + ", " +
+                    /*Log.d("MainActivity", "onApplyWindowInsets()"
+                    +"[" + insets.getSystemWindowInsetLeft() + ", " +
                             insets.getSystemWindowInsetTop() + ", " +
                             insets.getSystemWindowInsetRight() + ", " +
-                            insets.getSystemWindowInsetBottom() + "]");
+                            insets.getSystemWindowInsetBottom() + "]");*/
 
                     toolbar.setPadding(toolbar.getPaddingStart(),
                             toolbar.getPaddingTop() + insets.getSystemWindowInsetTop(),
@@ -375,33 +368,34 @@ public class MainActivity extends ThemeableActivity {
         setSystemUiFlags();
     }
 
-    @Override
+    /*@Override
     public void onActivityReenter(final int resultCode, Intent intent) {
         super.onActivityReenter(resultCode, intent);
-
+        //Log.i(TAG, "onActivityReenter");
         if (intent.getAction() != null
                 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
                 && intent.getAction().equals(ItemActivity.SHARED_ELEMENT_RETURN_TRANSITION)
                 && Settings.getInstance(this).getStyleInstance(this, pick_photos) instanceof NestedRecyclerView) {
+            //Log.i(TAG, "onActivityReenter handle shared-element transition");
             //handle shared-element transition, for nested nestedRecyclerView style
             Bundle tmpReenterState = new Bundle(intent.getExtras());
             if (tmpReenterState.containsKey(AlbumActivity.ALBUM_PATH)
                     && tmpReenterState.containsKey(AlbumActivity.EXTRA_CURRENT_ALBUM_POSITION)) {
 
                 String albumPath = tmpReenterState.getString(AlbumActivity.ALBUM_PATH);
-                Log.d("MainActivity", "albumPath: " + albumPath);
+                //Log.d("MainActivity", "albumPath: " + albumPath);
                 final int sharedElementReturnPosition = tmpReenterState.getInt(AlbumActivity.EXTRA_CURRENT_ALBUM_POSITION);
                 int index = -1;
                 ArrayList<Album> albums = MediaProvider.getAlbumsWithVirtualDirectories(this);
                 for (int i = 0; i < albums.size(); i++) {
-                    Log.d("MainActivity", "albums: " + albums.get(i).getPath());
+                    //Log.d("MainActivity", "albums: " + albums.get(i).getPath());
                     if (albums.get(i).getPath().equals(albumPath)) {
                         index = i;
                         break;
                     }
                 }
 
-                Log.d("MainActivity", "index: " + index);
+                //Log.d("MainActivity", "index: " + index);
 
                 if (index == -1) {
                     return;
@@ -450,7 +444,7 @@ public class MainActivity extends ThemeableActivity {
                 });
             }
         }
-    }
+    }*/
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -748,7 +742,7 @@ public class MainActivity extends ThemeableActivity {
         observer.setListener(new ContentObserver.Listener() {
             @Override
             public void onChange(boolean selfChange, Uri uri) {
-                Log.d("MainActivity", "onChange()");
+                //Log.d("MainActivity", "onChange()");
                 MediaProvider.dataChanged = true;
                 //observer.unregister(MainActivity.this);
                 //observer = null;

@@ -128,7 +128,7 @@ public class Move extends FileOperation {
                     path, destination, true);
         }
         addPathsToScan(copy.getPathsToScan());
-        Log.d("Move", "copyAndDeleteFiles(): " + result);
+       //Log.d("Move", "copyAndDeleteFiles(): " + result);
         if (result) {
             Delete delete = new Delete();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP

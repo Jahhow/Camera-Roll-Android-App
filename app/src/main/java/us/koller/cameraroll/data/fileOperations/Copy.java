@@ -4,8 +4,8 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+
 import androidx.documentfile.provider.DocumentFile;
-import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -92,7 +92,7 @@ public class Copy extends FileOperation {
     //treeUri only needed for removable storage
     boolean copyFilesRecursively(Context context, Uri treeUri, String path,
                                  String destination, boolean result) {
-        Log.d("Copy", "copyFilesRecursively() path = [" + path + "]");
+        //Log.d("Copy", "copyFilesRecursively() path = [" + path + "]");
         File file = new File(path);
         String destinationFilePath = getCopyFileName(new File(destination, new File(path).getName()).getPath());
         try {

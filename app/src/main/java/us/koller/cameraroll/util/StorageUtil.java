@@ -10,8 +10,8 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
+
 import androidx.documentfile.provider.DocumentFile;
-import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
@@ -173,7 +173,7 @@ public class StorageUtil {
             e.printStackTrace();
             return null;
         }
-        Log.d("StorageUtil", "path: " + path);
+       //Log.d("StorageUtil", "path: " + path);
 
         if (treeRoot != null) {
             treeRoot = DocumentFile.fromTreeUri(context, treeUri);

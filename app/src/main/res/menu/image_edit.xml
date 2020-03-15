@@ -15,9 +15,9 @@
 
                 <item
                     android:id="@+id/aspect_ratio_free"
+                    android:checked="true"
                     android:icon="@drawable/ic_crop_free_white"
-                    android:title="@string/aspect_ratio_free"
-                    android:checked="true" />
+                    android:title="@string/aspect_ratio_free" />
 
                 <item
                     android:id="@+id/aspect_ratio_original"
@@ -59,6 +59,11 @@
         android:visible="false"
         app:showAsAction="always" />
 
+    <item
+        android:id="@+id/antiAlias"
+        android:checkable="true"
+        android:title="@string/anti_alias"
+        app:showAsAction="never" />
     <item
         android:id="@+id/restore"
         android:title="@string/restore"

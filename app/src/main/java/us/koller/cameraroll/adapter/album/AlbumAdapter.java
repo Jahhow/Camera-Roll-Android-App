@@ -3,15 +3,14 @@ package us.koller.cameraroll.adapter.album;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.ActivityOptionsCompat;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.SimpleItemAnimator;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import com.michaelflisar.dragselectrecyclerview.DragSelectTouchListener;
 
@@ -23,7 +22,6 @@ import us.koller.cameraroll.adapter.album.viewHolder.GifViewHolder;
 import us.koller.cameraroll.adapter.album.viewHolder.PhotoViewHolder;
 import us.koller.cameraroll.adapter.album.viewHolder.RAWImageHolder;
 import us.koller.cameraroll.adapter.album.viewHolder.VideoViewHolder;
-import us.koller.cameraroll.data.Settings;
 import us.koller.cameraroll.data.models.Album;
 import us.koller.cameraroll.data.models.AlbumItem;
 import us.koller.cameraroll.data.models.Gif;
@@ -33,6 +31,7 @@ import us.koller.cameraroll.data.models.Video;
 import us.koller.cameraroll.ui.ItemActivity;
 
 public class AlbumAdapter extends AbstractRecyclerViewAdapter<Album> {
+    final static String TAG = AlbumAdapter.class.getSimpleName();
 
     @SuppressWarnings("FieldCanBeLocal")
     private final int VIEW_TYPE_PHOTO = 1;
@@ -137,24 +136,15 @@ public class AlbumAdapter extends AbstractRecyclerViewAdapter<Album> {
                 if (getSelectorMode()) {
                     onItemSelected((AlbumItemHolder) holder);
                 } else {
-                    Log.d("AlbumAdapter", "onClick: " + getData().getPath());
+                    //Log.d(TAG, "onClick: " + getData().getPath());
                     Context context = holder.itemView.getContext();
                     Intent intent = new Intent(context, ItemActivity.class);
                     intent.putExtra(ItemActivity.ALBUM_ITEM, albumItem);
                     intent.putExtra(ItemActivity.ALBUM_PATH, getData().getPath());
                     intent.putExtra(ItemActivity.ITEM_POSITION, getData().getAlbumItems().indexOf(albumItem));
 
-                    if (Settings.getInstance(context).showAnimations()) {
-                        ActivityOptionsCompat options =
-                                ActivityOptionsCompat.makeSceneTransitionAnimation(
-                                        (Activity) context, holder.itemView.findViewById(R.id.image),
-                                        albumItem.getPath());
-                        ActivityCompat.startActivityForResult((Activity) context, intent,
-                                ItemActivity.VIEW_IMAGE, options.toBundle());
-                    } else {
-                        ActivityCompat.startActivityForResult((Activity) context, intent,
-                                ItemActivity.VIEW_IMAGE, null);
-                    }
+                    ActivityCompat.startActivityForResult((Activity) context, intent,
+                            ItemActivity.VIEW_IMAGE, null);
                 }
             }
         });

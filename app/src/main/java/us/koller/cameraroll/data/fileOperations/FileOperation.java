@@ -19,7 +19,6 @@ import android.os.Looper;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
@@ -33,7 +32,6 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -308,7 +306,7 @@ public abstract class FileOperation extends IntentService implements Parcelable 
 
 
     public Uri getTreeUri(Intent workIntent, String path) {
-        Log.d("FileOperation", "getTreeUri");
+        //Log.d("FileOperation", "getTreeUri");
         Uri treeUri;
         String treeUriExtra = workIntent.getStringExtra(FileOperation.REMOVABLE_STORAGE_TREE_URI);
         if (treeUriExtra != null) {
@@ -419,7 +417,7 @@ public abstract class FileOperation extends IntentService implements Parcelable 
 
         @SuppressLint("ShowToast")
         private static void scanPaths(final Context context, final String[] paths, final MediaScannerCallback callback, final boolean withNotification) {
-            Log.i("FileOperation", "scanPaths(), paths: " + Arrays.toString(paths));
+           //Log.i("FileOperation", "scanPaths(), paths: " + Arrays.toString(paths));
             if (paths == null) {
                 if (callback != null) {
                     callback.onAllPathsScanned();

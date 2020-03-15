@@ -836,12 +836,21 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         isImageLoaded = getIsBaseLayerReady()
         if (isImageLoaded) {
             preDraw()
+            onImageLoaded()
             onImageEventListener?.onImageLoaded()
         }
         return isImageLoaded
     }
 
-    private fun createPaints() {
+    protected open fun onImageLoaded() {}
+
+    fun setFilterBitmap(filterBitmap: Boolean) {
+        createBitmapPaint()
+        bitmapPaint!!.isFilterBitmap = filterBitmap
+        invalidate()
+    }
+
+    open fun createBitmapPaint() {
         if (bitmapPaint == null) {
             bitmapPaint = Paint().apply {
                 isAntiAlias = true
@@ -849,6 +858,10 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                 isDither = true
             }
         }
+    }
+
+    private fun createPaints() {
+        createBitmapPaint()
 
         if (debug && (debugTextPaint == null || debugLinePaint == null)) {
             debugTextPaint = Paint().apply {
@@ -1041,12 +1054,12 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         val hSH = height - scaledSHeight
 
         // right, bottom
-        vTranslate.x = Math.max(vTranslate.x, wSW)
-        vTranslate.y = Math.max(vTranslate.y, hSH)
+        vTranslate.x = Math.max(vTranslate.x, wSW - paddingRight)
+        vTranslate.y = Math.max(vTranslate.y, hSH - paddingBottom)
 
         // left, top
-        val maxTx = Math.max(0f, wSW / 2f)
-        val maxTy = Math.max(0f, hSH / 2f)
+        val maxTx = Math.max(paddingLeft.toFloat(), paddingLeft + (wSW - paddingRight - paddingLeft) / 2f)
+        val maxTy = Math.max(paddingTop.toFloat(), paddingTop + (hSH - paddingBottom - paddingTop) / 2f)
         vTranslate.x = Math.min(vTranslate.x, maxTx)
         vTranslate.y = Math.min(vTranslate.y, maxTy)
 
@@ -1085,10 +1098,12 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
     private fun getFullScale(): Float {
         val degrees = Math.toDegrees(rotationRadian.toDouble()) + orientation
         val rightAngle = getClosestRightAngle(degrees) % 360
+        val innerWidth = width - paddingLeft - paddingRight
+        val innerHeight = height - paddingTop - paddingBottom
         return if (rightAngle == 0.0 || rightAngle == 180.0) {
-            Math.min(width / sWidth.toFloat(), height / sHeight.toFloat())
+            Math.min(innerWidth / sWidth.toFloat(), innerHeight / sHeight.toFloat())
         } else {
-            Math.min(width / sHeight.toFloat(), height / sWidth.toFloat())
+            Math.min(innerWidth / sHeight.toFloat(), innerHeight / sWidth.toFloat())
         }
     }
 
@@ -1258,10 +1273,10 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                     tile?.loading = false
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Failed to decode tile $e")
+                //Log.e(TAG, "Failed to decode tile $e")
                 exception = e
             } catch (e: OutOfMemoryError) {
-                Log.e(TAG, "Failed to decode tile - OutOfMemoryError $e")
+                //Log.e(TAG, "Failed to decode tile - OutOfMemoryError $e")
                 exception = RuntimeException(e)
             }
 
@@ -1320,10 +1335,10 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                     return view.orientation
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Failed to load bitmap", e)
+                //Log.e(TAG, "Failed to load bitmap", e)
                 exception = e
             } catch (e: OutOfMemoryError) {
-                Log.e(TAG, "Failed to load bitmap - OutOfMemoryError $e")
+                //Log.e(TAG, "Failed to load bitmap - OutOfMemoryError $e")
                 exception = RuntimeException(e)
             }
 

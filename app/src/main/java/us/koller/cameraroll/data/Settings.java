@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import us.koller.cameraroll.R;
 import us.koller.cameraroll.styles.Cards;
@@ -256,7 +255,7 @@ public class Settings {
     }
 
     public Uri getRemovableStorageTreeUri() {
-        Log.d("Settings", "getRemovableStorageTreeUri: " + removableStorageTreeUri);
+        //Log.d("Settings", "getRemovableStorageTreeUri: " + removableStorageTreeUri);
         return removableStorageTreeUri;
     }
 

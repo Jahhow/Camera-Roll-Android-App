@@ -16,7 +16,6 @@ import android.os.Handler;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.transition.Transition;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,7 +35,6 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
 import androidx.core.app.ShareCompat;
 import androidx.core.app.SharedElementCallback;
 import androidx.core.content.ContextCompat;
@@ -73,6 +71,7 @@ import us.koller.cameraroll.util.Util;
 import us.koller.cameraroll.util.animators.ColorFade;
 
 public class ItemActivity extends ThemeableActivity {
+    static final String TAG = ItemActivity.class.getSimpleName();
 
     public static final int VIEW_IMAGE = 3;
     public static final int FILE_OP_DIALOG_REQUEST = 1;
@@ -150,9 +149,7 @@ public class ItemActivity extends ThemeableActivity {
                 onShowViewHolder(viewHolder);
             }
 
-            super.onTransitionEnd(transition);
             albumItem.isSharedElement = false;
-            //showUI(!isReturning);
         }
     };
 
@@ -168,14 +165,6 @@ public class ItemActivity extends ThemeableActivity {
         MediaProvider.checkPermission(this);
 
         view_only = getIntent().getBooleanExtra(VIEW_ONLY, false);
-
-        if (!view_only && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && showAnimations()) {
-            if (savedInstanceState == null) {
-                postponeEnterTransition();
-            }
-            setEnterSharedElementCallback(sharedElementCallback);
-            getWindow().getSharedElementEnterTransition().addListener(transitionListener);
-        }
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -257,12 +246,12 @@ public class ItemActivity extends ThemeableActivity {
             } else {
                 path = getIntent().getStringExtra(ALBUM_PATH);
             }
-            Log.d("ItemActivity", "loadAlbum() " + path);
+            //Log.d("ItemActivity", "loadAlbum() " + path);
             MediaProvider.loadAlbum(this, path,
                     new MediaProvider.OnAlbumLoadedCallback() {
                         @Override
                         public void onAlbumLoaded(Album album) {
-                            Log.d("ItemActivity", "onAlbumLoaded()");
+                            //Log.d("ItemActivity", "onAlbumLoaded()");
                             ItemActivity.this.album = album;
                             ItemActivity.this.onAlbumLoaded(savedInstanceState);
                         }
@@ -328,26 +317,24 @@ public class ItemActivity extends ThemeableActivity {
             }
         });
 
-        if (!enterTransitionPostponed()) {
-            albumItem.isSharedElement = false;
-            //there is no sharedElementTransition
-            ItemAdapter adapter = (ItemAdapter) viewPager.getAdapter();
-            ViewHolder viewHolder = adapter.findViewHolderByTag(albumItem.getPath());
-            if (viewHolder != null) {
-                onShowViewHolder(viewHolder);
-            } else {
-                ((ItemAdapter) viewPager.getAdapter())
-                        .addOnInstantiateItemCallback(new ViewPagerOnInstantiateItemCallback() {
-                            @Override
-                            public boolean onInstantiateItem(ViewHolder viewHolder) {
-                                if (viewHolder.albumItem.getPath().equals(albumItem.getPath())) {
-                                    onShowViewHolder(viewHolder);
-                                    return false;
-                                }
-                                return true;
+        albumItem.isSharedElement = false;
+        //there is no sharedElementTransition
+        ItemAdapter adapter = (ItemAdapter) viewPager.getAdapter();
+        ViewHolder viewHolder = adapter.findViewHolderByTag(albumItem.getPath());
+        if (viewHolder != null) {
+            onShowViewHolder(viewHolder);
+        } else {
+            ((ItemAdapter) viewPager.getAdapter())
+                    .addOnInstantiateItemCallback(new ViewPagerOnInstantiateItemCallback() {
+                        @Override
+                        public boolean onInstantiateItem(ViewHolder viewHolder) {
+                            if (viewHolder.albumItem.getPath().equals(albumItem.getPath())) {
+                                onShowViewHolder(viewHolder);
+                                return false;
                             }
-                        });
-            }
+                            return true;
+                        }
+                    });
         }
     }
 
@@ -760,7 +747,7 @@ public class ItemActivity extends ThemeableActivity {
 
     public void bottomBarOnClick(final View v) {
         Drawable d = ((ImageView) v).getDrawable();
-        if (d instanceof Animatable && showAnimations()) {
+        if (d instanceof Animatable) {
             ((Animatable) d).start();
         }
         bottomBarAction(v);
@@ -864,30 +851,9 @@ public class ItemActivity extends ThemeableActivity {
     @Override
     public void onBackPressed() {
         if (view_only) {
-            /*if (getIntent().getBooleanExtra(FINISH_AFTER, false)) {
-                this.finishAffinity();
-            } else {
-                this.finish();
-            }*/
-            this.finish();
+            finish();
         } else {
-            if (!showAnimations()) {
-                setResultAndFinish();
-                return;
-            }
-            //showUI(false);
-            if (viewPager != null && viewPager.getAdapter() != null && albumItem != null) {
-                ViewHolder viewHolder = ((ItemAdapter)
-                        viewPager.getAdapter()).findViewHolderByTag(albumItem.getPath());
-                if (viewHolder != null) {
-                    viewHolder.onSharedElementExit(new ItemActivity.Callback() {
-                        @Override
-                        public void done() {
-                            setResultAndFinish();
-                        }
-                    });
-                }
-            }
+            setResultAndFinish();
         }
     }
 
@@ -898,11 +864,7 @@ public class ItemActivity extends ThemeableActivity {
         data.putExtra(AlbumActivity.ALBUM_PATH, album.getPath());
         data.putExtra(AlbumActivity.EXTRA_CURRENT_ALBUM_POSITION, viewPager.getCurrentItem());
         setResult(RESULT_OK, data);
-        if (showAnimations()) {
-            ActivityCompat.finishAfterTransition(this);
-        } else {
-            finish();
-        }
+        finish();
     }
 
     @Override

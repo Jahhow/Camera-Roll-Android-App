@@ -169,7 +169,7 @@ public class ExcludePathsActivity extends ThemeableActivity {
             loadRoots();
         }
 
-        Log.d("ExcludedPathsActivity", "onCreate: " + Provider.getExcludedPaths());
+       //Log.d("ExcludedPathsActivity", "onCreate: " + Provider.getExcludedPaths());
     }
 
     @Override

@@ -22,7 +22,6 @@ import android.os.Handler;
 import android.transition.Fade;
 import android.transition.Slide;
 import android.transition.TransitionSet;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -75,6 +74,7 @@ import us.koller.cameraroll.util.animators.ColorFade;
 
 public class AlbumActivity extends ThemeableActivity
         implements SwipeBackCoordinatorLayout.OnSwipeListener, SelectorModeManager.Callback {
+    static final String TAG = AlbumActivity.class.getSimpleName();
 
     public static final int FILE_OP_DIALOG_REQUEST = 1;
 
@@ -431,11 +431,11 @@ public class AlbumActivity extends ThemeableActivity
         }
     }
 
-    @Override
+    /*@Override
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void onActivityReenter(int requestCode, Intent data) {
         super.onActivityReenter(requestCode, data);
-        Log.d("AlbumActivity", "onActivityReenter: " + this);
+        //Log.d("AlbumActivity", "onActivityReenter: " + this);
         if (data != null) {
             sharedElementReturnPosition = data.getIntExtra(EXTRA_CURRENT_ALBUM_POSITION, -1);
             if (sharedElementReturnPosition > -1 && album != null
@@ -454,7 +454,7 @@ public class AlbumActivity extends ThemeableActivity
                 recyclerView.scrollToPosition(sharedElementReturnPosition);
             }
         }
-    }
+    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -817,7 +817,7 @@ public class AlbumActivity extends ThemeableActivity
         handleMenuVisibilityForSelectorMode(true);
 
         if (!pick_photos) {
-            animateFab(true, false);
+            animateFab(true);
         }
     }
 
@@ -887,7 +887,7 @@ public class AlbumActivity extends ThemeableActivity
         }, navIcon instanceof Animatable ? (int) (500 * Util.getAnimatorSpeed(this)) : 0);
 
         if (!pick_photos) {
-            animateFab(false, false);
+            animateFab(false);
         }
     }
 
@@ -908,14 +908,14 @@ public class AlbumActivity extends ThemeableActivity
         if (selectedItemCount > 0) {
             if (pick_photos) {
                 if (allowMultiple) {
-                    animateFab(true, false);
+                    animateFab(true);
                 } else {
                     setPhotosResult();
                 }
             }
         } else {
             if (pick_photos) {
-                animateFab(false, false);
+                animateFab(false);
             }
         }
     }
@@ -936,7 +936,6 @@ public class AlbumActivity extends ThemeableActivity
     }
 
     public void fabClicked() {
-        animateFab(false, true);
         if (!pick_photos) {
             //deleteClicked();
             shareSelectedItems();
@@ -965,7 +964,8 @@ public class AlbumActivity extends ThemeableActivity
         }
     }
 
-    public void animateFab(final boolean show, boolean click) {
+    public void animateFab(final boolean show) {
+        //Log.i(TAG, "animateFab " + show + ", " + click);
         final FloatingActionButton fab = findViewById(R.id.fab);
 
         if ((fab.getScaleX() == 1.0f && show)
@@ -974,50 +974,32 @@ public class AlbumActivity extends ThemeableActivity
         }
 
         if (show) {
-            fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    fabClicked();
-                }
-            });
+            fab.setOnClickListener(view -> fabClicked());
         } else {
             fab.setOnClickListener(null);
         }
-        if (click && showAnimations()) {
-            Drawable drawable = fab.getDrawable();
-            if (drawable instanceof Animatable) {
-                ((Animatable) drawable).start();
-            }
-        }
-        new Handler().postDelayed(new Runnable() {
+        AnimatorListenerAdapter l = show ? new AnimatorListenerAdapter() {
             @Override
-            public void run() {
-                fab.animate()
-                        .scaleX(show ? 1.0f : 0.0f)
-                        .scaleY(show ? 1.0f : 0.0f)
-                        .alpha(show ? 1.0f : 0.0f)
-                        .setDuration(250)
-                        .setListener(new AnimatorListenerAdapter() {
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                super.onAnimationEnd(animation);
-                                if (show) {
-                                    Drawable drawable = fab.getDrawable();
-                                    if (drawable instanceof Animatable) {
-                                        ((Animatable) drawable).start();
-                                    }
-                                }
-                            }
-                        })
-                        .start();
+            public void onAnimationEnd(Animator animation) {
+                Drawable drawable = fab.getDrawable();
+                if (drawable instanceof Animatable) {
+                    ((Animatable) drawable).start();
+                }
             }
-        }, click ? (int) (400 * Util.getAnimatorSpeed(this)) : 0);
+        } : null;
+        fab.animate()
+                .scaleX(show ? 1.0f : 0.0f)
+                .scaleY(show ? 1.0f : 0.0f)
+                .alpha(show ? 1.0f : 0.0f)
+                .setDuration(250)
+                .setListener(l)
+                .start();
     }
 
     @Override
     public void onBackPressed() {
         if (recyclerView != null && recyclerViewAdapter.onBackPressed()) {
-            animateFab(false, false);
+            animateFab(false);
         } /*else if (scrollToTheTop()) {
             recyclerView.smoothScrollToPosition(0);
         }*/ else {
@@ -1176,7 +1158,7 @@ public class AlbumActivity extends ThemeableActivity
     }
 
     private void removeAlbumItem(String path) {
-        Log.d("AlbumActivity", "removeAlbumItem() called with: path = [" + path + "]");
+        //Log.d("AlbumActivity", "removeAlbumItem() called with: path = [" + path + "]");
         int index = -1;
         for (int i = 0; i < album.getAlbumItems().size(); i++) {
             AlbumItem albumItem = album.getAlbumItems().get(i);
@@ -1185,7 +1167,7 @@ public class AlbumActivity extends ThemeableActivity
                 break;
             }
         }
-        Log.d("AlbumActivity", "removeAlbumItem: " + index);
+        //Log.d("AlbumActivity", "removeAlbumItem: " + index);
         if (index > -1) {
             album.getAlbumItems().remove(index);
         }

@@ -131,6 +131,13 @@
     <style name="CameraRoll.Theme.EditImage" parent="CameraRoll.Theme">
         <item name="android:windowBackground">@color/black</item>
         <item name="android:windowTranslucentNavigation">true</item>
+        <item name="materialButtonStyle">@style/CameraRoll.Theme.EditImage.ButtonStyle</item>
+    </style>
+
+    <style name="CameraRoll.Theme.EditImage.ButtonStyle" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">@color/colorAccent</item>
+        <item name="rippleColor">@color/accentRippleColor</item>
+        <item name="backgroundTint">@color/accentRippleColor</item>
     </style>
 
     <!--SetWallpaper Theme-->
@@ -168,7 +175,9 @@
     </style>
 
     <style name="CameraRoll.Theme.Light.Dialog" parent="Theme.MaterialComponents.Light.Dialog.Alert">
-        <item name="buttonBarButtonStyle">@style/CameraRoll.Theme.Light.Dialog.buttonBarButtonStyle</item>
+        <item name="buttonBarButtonStyle">
+            @style/CameraRoll.Theme.Light.Dialog.buttonBarButtonStyle
+        </item>
         <item name="android:colorBackground">@color/light_bg</item>
     </style>
 

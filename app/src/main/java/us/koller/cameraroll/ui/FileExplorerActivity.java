@@ -21,7 +21,6 @@ import android.text.TextUtils;
 import android.transition.Fade;
 import android.transition.Slide;
 import android.transition.TransitionSet;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -333,7 +332,7 @@ public class FileExplorerActivity extends ThemeableActivity
     }
 
     public void loadDirectory(final String path) {
-        Log.d("FileExplorerActivity", "loadDirectory(): " + path);
+       //Log.d("FileExplorerActivity", "loadDirectory(): " + path);
         final Snackbar snackbar = Snackbar.make(findViewById(R.id.root_view),
                 getString(R.string.loading), Snackbar.LENGTH_INDEFINITE);
         Util.showSnackbar(snackbar);
@@ -548,7 +547,7 @@ public class FileExplorerActivity extends ThemeableActivity
         }
 
         View dialogLayout = LayoutInflater.from(this).inflate(R.layout.input_dialog_layout,
-                (ViewGroup) findViewById(R.id.root_view), false);
+                findViewById(R.id.root_view), false);
 
         final EditText editText = dialogLayout.findViewById(R.id.edit_text);
 

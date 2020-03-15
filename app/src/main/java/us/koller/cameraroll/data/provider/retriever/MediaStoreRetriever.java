@@ -8,9 +8,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
-import androidx.loader.content.CursorLoader;
-import android.util.Log;
 import android.widget.Toast;
+
+import androidx.loader.content.CursorLoader;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -126,8 +126,8 @@ public class MediaStoreRetriever extends Retriever {
                     callback.onMediaLoaded(albums);
                 }
 
-                Log.d("MediaStoreRetriever", "onMediaLoaded(): "
-                        + String.valueOf(System.currentTimeMillis() - startTime) + " ms");
+                /*Log.d("MediaStoreRetriever", "onMediaLoaded(): "
+                        + String.valueOf(System.currentTimeMillis() - startTime) + " ms");*/
             }
         });
     }

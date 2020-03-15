@@ -19,6 +19,7 @@ import android.graphics.RectF;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +43,7 @@ import us.koller.cameraroll.util.Util;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class CropImageView extends SubsamplingScaleImageView implements View.OnTouchListener {
+    static final String TAG = CropImageView.class.getSimpleName();
 
     private static final int MIN_CROP_RECT_SIZE_DP = 50;
 
@@ -66,6 +68,9 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
 
     private Uri imageUri;
 
+    private PointF prevTouchPos = new PointF();
+    private PointF newTouchPos = new PointF();
+    private Rect StartCropRect = new Rect();
     private Rect cropRect;
     private Paint cropRectPaint;
     private Paint cropRectCornerPaint;
@@ -155,6 +160,7 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
         setOrientation(0);
         //setMinScale(0.01f);
         //setMinimumScaleType(SCALE_TYPE_CUSTOM);
+        setRotationEnabled(false);
 
         setOnTouchListener(this);
 
@@ -219,6 +225,18 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
 
     public Uri getImageUri() {
         return imageUri;
+    }
+
+    @Override
+    protected void onImageLoaded() {
+        super.onImageLoaded();
+        if (cropRect == null) {
+            cropRect = getMaxCenteredCropRect();
+            //Log.d("CropImageView", "onImageLoaded: " + cropRect);
+        }
+        autoZoom(false);
+
+        setProgressBarVisibility(GONE);
     }
 
     /**
@@ -311,50 +329,49 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
-        boolean consumed = false;
-        switch (motionEvent.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                touchedCorner = getTouchedCorner(motionEvent);
-                touching = true;
-                consumed = true;
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if (touchedCorner != NO_CORNER) {
-                    Rect newCropRect = getNewRect(motionEvent.getX(), motionEvent.getY());
-                    if (newCropRect != null) {
-                        setCropRect(newCropRect);
+        if (touchedCorner != NO_CORNER) {
+            switch (motionEvent.getAction()) {
+                case MotionEvent.ACTION_MOVE: {
+                    Rect newCropRect;
+                    if (touchedCorner != NO_CORNER) {
+                        newCropRect = getNewRect(motionEvent.getX(), motionEvent.getY());
+                    } else {
+                        newCropRect = getMovedRect(motionEvent);
                     }
-                    consumed = true;
-                } else {
-                    Rect newCropRect = getMovedRect(motionEvent);
-                    if (newCropRect != null) {
-                        setCropRect(newCropRect);
-                    }
-                    consumed = true;
-                }
 
-                if (cropRect != null) {
-                    PointF center = getCenterOfCropRect();
+                    if (newCropRect != null) {
+                        setCropRect(newCropRect);
+                    }
+
+                    /*PointF center = getCenterOfCropRect();
                     float scale = getScale();
                     float newScale = getNewScale();
-                    setScaleAndCenter(newScale < scale ? newScale : scale, center);
+                    setScaleAndCenter(newScale < scale ? newScale : scale, center);*/
                     invalidate();
+                    break;
                 }
-                break;
-            case MotionEvent.ACTION_UP:
-                //auto-zoom
-                if (cropRect != null) {
-                    autoZoom(true);
-                    touching = false;
-                    touchedCorner = NO_CORNER;
-                    invalidate();
-                }
-                break;
-            default:
-                break;
+                case MotionEvent.ACTION_UP:
+                    if (cropRect != null) {
+                        //autoZoom(touchedCorner != NO_CORNER);
+                        touching = false;
+                        touchedCorner = NO_CORNER;
+                    }
+                    break;
+                default:
+                    break;
+            }
+            return true;
         }
-        // Use parent to handle pinch and two-finger pan.
-        return consumed || super.onTouchEvent(motionEvent);
+
+        if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+            StartCropRect.set(cropRect);
+            touchedCorner = getTouchedCorner(motionEvent);
+            touching = true;
+            if (touchedCorner != NO_CORNER)
+                return true;
+        }
+
+        return super.onTouchEvent(motionEvent);
     }
 
     /**
@@ -364,8 +381,8 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
      **/
     private PointF getCenterOfCropRect() {
         return new PointF(
-                cropRect.centerX(),
-                cropRect.centerY());
+                cropRect.exactCenterX(),
+                cropRect.exactCenterY());
     }
 
     /**
@@ -375,10 +392,10 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
      **/
     private float getNewScale() {
         int width = getWidth() - (padding[0] + padding[2]);
-        float scaleWidth = (float) width / (cropRect.right - cropRect.left);
+        float scaleWidth = (float) width / Math.max(4, cropRect.width());
 
         int height = getHeight() - (padding[1] + padding[3]);
-        float scaleHeight = (float) height / (cropRect.bottom - cropRect.top);
+        float scaleHeight = (float) height / Math.max(4, cropRect.height());
         if (getHeight() > getWidth()) {
             return scaleWidth < scaleHeight ? scaleWidth : scaleHeight;
         }
@@ -389,12 +406,12 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
      * Set if the ImageView should zoom in and out according to the current cropRect
      **/
     private void autoZoom(boolean animate) {
+        Log.i(TAG, "autoZoom");
         //auto-zoom
         float scale = getNewScale();
         PointF center = getCenterOfCropRect();
-        PointF sCenter = viewToSourceCoord(center, center);
         if (animate) {
-            new AnimationBuilder(sCenter,scale).start();
+            new AnimationBuilder(center, scale).start(true);
         } else {
             setScaleAndCenter(scale, center);
         }
@@ -407,7 +424,8 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
      * @return one of: NO_CORNER, TOP_LEFT, TOP_RIGHT, BOTTOM_RIGHT or BOTTOM_LEFT
      **/
     private int getTouchedCorner(MotionEvent motionEvent) {
-        PointF currentTouchPos = new PointF(motionEvent.getX(), motionEvent.getY());
+        prevTouchPos.set(motionEvent.getX(), motionEvent.getY());
+        newTouchPos.set(prevTouchPos);
         if (cropRect == null) {
             return NO_CORNER;
         }
@@ -416,31 +434,31 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
         Rect cropRect = new Rect((int) topLeft.x, (int) topLeft.y,
                 (int) bottomRight.x, (int) bottomRight.y);
 
-        if (currentTouchPos.x > cropRect.left - touchDelta
-                && currentTouchPos.x < cropRect.left + touchDelta
-                && currentTouchPos.y > cropRect.top - touchDelta
-                && currentTouchPos.y < cropRect.top + touchDelta) {
+        if (newTouchPos.x > cropRect.left - touchDelta
+                && newTouchPos.x < cropRect.left + touchDelta
+                && newTouchPos.y > cropRect.top - touchDelta
+                && newTouchPos.y < cropRect.top + touchDelta) {
             return TOP_LEFT;
         }
 
-        if (currentTouchPos.x > cropRect.right - touchDelta
-                && currentTouchPos.x < cropRect.right + touchDelta
-                && currentTouchPos.y > cropRect.top - touchDelta
-                && currentTouchPos.y < cropRect.top + touchDelta) {
+        if (newTouchPos.x > cropRect.right - touchDelta
+                && newTouchPos.x < cropRect.right + touchDelta
+                && newTouchPos.y > cropRect.top - touchDelta
+                && newTouchPos.y < cropRect.top + touchDelta) {
             return TOP_RIGHT;
         }
 
-        if (currentTouchPos.x > cropRect.right - touchDelta
-                && currentTouchPos.x < cropRect.right + touchDelta
-                && currentTouchPos.y > cropRect.bottom - touchDelta
-                && currentTouchPos.y < cropRect.bottom + touchDelta) {
+        if (newTouchPos.x > cropRect.right - touchDelta
+                && newTouchPos.x < cropRect.right + touchDelta
+                && newTouchPos.y > cropRect.bottom - touchDelta
+                && newTouchPos.y < cropRect.bottom + touchDelta) {
             return BOTTOM_RIGHT;
         }
 
-        if (currentTouchPos.x > cropRect.left - touchDelta
-                && currentTouchPos.x < cropRect.left + touchDelta
-                && currentTouchPos.y > cropRect.bottom - touchDelta
-                && currentTouchPos.y < cropRect.bottom + touchDelta) {
+        if (newTouchPos.x > cropRect.left - touchDelta
+                && newTouchPos.x < cropRect.left + touchDelta
+                && newTouchPos.y > cropRect.bottom - touchDelta
+                && newTouchPos.y < cropRect.bottom + touchDelta) {
             return BOTTOM_LEFT;
         }
 
@@ -516,24 +534,16 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
             return null;
         }
 
-        PointF currentTouchPos = viewToSourceCoord(motionEvent.getX(),
-                motionEvent.getY());
+        newTouchPos.set(motionEvent.getX(), motionEvent.getY());
 
-        int historySize = motionEvent.getHistorySize();
-        if (historySize > 0) {
-            PointF oldTouchPos = viewToSourceCoord(motionEvent.getHistoricalX(0),
-                    motionEvent.getHistoricalY(0));
-            int deltaX = (int) (oldTouchPos.x - currentTouchPos.x);
-            int deltaY = (int) (oldTouchPos.y - currentTouchPos.y);
+        int dSX = Math.round((prevTouchPos.x - newTouchPos.x) / getScale());
+        int dSY = Math.round((prevTouchPos.y - newTouchPos.y) / getScale());
 
-            return checkRectBounds(new Rect(
-                    cropRect.left + deltaX,
-                    cropRect.top + deltaY,
-                    cropRect.right + deltaX,
-                    cropRect.bottom + deltaY), false);
-        } else {
-            return cropRect;
-        }
+        return checkRectBounds(new Rect(
+                StartCropRect.left + dSX,
+                StartCropRect.top + dSY,
+                StartCropRect.right + dSX,
+                StartCropRect.bottom + dSY), false);
     }
 
     /**
@@ -719,6 +729,7 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
 
     @Override
     public void setPadding(int left, int top, int right, int bottom) {
+        super.setPadding(left, top, right, bottom);
         padding = new int[]{left, top, right, bottom};
     }
 
@@ -732,14 +743,14 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
         }
 
         drawBackground(canvas);
-        drawRect(canvas);
+        //drawRect(canvas);
         drawCorners(canvas);
         if (touching) {
             drawGuidelines(canvas);
         }
     }
 
-    private void drawRect(Canvas canvas) {
+    /*private void drawRect(Canvas canvas) {
         PointF topLeft = sourceToViewCoord(cropRect.left, cropRect.top);
         PointF bottomRight = sourceToViewCoord(cropRect.right, cropRect.bottom);
         if (topLeft == null || bottomRight == null) {
@@ -751,7 +762,7 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
                 bottomRight.x - strokeWidth / 2,
                 bottomRight.y - strokeWidth / 2,
                 cropRectPaint);
-    }
+    }*/
 
     private void drawCorners(Canvas canvas) {
         PointF topLeft = sourceToViewCoord(cropRect.left, cropRect.top);
@@ -981,9 +992,7 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
      * @return minimal valid cropRect.
      **/
     private Rect getMinCropRect() {
-        return new Rect(0, 0,
-                aspectRatio < 0.0 ? minCropRectSize : (int) (minCropRectSize * aspectRatio),
-                minCropRectSize);
+        return new Rect(0, 0, 1, 1);
     }
 
     /**
@@ -1040,6 +1049,5 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
      **/
     public void setCropRect(Rect cropRect) {
         this.cropRect = cropRect;
-        //invalidate();
     }
 }

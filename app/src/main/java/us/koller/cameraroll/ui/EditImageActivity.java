@@ -33,7 +33,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import us.koller.cameraroll.R;
-import us.koller.cameraroll.data.Settings;
 import us.koller.cameraroll.data.fileOperations.FileOperation;
 import us.koller.cameraroll.data.provider.retriever.MediaStoreRetriever;
 import us.koller.cameraroll.ui.widget.CropImageView;
@@ -50,6 +49,7 @@ public class EditImageActivity extends AppCompatActivity {
 
     public static final int JPEG_QUALITY = 90;
 
+    CropImageView imageView;
     private String imagePath;
 
     private CropImageView.Result result;
@@ -87,7 +87,7 @@ public class EditImageActivity extends AppCompatActivity {
 
         imagePath = intent.getStringExtra(IMAGE_PATH);
 
-        final CropImageView imageView = findViewById(R.id.cropImageView);
+        imageView = findViewById(R.id.cropImageView);
 
         CropImageView.State state = null;
         if (savedInstanceState != null) {
@@ -188,9 +188,8 @@ public class EditImageActivity extends AppCompatActivity {
     }
 
     public void done(View v) {
-        CropImageView cropImageView = findViewById(R.id.cropImageView);
-        final ExifUtil.ExifItem[] exifData = ExifUtil.retrieveExifData(this, cropImageView.getImageUri());
-        cropImageView.getCroppedBitmap(new CropImageView.OnResultListener() {
+        final ExifUtil.ExifItem[] exifData = ExifUtil.retrieveExifData(this, imageView.getImageUri());
+        imageView.getCroppedBitmap(new CropImageView.OnResultListener() {
             @Override
             public void onResult(final CropImageView.Result result) {
                 final BottomSheetDialog dialog = new BottomSheetDialog(EditImageActivity.this);
@@ -326,20 +325,20 @@ public class EditImageActivity extends AppCompatActivity {
                     ContextCompat.getDrawable(this, R.drawable.ic_rotate_90_avd);
             rotate.setIcon(avd);
         }
+        MenuItem antiAlias = menu.findItem(R.id.antiAlias);
+        imageView.setFilterBitmap(antiAlias.isChecked());
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        final CropImageView imageView = findViewById(R.id.cropImageView);
         switch (item.getItemId()) {
             case android.R.id.home:
                 onBackPressed();
                 break;
             case R.id.rotate:
-                boolean showAnimations = Settings.getInstance(this).showAnimations();
                 Drawable d = item.getIcon();
-                if (showAnimations && d instanceof Animatable && !((Animatable) d).isRunning()) {
+                if (d instanceof Animatable && !((Animatable) d).isRunning()) {
                     ((Animatable) d).start();
                 }
                 rotate90Degrees();
@@ -374,6 +373,11 @@ public class EditImageActivity extends AppCompatActivity {
             case R.id.restore:
                 imageView.restore();
                 break;
+            case R.id.antiAlias:
+                boolean checked = !item.isChecked();
+                item.setChecked(checked);
+                imageView.setFilterBitmap(checked);
+                break;
             default:
                 break;
         }
@@ -381,14 +385,12 @@ public class EditImageActivity extends AppCompatActivity {
     }
 
     private void rotate90Degrees() {
-        CropImageView imageView = findViewById(R.id.cropImageView);
         imageView.rotate90Degree();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        CropImageView imageView = findViewById(R.id.cropImageView);
         outState.putSerializable(IMAGE_VIEW_STATE, imageView.getCropImageViewState());
     }
 }

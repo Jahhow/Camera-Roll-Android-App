@@ -3,7 +3,6 @@ package us.koller.cameraroll.ui;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +20,6 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SwitchPreference;
 import androidx.preference.TwoStatePreference;
-
-import java.util.Arrays;
 
 import us.koller.cameraroll.R;
 import us.koller.cameraroll.data.Settings;
@@ -94,7 +91,7 @@ public class SettingsActivity extends ThemeableActivity {
                                             Math.abs(screenSize[2] - rootView.getRight()),
                                             Math.abs(screenSize[3] - rootView.getBottom())};
 
-                                    Log.d("MainActivity", "windowInsets: " + Arrays.toString(windowInsets));
+                                   //Log.d("MainActivity", "windowInsets: " + Arrays.toString(windowInsets));
 
                                     toolbar.setPadding(toolbar.getPaddingStart(),
                                             toolbar.getPaddingTop() + windowInsets[1],
@@ -397,7 +394,7 @@ public class SettingsActivity extends ThemeableActivity {
 
         @Override
         public boolean onPreferenceChange(Preference preference, Object o) {
-            Log.d("SettingsActivity", "onPreferenceChange() called with: preference = [" + preference + "], o = [" + o + "]");
+           //Log.d("SettingsActivity", "onPreferenceChange() called with: preference = [" + preference + "], o = [" + o + "]");
             if (callback != null) {
                 callback.onSettingChanged();
             }

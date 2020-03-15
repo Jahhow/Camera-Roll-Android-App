@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
-import android.util.Log;
 
 import androidx.exifinterface.media.ExifInterface;
 
@@ -58,7 +57,7 @@ public class DateTakenRetriever {
                 running = true;
                 while (queue.size() > 0) {
                     AlbumItem albumItem = queue.get(0);
-                    Log.d("DateTakenRetriever", "tryToRetrieveDateTaken: " + albumItem.getName());
+                   //Log.d("DateTakenRetriever", "tryToRetrieveDateTaken: " + albumItem.getName());
                     tryToRetrieveDateTaken(context, albumItem);
                     queue.remove(albumItem);
                 }

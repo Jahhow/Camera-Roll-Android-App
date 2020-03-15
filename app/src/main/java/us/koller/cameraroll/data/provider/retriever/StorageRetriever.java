@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
@@ -14,11 +13,11 @@ import java.util.Arrays;
 import us.koller.cameraroll.data.models.Album;
 import us.koller.cameraroll.data.models.File_POJO;
 import us.koller.cameraroll.data.provider.FilesProvider;
+import us.koller.cameraroll.data.provider.MediaProvider;
+import us.koller.cameraroll.data.provider.Provider;
 import us.koller.cameraroll.data.provider.itemLoader.AlbumLoader;
 import us.koller.cameraroll.data.provider.itemLoader.FileLoader;
 import us.koller.cameraroll.data.provider.itemLoader.ItemLoader;
-import us.koller.cameraroll.data.provider.MediaProvider;
-import us.koller.cameraroll.data.provider.Provider;
 import us.koller.cameraroll.util.MediaType;
 import us.koller.cameraroll.util.SortUtil;
 
@@ -91,8 +90,8 @@ public class StorageRetriever extends Retriever {
                                     callback.onMediaLoaded(albums);
                                 }
                                 cancelTimeout();
-                                Log.d("StorageRetriever", "onMediaLoaded(" + String.valueOf(THREAD_COUNT)
-                                        + "): " + String.valueOf(System.currentTimeMillis() - startTime) + " ms");
+                                /*Log.d("StorageRetriever", "onMediaLoaded(" + String.valueOf(THREAD_COUNT)
+                                        + "): " + String.valueOf(System.currentTimeMillis() - startTime) + " ms")*/;
                             }
                         });
             }
@@ -214,7 +213,7 @@ public class StorageRetriever extends Retriever {
                 rest--;
             }
         }
-        Log.d("StorageRetriever", Arrays.toString(threadDirs_sizes));
+       //Log.d("StorageRetriever", Arrays.toString(threadDirs_sizes));
 
         File[][] threadDirs = new File[THREAD_COUNT][dirs.length / THREAD_COUNT + 1];
         int index = 0;
