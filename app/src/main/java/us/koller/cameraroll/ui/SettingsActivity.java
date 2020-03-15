@@ -176,7 +176,7 @@ public class SettingsActivity extends ThemeableActivity {
     @Override
     public void onThemeApplied(Theme theme) {
         Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setBackgroundColor(backgroundColor);
+        toolbar.setBackgroundColor(toolbarColor);
         toolbar.setTitleTextColor(textColorPrimary);
 
         if (theme.darkStatusBarIcons() &&

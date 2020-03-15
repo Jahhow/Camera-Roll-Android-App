@@ -8,4 +8,9 @@ public class BlackTheme extends DarkTheme {
     public int getBackgroundColorRes() {
         return R.color.black_bg;
     }
+
+    @Override
+    public int getToolbarColorRes() {
+        return R.color.black_translucent2;
+    }
 }

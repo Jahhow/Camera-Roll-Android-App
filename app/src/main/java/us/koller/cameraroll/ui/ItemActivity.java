@@ -762,15 +762,8 @@ public class ItemActivity extends ThemeableActivity {
         Drawable d = ((ImageView) v).getDrawable();
         if (d instanceof Animatable && showAnimations()) {
             ((Animatable) d).start();
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    bottomBarAction(v);
-                }
-            }, (int) (400 * Util.getAnimatorSpeed(this)));
-        } else {
-            bottomBarAction(v);
         }
+        bottomBarAction(v);
     }
 
     private void bottomBarAction(View v) {

@@ -52,6 +52,10 @@ public class Settings {
         return instance;
     }
 
+    public static Settings getInstance() {
+        return instance;
+    }
+
     private Settings(Context context) {
         SharedPreferences sharedPreferences
                 = PreferenceManager.getDefaultSharedPreferences(context);

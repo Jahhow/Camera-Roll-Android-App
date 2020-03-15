@@ -36,7 +36,7 @@ public class DarkTheme extends Theme {
 
     @Override
     public int getToolbarColorRes() {
-        return R.color.black_translucent2;
+        return R.color.grey_900_translucent;
     }
 
     @Override

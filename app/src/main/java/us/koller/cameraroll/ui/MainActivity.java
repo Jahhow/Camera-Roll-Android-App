@@ -473,14 +473,20 @@ public class MainActivity extends ThemeableActivity {
     }
 
     public void refreshPhotos() {
+        refreshPhotos(false);
+    }
+
+    public void refreshPhotos(boolean showSnackBar) {
         if (mediaProvider != null) {
             mediaProvider.onDestroy();
             mediaProvider = null;
         }
 
-        snackbar = Snackbar.make(findViewById(R.id.root_view),
-                R.string.loading, Snackbar.LENGTH_INDEFINITE);
-        Util.showSnackbar(snackbar);
+        if (showSnackBar) {
+            snackbar = Snackbar.make(findViewById(R.id.root_view),
+                    R.string.loading, Snackbar.LENGTH_SHORT);
+            Util.showSnackbar(snackbar);
+        }
 
         final MediaProvider.OnMediaLoadedCallback callback
                 = new MediaProvider.OnMediaLoadedCallback() {
@@ -495,7 +501,10 @@ public class MainActivity extends ThemeableActivity {
                             MainActivity.this.albums = albumsWithVirtualDirs;
                             recyclerViewAdapter.setData(albumsWithVirtualDirs);
 
-                            snackbar.dismiss();
+                            if (showSnackBar) {
+                                snackbar.setText(R.string.done);
+                                Util.showSnackbar(snackbar);
+                            }
 
                             if (mediaProvider != null) {
                                 mediaProvider.onDestroy();
@@ -509,7 +518,6 @@ public class MainActivity extends ThemeableActivity {
             @Override
             public void timeout() {
                 //handle timeout
-                snackbar.dismiss();
                 snackbar = Snackbar.make(findViewById(R.id.root_view),
                         R.string.loading_failed, Snackbar.LENGTH_INDEFINITE);
                 snackbar.setAction(getString(R.string.retry), new View.OnClickListener() {
@@ -519,7 +527,6 @@ public class MainActivity extends ThemeableActivity {
                             mediaProvider.onDestroy();
                         }
                         refreshPhotos();
-                        snackbar.dismiss();
                     }
                 });
                 Util.showSnackbar(snackbar);
@@ -532,7 +539,7 @@ public class MainActivity extends ThemeableActivity {
 
             @Override
             public void needPermission() {
-                snackbar.dismiss();
+                //snackbar.dismiss();
             }
         };
 
@@ -551,6 +558,8 @@ public class MainActivity extends ThemeableActivity {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.main, menu);
         menu.findItem(R.id.hiddenFolders).setChecked(hiddenFolders);
+        menu.findItem(R.id.refresh).setIcon(
+                theme.isBaseLight() ? R.drawable.ic_refresh_dark : R.drawable.ic_refresh_white);
 
         int sort_by = Settings.getInstance(this).sortAlbumsBy();
         if (sort_by == SortUtil.BY_NAME) {
@@ -591,13 +600,13 @@ public class MainActivity extends ThemeableActivity {
                 }
                 break;
             case R.id.refresh:
-                refreshPhotos();
+                refreshPhotos(true);
                 break;
             case R.id.hiddenFolders:
                 hiddenFolders = Settings.getInstance(this)
                         .setHiddenFolders(this, !hiddenFolders);
                 item.setChecked(hiddenFolders);
-                refreshPhotos();
+                refreshPhotos(true);
                 break;
             case R.id.file_explorer:
                 startActivity(new Intent(this, FileExplorerActivity.class),
@@ -664,18 +673,13 @@ public class MainActivity extends ThemeableActivity {
                 ((Animatable) drawable).start();
             }
         }
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Intent i = new Intent();
-                i.setAction(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA);
-                if (i.resolveActivity(getPackageManager()) != null) {
-                    startActivity(i);
-                } else {
-                    Toast.makeText(MainActivity.this, getString(R.string.error), Toast.LENGTH_SHORT).show();
-                }
-            }
-        }, (int) (500 * Util.getAnimatorSpeed(this)));
+        Intent i = new Intent();
+        i.setAction(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA);
+        if (i.resolveActivity(getPackageManager()) != null) {
+            startActivity(i);
+        } else {
+            Toast.makeText(MainActivity.this, getString(R.string.error), Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void showAndHideFab(boolean show) {
