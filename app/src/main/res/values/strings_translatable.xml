@@ -105,6 +105,7 @@
     <string name="restore">Restore</string>
     <string name="moveToTarget">Move to Target</string>
     <string name="anti_alias">Anti Alias</string>
+    <string name="show_cropping_edge">Show Cropping Edge</string>
     <string name="save_edit">Save</string>
     <string name="export">Export</string>
     <string name="editing_file_format_not_supported">This file format is not supported for editing</string>

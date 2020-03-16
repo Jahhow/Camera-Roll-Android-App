@@ -44,6 +44,8 @@ import us.koller.cameraroll.util.Util;
 public class CropImageView extends SubsamplingScaleImageView implements View.OnTouchListener {
     static final String TAG = CropImageView.class.getSimpleName();
 
+    private boolean showCroppingEdge = false;
+
     private static final int MIN_CROP_RECT_SIZE_DP = 50;
 
     private static final int STROKE_WIDTH_DP = 2;
@@ -257,6 +259,11 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
                 autoZoom(false);
             }
         });
+    }
+
+    public void setShowCroppingEdge(boolean show) {
+        showCroppingEdge = show;
+        invalidate();
     }
 
     /**
@@ -747,33 +754,28 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
         }
 
         drawBackground(canvas);
-        //drawRect(canvas);
+        if (showCroppingEdge)
+            drawRect(canvas);
         drawCorners(canvas);
         if (touching) {
             drawGuidelines(canvas);
         }
     }
 
-    /*private void drawRect(Canvas canvas) {
+    private void drawRect(Canvas canvas) {
         PointF topLeft = sourceToViewCoord(cropRect.left, cropRect.top);
         PointF bottomRight = sourceToViewCoord(cropRect.right, cropRect.bottom);
-        if (topLeft == null || bottomRight == null) {
-            return;
-        }
         canvas.drawRect(
-                topLeft.x + strokeWidth / 2,
-                topLeft.y + strokeWidth / 2,
-                bottomRight.x - strokeWidth / 2,
-                bottomRight.y - strokeWidth / 2,
+                topLeft.x + strokeWidth / 2f,
+                topLeft.y + strokeWidth / 2f,
+                bottomRight.x - strokeWidth / 2f,
+                bottomRight.y - strokeWidth / 2f,
                 cropRectPaint);
-    }*/
+    }
 
     private void drawCorners(Canvas canvas) {
         PointF topLeft = sourceToViewCoord(cropRect.left, cropRect.top);
         PointF bottomRight = sourceToViewCoord(cropRect.right, cropRect.bottom);
-        if (topLeft == null || bottomRight == null) {
-            return;
-        }
 
         Matrix matrix;
         RectF bounds = new RectF();
