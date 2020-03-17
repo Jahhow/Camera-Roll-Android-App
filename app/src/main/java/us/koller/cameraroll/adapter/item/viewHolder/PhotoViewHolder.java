@@ -80,7 +80,7 @@ public class PhotoViewHolder extends ViewHolder {
         //imageView.setDoubleTapZoomScale(1.0f);
 
         int orientation = ExifUtil.getExifOrientationAngle(view.getContext(), albumItem);
-        imageView.setOrientation(orientation);
+        //imageView.setOrientation(orientation);
 
         imageView.setOnClickListener(PhotoViewHolder.this::imageOnClick);
 

@@ -14,6 +14,8 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.animation.Interpolator
 import android.widget.ImageView
+import androidx.annotation.AnyThread
+import androidx.exifinterface.media.ExifInterface
 import java.io.File
 import java.io.UnsupportedEncodingException
 import java.lang.ref.WeakReference
@@ -65,7 +67,13 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
     var scale = 0f
     var sWidth = 0
     var sHeight = 0
-    var orientation = ORIENTATION_0
+    var orientationDegrees = ORIENTATION_0
+        set(degrees) {
+            stopAnimation()
+            setRotationRadian(Math.toRadians(degrees.toDouble() - field).toFloat() + rotationRadian)
+            field = degrees
+            invalidate()
+        }
     var minimumScaleType = 0
     var retainXSwipe = true
     var retainYSwipe = false
@@ -81,8 +89,8 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
     private var maxTileWidth = TILE_SIZE_AUTO
     private var maxTileHeight = TILE_SIZE_AUTO
     private var scaleStart = 0f
-
-    private var rotationRadian = 0f
+    protected var rotationRadian = 0f
+        private set
     private var cos = Math.cos(0.0)
     private var sin = Math.sin(0.0)
 
@@ -121,7 +129,8 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
     private var quickScaleSCenter: PointF? = null
     private var quickScaleVStart: PointF? = null
 
-    private var anim: Anim? = null
+    protected var anim: Anim? = null
+        private set
     var isReady = false
         private set
     var isImageLoaded = false
@@ -135,8 +144,6 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
 
     private var satTemp = ScaleTranslateRotate(0f, PointF(0f, 0f), 0f)
     private var objectMatrix = Matrix()
-    private val srcArray = FloatArray(8)
-    private val dstArray = FloatArray(8)
 
     private val density = resources.displayMetrics.density
 
@@ -163,8 +170,6 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         }
         return false
     }
-
-    private fun getRequiredRotation() = orientation
 
     fun getCenter(): PointF? {
         return viewToSourceCoord(vCenterX, vCenterY)
@@ -333,12 +338,12 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         var height = parentHeight
         if (sWidth > 0 && sHeight > 0) {
             if (resizeWidth && resizeHeight) {
-                width = sWidth()
-                height = sHeight()
+                width = sWidth
+                height = sHeight
             } else if (resizeHeight) {
-                height = (sHeight().toDouble() / sWidth().toDouble() * width).toInt()
+                height = (sHeight.toDouble() / sWidth.toDouble() * width).toInt()
             } else if (resizeWidth) {
-                width = (sWidth().toDouble() / sHeight().toDouble() * height).toInt()
+                width = (sWidth.toDouble() / sHeight.toDouble() * height).toInt()
             }
         }
         width = Math.max(width, suggestedMinimumWidth)
@@ -405,7 +410,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                         if (rotationEnabled) {
                             val angle = Math.atan2((event.getY(0) - event.getY(1)).toDouble(), (event.getX(0) - event.getX(1)).toDouble()).toFloat()
                             if (triggeredRotation) {
-                                setRotationRadianInternal(angle - originRadian)
+                                setRotationRadian(angle - originRadian)
                                 consumed = true
                             } else {
                                 if (Math.abs(diffRadian(angle, originRadian)) > ROTATION_THRESHOLD) {
@@ -438,7 +443,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                             vTranslate.x += dxR
                             vTranslate.y += dyR
 
-                            if (previousScale * sHeight() < height && scale * sHeight() >= height || previousScale * sWidth() < width && scale * sWidth() >= width) {
+                            if (previousScale * sHeight < height && scale * sHeight >= height || previousScale * sWidth < width && scale * sWidth >= width) {
                                 vCenterStart!!.set(vCenterEndX, vCenterEndY)
                                 vTranslateStart!!.set(vTranslate)
                                 scaleStart = scale
@@ -475,7 +480,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                             val vTopNow = vTopStart * (scale / scaleStart)
                             vTranslate.x = vCenterStart!!.x - vLeftNow
                             vTranslate.y = vCenterStart!!.y - vTopNow
-                            if (previousScale * sHeight() < height && scale * sHeight() >= height || previousScale * sWidth() < width && scale * sWidth() >= width) {
+                            if (previousScale * sHeight < height && scale * sHeight >= height || previousScale * sWidth < width && scale * sWidth >= width) {
                                 vCenterStart!!.set(sourceToViewCoord(quickScaleSCenter!!))
                                 vTranslateStart!!.set(vTranslate)
                                 scaleStart = scale
@@ -524,7 +529,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                                     if (scale > fullScale) {
                                         fitToBounds(false)
                                         val degrees = Math.toDegrees(rotationRadian.toDouble())
-                                        val rightAngle = getClosestRightAngleDegrees(degrees)
+                                        val rightAngle = getClosestRightAngleDegrees(degrees) % 360
                                         val atXEdge = if (rightAngle == 90.0 || rightAngle == 270.0) newY != satTemp.vTranslate.y else newX != satTemp.vTranslate.x
                                         val atYEdge = if (rightAngle == 90.0 || rightAngle == 270.0) newX != satTemp.vTranslate.x else newY != satTemp.vTranslate.y
                                         edgeXSwipe = edgeXSwipe && atXEdge
@@ -535,12 +540,12 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                                     if (edgeXSwipe) {
                                         val swipeLeft = dx < 0 && finishEdges.and(ANIM_FINISH_EDGE_RIGHT.toInt()) != 0
                                         val swipeRight = dx > 0 && finishEdges.and(ANIM_FINISH_EDGE_LEFT.toInt()) != 0
-                                        debug("swipeLeft $swipeLeft, swipeRight $swipeRight")
+                                        //debug("swipeLeft $swipeLeft, swipeRight $swipeRight")
                                         edgeXSwipe = (swipeLeft || swipeRight)
                                     } else {
                                         val swipeUp = dy < 0 && finishEdges.and(ANIM_FINISH_EDGE_BOTTOM.toInt()) != 0
                                         val swipeDown = dy > 0 && finishEdges.and(ANIM_FINISH_EDGE_TOP.toInt()) != 0
-                                        debug("swipeUp $swipeUp, swipeDown $swipeDown")
+                                        //debug("swipeUp $swipeUp, swipeDown $swipeDown")
                                         edgeYSwipe = (swipeUp || swipeDown)
                                     }
                                 }
@@ -624,7 +629,8 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         return a
     }
 
-    private fun getClosestRightAngleDegrees(degrees: Double) = Math.round(degrees / 90f) * 90.0
+    fun getClosestRightAngleDegrees() = getClosestRightAngleDegrees(Math.toDegrees(rotationRadian.toDouble()))
+    fun getClosestRightAngleDegrees(degrees: Double) = Math.round(degrees / 90f) * 90.0
 
     private fun doubleTapZoom(sCenter: PointF?) {
         val fullScale = getFullScale()
@@ -650,6 +656,8 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         invalidate()
     }
 
+    private val rectF = RectF()
+    private val tileVRect = RectF()
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         createPaints()
@@ -698,6 +706,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
             degrees = getRotationDegrees()
         }
 
+        canvas.rotate(degrees, vCenterX, vCenterY)
         val tileMap = tileMap
         if (tileMap != null && getIsBaseLayerReady()) {
             val sampleSize = Math.min(fullImageSampleSize, calculateInSampleSize(scale))
@@ -713,67 +722,44 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                     }
             }
 
-            fun _setMatrixArray(tile: Tile) = when (getRequiredRotation()) {
-                ORIENTATION_90 -> setMatrixArray(dstArray, tile.vRect!!.right, tile.vRect!!.top, tile.vRect!!.right, tile.vRect!!.bottom, tile.vRect!!.left, tile.vRect!!.bottom, tile.vRect!!.left, tile.vRect!!.top)
-                ORIENTATION_180 -> setMatrixArray(dstArray, tile.vRect!!.right, tile.vRect!!.bottom, tile.vRect!!.left, tile.vRect!!.bottom, tile.vRect!!.left, tile.vRect!!.top, tile.vRect!!.right, tile.vRect!!.top)
-                ORIENTATION_270 -> setMatrixArray(dstArray, tile.vRect!!.left, tile.vRect!!.bottom, tile.vRect!!.left, tile.vRect!!.top, tile.vRect!!.right, tile.vRect!!.top, tile.vRect!!.right, tile.vRect!!.bottom)
-                else -> setMatrixArray(dstArray, tile.vRect!!.left, tile.vRect!!.top, tile.vRect!!.right, tile.vRect!!.top, tile.vRect!!.right, tile.vRect!!.bottom, tile.vRect!!.left, tile.vRect!!.bottom)
-            }
-
             fun drawTiles(tiles: List<Tile>) {
                 for (tile in tiles) {
                     if (tile.visible) {
-                        sourceToViewRect(tile.sRect!!, tile.vRect!!)
+                        sourceToViewRectPreRotate(tile.sRectF, tileVRect)
                         if (tile.bitmap != null) {
                             objectMatrix.reset()
-                            val bw = tile.bitmap!!.width.toFloat()
-                            val bh = tile.bitmap!!.height.toFloat()
-                            setMatrixArray(srcArray, 0f, 0f, bw, 0f, bw, bh, 0f, bh)
-                            _setMatrixArray(tile)
-                            objectMatrix.setPolyToPoly(srcArray, 0, dstArray, 0, 4)
-                            canvas.drawBitmap(tile.bitmap!!, objectMatrix, bitmapPaint)
+                            val tileBitmap = tile.bitmap!!
+                            rectF.set(0f, 0f, tileBitmap.width.toFloat(), tileBitmap.height.toFloat())
+                            objectMatrix.setRectToRect(rectF, tileVRect, Matrix.ScaleToFit.FILL)
+                            canvas.drawBitmap(tileBitmap, objectMatrix, bitmapPaint)
                         }
                         if (debug) {
-                            canvas.drawRect(tile.vRect!!, debugLinePaint!!)
-                            canvas.drawText("ISS ${tile.sampleSize} RECT ${tile.sRect!!.top}, ${tile.sRect!!.left}, ${tile.sRect!!.bottom}, ${tile.sRect!!.right}", (tile.vRect!!.left + px(5)), (tile.vRect!!.top + px(15)), debugTextPaint!!)
+                            canvas.drawRect(tileVRect, debugLinePaint!!)
+                            canvas.drawText("ISS ${tile.sampleSize} RECT ${tile.sRectF.top}, ${tile.sRectF.left}, ${tile.sRectF.bottom}, ${tile.sRectF.right}", (tileVRect.left + px(5)), (tileVRect.top + px(15)), debugTextPaint!!)
                             if (tile.loading) {
-                                canvas.drawText("LOADING", tile.vRect!!.left + px(5), tile.vRect!!.top + px(35), debugTextPaint!!)
+                                canvas.drawText("LOADING", tileVRect.left + px(5), tileVRect.top + px(35), debugTextPaint!!)
                             }
                         }
                     }
                 }
             }
 
-            canvas.rotate(degrees, vCenterX, vCenterY)
             if (drawFullImage) drawTiles(tileMap[fullImageSampleSize]!!)
             drawTiles(tileMap[sampleSize]!!)
-            if (debug)
-                canvas.rotate(-degrees, vCenterX, vCenterY)
         } else if (bitmap?.isRecycled == false) {
-            val xScale = scale
-            val yScale = scale
-
             objectMatrix.apply {
                 reset()
-                postScale(xScale, yScale)
-                postRotate(getRequiredRotation().toFloat())
+                postScale(scale, scale)
                 postTranslate(vTranslate.x, vTranslate.y)
-
-                when (getRequiredRotation()) {
-                    ORIENTATION_90 -> postTranslate(scale * sHeight, 0f)
-                    ORIENTATION_180 -> postTranslate(scale * sWidth, scale * sHeight)
-                    ORIENTATION_270 -> postTranslate(0f, scale * sWidth)
-                }
-                postRotate(degrees, vCenterX, vCenterY)
             }
-
             canvas.drawBitmap(bitmap!!, objectMatrix, bitmapPaint)
         }
-
+        onDrawPreRotate(canvas)
+        canvas.rotate(-degrees, vCenterX, vCenterY)
         if (debug) {
             canvas.drawText(String.format(Locale.ENGLISH, "Scale (%.2f - %.2f): %.2f", limitedScale(0f), maxScale, scale), px(5).toFloat(), px(15).toFloat(), debugTextPaint!!)
             canvas.drawText(String.format(Locale.ENGLISH, "Translate: %.0f, %.0f", vTranslate.x, vTranslate.y), px(5).toFloat(), px(30).toFloat(), debugTextPaint!!)
-            canvas.drawText(String.format(Locale.ENGLISH, "Rotate: %.0f", Math.toDegrees(rotationRadian.toDouble())), px(5).toFloat(), px(45).toFloat(), debugTextPaint!!)
+            canvas.drawText(String.format(Locale.ENGLISH, "Orientation: %d°, Total Rotation: %.0f°", orientationDegrees, Math.toDegrees(rotationRadian.toDouble())), px(5).toFloat(), px(45).toFloat(), debugTextPaint!!)
             val center = getCenter()
             canvas.drawText(String.format(Locale.ENGLISH, "Source Center: %.0f, %.0f", center!!.x, center.y), px(5).toFloat(), px(60).toFloat(), debugTextPaint!!)
             if (anim != null) {
@@ -801,18 +787,12 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                 debugLinePaint!!.color = Color.CYAN
                 canvas.drawCircle(quickScaleVStart!!.x, quickScaleVStart!!.y, px(30).toFloat(), debugLinePaint!!)
             }
+
+            debugLinePaint!!.color = Color.MAGENTA
         }
     }
 
-    private fun setMatrixArray(array: FloatArray, f0: Float, f1: Float, f2: Float, f3: Float, f4: Float, f5: Float, f6: Float, f7: Float) {
-        array[0] = f0
-        array[1] = f1
-        array[2] = f2
-        array[3] = f3
-        array[4] = f4
-        array[5] = f5
-        array[6] = f6
-        array[7] = f7
+    protected open fun onDrawPreRotate(canvas: Canvas) {
     }
 
     private fun checkReady(): Boolean {
@@ -829,7 +809,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         return isReady
     }
 
-    private fun setRotationRadianInternal(radian: Float) {
+    fun setRotationRadian(radian: Float) {
         rotationRadian = radian % (Math.PI * 2).toFloat()
         if (rotationRadian < 0) {
             rotationRadian += (Math.PI * 2).toFloat()
@@ -891,7 +871,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
 
     @Synchronized
     private fun initialiseBaseLayer(maxTileDimensions: Point) {
-        debug("initialiseBaseLayer maxTileDimensions=${maxTileDimensions.x}x${maxTileDimensions.y}")
+        //debug("initialiseBaseLayer maxTileDimensions=${maxTileDimensions.x}x${maxTileDimensions.y}")
 
         scale = getFullScale()
         fitToBounds()
@@ -905,7 +885,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
             return
         }
 
-        if (fullImageSampleSize == 1 && sWidth() < maxTileDimensions.x && sHeight() < maxTileDimensions.y) {
+        if (fullImageSampleSize == 1 && sWidth < maxTileDimensions.x && sHeight < maxTileDimensions.y) {
             decoder!!.recycle()
             decoder = null
             val task = BitmapLoadTask(this, context, bitmapDecoderFactory, uri!!)
@@ -955,20 +935,21 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         }
     }
 
+    private val corners = Array(4) { PointF() }
+
     private fun tileVisible(tile: Tile): Boolean {
         if (this.rotationRadian == 0f) {
             val sVisLeft = viewToSourceX(0f)
             val sVisRight = viewToSourceX(width.toFloat())
             val sVisTop = viewToSourceY(0f)
             val sVisBottom = viewToSourceY(height.toFloat())
-            return !(sVisLeft > tile.sRect!!.right || tile.sRect!!.left > sVisRight || sVisTop > tile.sRect!!.bottom || tile.sRect!!.top > sVisBottom)
+            return !(sVisLeft > tile.sRectF.right || tile.sRectF.left > sVisRight || sVisTop > tile.sRectF.bottom || tile.sRectF.top > sVisBottom)
         }
 
-        val corners = arrayOf(
-                sourceToViewCoord(tile.sRect!!.left, tile.sRect!!.top),
-                sourceToViewCoord(tile.sRect!!.right, tile.sRect!!.top),
-                sourceToViewCoord(tile.sRect!!.right, tile.sRect!!.bottom),
-                sourceToViewCoord(tile.sRect!!.left, tile.sRect!!.bottom))
+        sourceToViewCoord(tile.sRectF.left, tile.sRectF.top, corners[0])
+        sourceToViewCoord(tile.sRectF.right, tile.sRectF.top, corners[1])
+        sourceToViewCoord(tile.sRectF.right, tile.sRectF.bottom, corners[2])
+        sourceToViewCoord(tile.sRectF.left, tile.sRectF.bottom, corners[3])
 
         val rotation = this.rotationRadian
 
@@ -1005,17 +986,17 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
             newScale *= minimumTileDpi / averageDpi
         }
 
-        val reqWidth = (sWidth() * newScale).toInt()
-        val reqHeight = (sHeight() * newScale).toInt()
+        val reqWidth = (sWidth * newScale).toInt()
+        val reqHeight = (sHeight * newScale).toInt()
 
         var inSampleSize = 1
         if (reqWidth == 0 || reqHeight == 0) {
             return 32
         }
 
-        if (sHeight() > reqHeight || sWidth() > reqWidth) {
-            val heightRatio = Math.round(sHeight().toFloat() / reqHeight.toFloat())
-            val widthRatio = Math.round(sWidth().toFloat() / reqWidth.toFloat())
+        if (sHeight > reqHeight || sWidth > reqWidth) {
+            val heightRatio = Math.round(sHeight.toFloat() / reqHeight.toFloat())
+            val widthRatio = Math.round(sWidth.toFloat() / reqWidth.toFloat())
             inSampleSize = if (heightRatio < widthRatio) heightRatio else widthRatio
         }
 
@@ -1034,14 +1015,18 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
     private fun fitToBounds(sat: ScaleTranslateRotate) {
         val vTranslate = sat.vTranslate
         val scale = limitedScale(sat.scale)
-        val scaledSWidth = scale * sWidth()
-        val scaledSHeight = scale * sHeight()
+        val vsWidth = scale * sWidth
+        val vsHeight = scale * sHeight
         val degrees = Math.toDegrees(sat.rotationRadian.toDouble())
-        val rightAngle = getClosestRightAngleDegrees(degrees)
+        val rightAngle = getClosestRightAngleDegrees(degrees) % 360
 
         val width: Float
         val height: Float
         val wh: Float
+        val paddingLeft: Int
+        val paddingTop: Int
+        val paddingRight: Int
+        val paddingBottom: Int
         if (rightAngle == 90.0 || rightAngle == 270.0) {
             // Convert all variables to visual coordinates
             width = this.height.toFloat()
@@ -1049,14 +1034,36 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
             wh = (width - height) / 2f
             vTranslate.x += wh
             vTranslate.y -= wh
+            if (rightAngle == 90.0) {
+                paddingLeft = this.paddingTop
+                paddingTop = this.paddingRight
+                paddingRight = this.paddingBottom
+                paddingBottom = this.paddingLeft
+            } else {
+                paddingLeft = this.paddingBottom
+                paddingTop = this.paddingLeft
+                paddingRight = this.paddingTop
+                paddingBottom = this.paddingRight
+            }
         } else {
+            if (rightAngle == 180.0) {
+                paddingLeft = this.paddingRight
+                paddingTop = this.paddingBottom
+                paddingRight = this.paddingLeft
+                paddingBottom = this.paddingTop
+            } else {
+                paddingLeft = this.paddingLeft
+                paddingTop = this.paddingTop
+                paddingRight = this.paddingRight
+                paddingBottom = this.paddingBottom
+            }
             wh = 0f
             width = this.width.toFloat()
             height = this.height.toFloat()
         }
 
-        val remainWidth = width - scaledSWidth
-        val remainHeight = height - scaledSHeight
+        val remainWidth = width - vsWidth
+        val remainHeight = height - vsHeight
 
         // right, bottom
         vTranslate.x = Math.max(vTranslate.x, remainWidth - paddingRight)
@@ -1085,7 +1092,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         if (apply) {
             scale = satTemp.scale
             vTranslate.set(satTemp.vTranslate)
-            setRotationRadianInternal(satTemp.rotationRadian)
+            setRotationRadian(satTemp.rotationRadian)
         }
     }
 
@@ -1102,9 +1109,9 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         }
     }
 
-    private fun getFullScale(): Float {
-        val degrees = Math.toDegrees(rotationRadian.toDouble()) + orientation
-        val rightAngle = getClosestRightAngleDegrees(degrees) % 360
+    @JvmOverloads
+    fun getFullScale(sWidth: Int = this.sWidth, sHeight: Int = this.sHeight): Float {
+        val rightAngle = getClosestRightAngleDegrees()
         val innerWidth = getInnerWidth()
         val innerHeight = getInnerHeight()
         return if (rightAngle == 0.0 || rightAngle == 180.0) {
@@ -1118,7 +1125,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
     fun getInnerHeight() = height - paddingTop - paddingBottom
 
     private fun getCenterCropScale(): Float {
-        val degrees = Math.toDegrees(rotationRadian.toDouble()) + orientation
+        val degrees = Math.toDegrees(rotationRadian.toDouble())
         val rightAngle = getClosestRightAngleDegrees(degrees) % 360
         return if (rightAngle == 0.0 || rightAngle == 180.0) {
             Math.max(width / sWidth.toFloat(), height / sHeight.toFloat())
@@ -1128,9 +1135,9 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
     }
 
     private fun getRotatedFullScale(): Float {
-        val degrees = Math.toDegrees(rotationRadian.toDouble()) + orientation
-        val rightAngle = getClosestRightAngleDegrees(degrees)
-        return if (rightAngle % 360 == 0.0 || rightAngle == 180.0) {
+        val degrees = Math.toDegrees(rotationRadian.toDouble())
+        val rightAngle = getClosestRightAngleDegrees(degrees) % 360
+        return if (rightAngle == 0.0 || rightAngle == 180.0) {
             Math.min(width / sHeight.toFloat(), height / sWidth.toFloat())
         } else {
             Math.min(width / sWidth.toFloat(), height / sHeight.toFloat())
@@ -1138,26 +1145,26 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
     }
 
     private fun initialiseTileMap(maxTileDimensions: Point) {
-        debug("initialiseTileMap maxTileDimensions=${maxTileDimensions.x}x${maxTileDimensions.y}")
+        //debug("initialiseTileMap maxTileDimensions=${maxTileDimensions.x}x${maxTileDimensions.y}")
         tileMap = LinkedHashMap()
         var sampleSize = fullImageSampleSize
         var xTiles = 1
         var yTiles = 1
 
         while (true) {
-            var sTileWidth = sWidth() / xTiles
-            var sTileHeight = sHeight() / yTiles
+            var sTileWidth = sWidth / xTiles
+            var sTileHeight = sHeight / yTiles
             var subTileWidth = sTileWidth / sampleSize
             var subTileHeight = sTileHeight / sampleSize
             while (subTileWidth + xTiles + 1 > maxTileDimensions.x || subTileWidth > width * 1.25 && sampleSize < fullImageSampleSize) {
                 xTiles += 1
-                sTileWidth = sWidth() / xTiles
+                sTileWidth = sWidth / xTiles
                 subTileWidth = sTileWidth / sampleSize
             }
 
             while (subTileHeight + yTiles + 1 > maxTileDimensions.y || subTileHeight > height * 1.25 && sampleSize < fullImageSampleSize) {
                 yTiles += 1
-                sTileHeight = sHeight() / yTiles
+                sTileHeight = sHeight / yTiles
                 subTileHeight = sTileHeight / sampleSize
             }
 
@@ -1167,17 +1174,16 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                     val tile = Tile()
                     tile.sampleSize = sampleSize
                     tile.visible = sampleSize == fullImageSampleSize
-                    tile.vRect = RectF(0f, 0f, 0f, 0f)
-                    tile.fileSRect = Rect(
+                    tile.sRect.set(
                             x * sTileWidth,
                             y * sTileHeight,
-                            if (x == xTiles - 1) sWidth() else (x + 1) * sTileWidth,
-                            if (y == yTiles - 1) sHeight() else (y + 1) * sTileHeight)
-                    tile.sRect = RectF(
-                            tile.fileSRect!!.left.toFloat(),
-                            tile.fileSRect!!.top.toFloat(),
-                            tile.fileSRect!!.right.toFloat(),
-                            tile.fileSRect!!.bottom.toFloat())
+                            if (x == xTiles - 1) sWidth else (x + 1) * sTileWidth,
+                            if (y == yTiles - 1) sHeight else (y + 1) * sTileHeight)
+                    tile.sRectF.set(
+                            tile.sRect.left.toFloat(),
+                            tile.sRect.top.toFloat(),
+                            tile.sRect.right.toFloat(),
+                            tile.sRect.bottom.toFloat())
                     tileGrid.add(tile)
                 }
             }
@@ -1203,13 +1209,12 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                 val decoderFactory = decoderFactoryRef.get()
                 val view = viewRef.get()
                 if (context != null && decoderFactory != null && view != null) {
-                    view.debug("TilesInitTask.doInBackground")
+                    //view.debug("TilesInitTask.doInBackground")
                     decoder = decoderFactory.make()
                     val dimensions = decoder!!.init(context, source)
                     val sWidth = dimensions.x
                     val sHeight = dimensions.y
-                    val exifOrientation = view.orientation
-                    return intArrayOf(sWidth, sHeight, exifOrientation)
+                    return intArrayOf(sWidth, sHeight, view.getExifOrientation())
                 }
             } catch (e: Exception) {
                 exception = e
@@ -1232,7 +1237,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
 
     @Synchronized
     private fun onTilesInited(decoder: ImageRegionDecoder, sWidth: Int, sHeight: Int, sOrientation: Int) {
-        debug("onTilesInited sWidth=$sWidth, sHeight=$sHeight, sOrientation=$orientation")
+        //debug("onTilesInited sWidth=$sWidth, sHeight=$sHeight, sOrientation=$sOrientation")
         if (this.sWidth > 0 && this.sHeight > 0 && (this.sWidth != sWidth || this.sHeight != sHeight)) {
             reset(false)
             bitmap?.recycle()
@@ -1241,7 +1246,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         this.decoder = decoder
         this.sWidth = sWidth
         this.sHeight = sHeight
-        this.sOrientation = sOrientation
+        this.orientationDegrees = sOrientation
         checkReady()
         if (!checkImageLoaded() && maxTileWidth > 0 && maxTileWidth != TILE_SIZE_AUTO && maxTileHeight > 0 && maxTileHeight != TILE_SIZE_AUTO && width > 0 && height > 0) {
             initialiseBaseLayer(Point(maxTileWidth, maxTileHeight))
@@ -1267,12 +1272,11 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                 val decoder = decoderRef.get()
                 val tile = tileRef.get()
                 if (decoder != null && tile != null && view != null && decoder.isReady() && tile.visible) {
-                    view.debug("TileLoadTask.doInBackground, tile.sRect=${tile.sRect}, tile.sampleSize=${tile.sampleSize}")
+                    //view.debug("TileLoadTask.doInBackground, tile.sRect=${tile.sRect}, tile.sampleSize=${tile.sampleSize}")
                     view.decoderLock.readLock().lock()
                     try {
                         if (decoder.isReady()) {
-                            view.fileSRect(tile.sRect!!, tile.fileSRect!!)
-                            return decoder.decodeRegion(tile.fileSRect!!, tile.sampleSize)
+                            return decoder.decodeRegion(tile.sRect, tile.sampleSize)
                         } else {
                             tile.loading = false
                         }
@@ -1316,7 +1320,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
 
     @Synchronized
     private fun onTileLoaded() {
-        debug("onTileLoaded")
+        //debug("onTileLoaded")
         checkReady()
         checkImageLoaded()
         if (getIsBaseLayerReady()) {
@@ -1326,23 +1330,23 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         invalidate()
     }
 
-    private class BitmapLoadTask internal constructor(view: SubsamplingScaleImageView, context: Context, decoderFactory: DecoderFactory<out ImageDecoder>, private val source: Uri) : AsyncTask<Void, Void, Int>() {
+    private class BitmapLoadTask internal constructor(view: SubsamplingScaleImageView, context: Context, decoderFactory: DecoderFactory<out ImageDecoder>, private val source: Uri) : AsyncTask<Void, Void, Unit>() {
         private val viewRef = WeakReference(view)
         private val contextRef = WeakReference(context)
         private val decoderFactoryRef = WeakReference(decoderFactory)
         private var bitmap: Bitmap? = null
         private var exception: Exception? = null
 
-        override fun doInBackground(vararg params: Void): Int? {
+        override fun doInBackground(vararg params: Void?) {
             try {
                 val context = contextRef.get()
                 val decoderFactory = decoderFactoryRef.get()
                 val view = viewRef.get()
 
                 if (context != null && decoderFactory != null && view != null) {
-                    view.debug("BitmapLoadTask.doInBackground")
+                    //view.debug("BitmapLoadTask.doInBackground")
                     bitmap = decoderFactory.make().decode(context, source)
-                    return view.orientation
+                    view.orientationDegrees = 0
                 }
             } catch (e: Exception) {
                 //Log.e(TAG, "Failed to load bitmap", e)
@@ -1351,23 +1355,22 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                 //Log.e(TAG, "Failed to load bitmap - OutOfMemoryError $e")
                 exception = RuntimeException(e)
             }
-
-            return null
         }
 
-        override fun onPostExecute(orientation: Int?) {
-            val subsamplingScaleImageView = viewRef.get()
-            if (bitmap != null && orientation != null) {
-                subsamplingScaleImageView?.onImageLoaded(bitmap!!, orientation)
-            } else if (exception != null) {
-                subsamplingScaleImageView?.onImageEventListener?.onImageLoadError(exception!!)
-            }
+        override fun onPostExecute(result: Unit?) {
+            val view = viewRef.get()
+            if (view != null)
+                if (bitmap != null) {
+                    view.onSingleBitmapLoaded(bitmap!!)
+                } else if (exception != null) {
+                    view.onImageEventListener?.onImageLoadError(exception!!)
+                }
         }
     }
 
     @Synchronized
-    private fun onImageLoaded(bitmap: Bitmap, sOrientation: Int) {
-        debug("onImageLoaded")
+    private fun onSingleBitmapLoaded(bitmap: Bitmap) {
+        //debug("onImageLoaded")
         if (sWidth > 0 && sHeight > 0 && (sWidth != bitmap.width || sHeight != bitmap.height)) {
             reset(false)
         }
@@ -1376,7 +1379,6 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         this.bitmap = bitmap
         sWidth = bitmap.width
         sHeight = bitmap.height
-        this.sOrientation = sOrientation
         val ready = checkReady()
         val imageLoaded = checkImageLoaded()
         if (ready || imageLoaded) {
@@ -1402,7 +1404,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
 
     fun getState(): ImageViewState? {
         return if (isReady)
-            ImageViewState(scale, getCenter()!!, orientation)
+            ImageViewState(scale, getCenter()!!, orientationDegrees)
         else null
     }
 
@@ -1417,33 +1419,6 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
     }
 
     private fun getMaxBitmapDimensions(canvas: Canvas) = Point(Math.min(canvas.maximumBitmapWidth, maxTileWidth), Math.min(canvas.maximumBitmapHeight, maxTileHeight))
-
-    private fun sWidth(): Int {
-        val rotation = getRequiredRotation()
-        return if (rotation == 90 || rotation == 270) {
-            sHeight
-        } else {
-            sWidth
-        }
-    }
-
-    private fun sHeight(): Int {
-        val rotation = getRequiredRotation()
-        return if (rotation == 90 || rotation == 270) {
-            sWidth
-        } else {
-            sHeight
-        }
-    }
-
-    private fun fileSRect(sRect: RectF, target: Rect) {
-        when (getRequiredRotation()) {
-            0 -> target.set(sRect.left.toInt(), sRect.top.toInt(), sRect.right.toInt(), sRect.bottom.toInt())
-            90 -> target.set(sRect.top.toInt(), sHeight - sRect.right.toInt(), sRect.bottom.toInt(), sHeight - sRect.left.toInt())
-            180 -> target.set(sWidth - sRect.right.toInt(), sHeight - sRect.bottom.toInt(), sWidth - sRect.left.toInt(), sHeight - sRect.top.toInt())
-            else -> target.set(sWidth - sRect.bottom.toInt(), sRect.left.toInt(), sWidth - sRect.top.toInt(), sRect.right.toInt())
-        }
-    }
 
     private fun distance(x0: Float, x1: Float, y0: Float, y1: Float): Float {
         val x = x0 - x1
@@ -1521,8 +1496,8 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         return vTarget
     }
 
-    private fun sourceToViewRect(sRect: RectF, vTarget: RectF) {
-        vTarget.set(
+    protected fun sourceToViewRectPreRotate(sRect: RectF, result: RectF) {
+        result.set(
                 sourceToViewX(sRect.left),
                 sourceToViewY(sRect.top),
                 sourceToViewX(sRect.right),
@@ -1601,9 +1576,9 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         }
 
         val oldDegrees = Math.toDegrees(rotationRadian.toDouble())
-        val rightAngle = getClosestRightAngleDegrees(oldDegrees)
+        val rightAngle = getClosestRightAngleDegrees(oldDegrees) % 360
         val newDegrees = ((rightAngle + degrees).toInt())
-        val center = PointF(sWidth() / 2f, sHeight() / 2f)
+        val center = PointF(sWidth / 2f, sHeight / 2f)
         val scale = if (degrees == -90 || degrees == 90 || degrees == 270) getRotatedFullScale() else scale
         AnimationBuilder(center, scale, newDegrees.toDouble()).start(true)
     }
@@ -1632,6 +1607,12 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
             targetScale = scale
             sFocus = sCenter
             targetRotationRadian = Math.toRadians(degrees).toFloat()
+        }
+
+        constructor(sCenter: PointF, scale: Float, radian: Float) {
+            targetScale = scale
+            sFocus = sCenter
+            targetRotationRadian = radian
         }
 
         constructor(anim: Anim) {
@@ -1672,7 +1653,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
             refreshRequiredTiles(true)
 
             scale = anim!!.scaleStart
-            setRotationRadianInternal(anim!!.rotationRadianStart)
+            setRotationRadian(anim!!.rotationRadianStart)
             vTranslate.set(tx, ty)
 
             invalidate()
@@ -1703,19 +1684,19 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                 finishEdges = ANIM_FINISH_EDGE_ALL
             } else {
                 val degrees = Math.toDegrees(rotationRadianEnd.toDouble())
-                val rightAngle = getClosestRightAngleDegrees(degrees)
+                val rightAngle = getClosestRightAngleDegrees(degrees) % 360
                 val sWidth: Int
                 val sHeight: Int
                 if (rightAngle == 90.0 || rightAngle == 270.0) {
-                    sWidth = sHeight()
-                    sHeight = sWidth()
+                    sWidth = this@SubsamplingScaleImageView.sHeight
+                    sHeight = this@SubsamplingScaleImageView.sWidth
                 } else {
-                    sWidth = sWidth()
-                    sHeight = sHeight()
+                    sWidth = this@SubsamplingScaleImageView.sWidth
+                    sHeight = this@SubsamplingScaleImageView.sHeight
                 }
                 val scaledSWidth = scaleEnd * sWidth
                 val scaledSHeight = scaleEnd * sHeight
-                //debug("scaledSWidth $scaledSWidth, scaledSHeight $scaledSHeight")
+                ////debug("scaledSWidth $scaledSWidth, scaledSHeight $scaledSHeight")
 
                 var finishEdges2 = 0
                 if (scaledSWidth < width) {
@@ -1752,7 +1733,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                     str.append(" Right")
                 if (finishEdges and ANIM_FINISH_EDGE_BOTTOM.toInt() != 0)
                     str.append(" Bottom")
-                debug(str.toString())
+                //debug(str.toString())
             }*/
         }
 
@@ -1762,7 +1743,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
             val newVFocusX = ease(interpolation, anim!!.vFocusStart!!.x, anim!!.vFocusEnd!!.x - anim!!.vFocusStart!!.x, anim!!.vFocusEnd!!.x)
             val newVFocusY = ease(interpolation, anim!!.vFocusStart!!.y, anim!!.vFocusEnd!!.y - anim!!.vFocusStart!!.y, anim!!.vFocusEnd!!.y)
             val rotation = ease(interpolation, anim!!.rotationRadianStart, anim!!.rotationRadianEnd - anim!!.rotationRadianStart, anim!!.rotationRadianEnd)
-            setRotationRadianInternal(rotation)
+            setRotationRadian(rotation)
             // Find out where the focal point is at this scale/rotation then adjust its position to follow the animation path
             val vFocus = sourceToViewCoord(anim!!.sFocus!!)
             var dX = vFocus.x - newVFocusX
@@ -1779,19 +1760,25 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
     data class ScaleTranslateRotate(var scale: Float, var vTranslate: PointF, var rotationRadian: Float)
 
     class Tile {
-        var sRect: RectF? = null
         var sampleSize = 0
+        var sRect = Rect()
+        var sRectF = RectF()
         var bitmap: Bitmap? = null
         var loading = false
         var visible = false
-        var vRect: RectF? = null
-        var fileSRect: Rect? = null
+    }
+
+    @AnyThread
+    private fun getExifOrientation(): Int {
+        return ExifInterface(context.contentResolver.openInputStream(uri!!)!!).rotationDegrees
     }
 
     fun stopAnimation() {
         anim = null
         refreshRequiredTiles(true)
     }
+
+    fun isAnimating() = anim != null
 
     class SigmoidInterpolator @JvmOverloads
     constructor(easeOut: Double = 6.0, easeIn: Double = 1.0) : Interpolator {

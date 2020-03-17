@@ -200,32 +200,29 @@ public class EditImageActivity extends AppCompatActivity {
                 View save = sheetView.findViewById(R.id.save);
                 View export = sheetView.findViewById(R.id.export);
 
-                View.OnClickListener clickListener = new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        dialog.dismiss();
-                        switch (view.getId()) {
-                            case R.id.save:
-                                saveCroppedImage(result.getImageUri(), result.getCroppedBitmap(), exifData);
-                                break;
-                            case R.id.export:
-                                EditImageActivity.this.result = result;
-                                EditImageActivity.this.exifData = exifData;
+                View.OnClickListener clickListener = view -> {
+                    dialog.dismiss();
+                    switch (view.getId()) {
+                        case R.id.save:
+                            saveCroppedImage(result.getImageUri(), result.getCroppedBitmap(), exifData);
+                            break;
+                        case R.id.export:
+                            EditImageActivity.this.result = result;
+                            EditImageActivity.this.exifData = exifData;
 
-                                Uri imageUri = getIntent().getData();
-                                String filename = InfoUtil.retrieveFileName(EditImageActivity.this, imageUri);
-                                if (filename == null) {
-                                    filename = "image_edit.jpeg";
-                                }
+                            Uri imageUri = getIntent().getData();
+                            String filename = InfoUtil.retrieveFileName(EditImageActivity.this, imageUri);
+                            if (filename == null) {
+                                filename = "image_edit.jpeg";
+                            }
 
-                                Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
-                                intent.setType("image/jpeg");
-                                intent.putExtra(Intent.EXTRA_TITLE, filename);
-                                startActivityForResult(intent, STORAGE_FRAMEWORK_REQUEST_CODE);
-                                break;
-                            default:
-                                break;
-                        }
+                            Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+                            intent.setType("image/jpeg");
+                            intent.putExtra(Intent.EXTRA_TITLE, filename);
+                            startActivityForResult(intent, STORAGE_FRAMEWORK_REQUEST_CODE);
+                            break;
+                        default:
+                            break;
                     }
                 };
 
