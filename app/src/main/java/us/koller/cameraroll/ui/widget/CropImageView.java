@@ -238,11 +238,11 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
      **/
     public void rotate90Degree() {
         aspectRatio = 1 / aspectRatio;
-        float oldRotationRadian;
-        if (isAnimating()) oldRotationRadian = getAnim().getRotationRadianEnd();
-        else oldRotationRadian = getRotationRadian();
-        float rotationRadian = (float) (oldRotationRadian - Math.PI / 2);
-        new AnimationBuilder(getCenterOfCropRect(), getFullScale(cropRect.height(), cropRect.width()), rotationRadian).start(true);
+        float oldRotationDegrees;
+        if (isAnimating()) oldRotationDegrees = getAnim().getRotationDegreesEnd();
+        else oldRotationDegrees = getRotationDegrees();
+        float rotationDegrees = oldRotationDegrees - 90;
+        new AnimationBuilder(getCenterOfCropRect(), getFullScale(cropRect.width(), cropRect.height(), getClosestRightAngleDegreesNormalized(rotationDegrees)), rotationDegrees).start(true);
     }
 
     public void setShowCroppingEdge(boolean show) {
@@ -268,6 +268,7 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
         setProgressBarVisibility(VISIBLE);
         AsyncTask.execute(() -> {
             try {
+                //todo
                 ContentResolver resolver = getContext().getContentResolver();
                 InputStream inputStream = resolver.openInputStream(imageUri);
                 BitmapRegionDecoder decoder = BitmapRegionDecoder.newInstance(inputStream, false);

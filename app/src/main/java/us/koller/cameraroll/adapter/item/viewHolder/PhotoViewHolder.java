@@ -5,8 +5,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import androidx.annotation.NonNull;
-
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
 import us.koller.cameraroll.R;
@@ -104,7 +102,7 @@ public class PhotoViewHolder extends ViewHolder {
             }
 
             @Override
-            public void onImageLoadError(@NonNull Exception e) {
+            public void onImageLoadError(Exception e) {
                 PhotoViewHolder.this.onImageLoadError();
             }
         });

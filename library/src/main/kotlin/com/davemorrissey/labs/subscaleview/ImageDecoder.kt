@@ -7,5 +7,5 @@ import java.lang.Exception
 
 interface ImageDecoder {
     @Throws(Exception::class)
-    fun decode(context: Context, uri: Uri): Bitmap
+    fun decode(context: Context, uri: Uri): Bitmap?
 }
