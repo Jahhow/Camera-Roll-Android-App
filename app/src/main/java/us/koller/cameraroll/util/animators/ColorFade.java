@@ -3,22 +3,21 @@ package us.koller.cameraroll.util.animators;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.graphics.Color;
-import android.graphics.ColorMatrixColorFilter;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
-import androidx.core.graphics.drawable.DrawableCompat;
-import androidx.appcompat.widget.Toolbar;
 import android.view.View;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.graphics.drawable.DrawableCompat;
+
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
 import us.koller.cameraroll.data.Settings;
 
 public class ColorFade {
+    final static String TAG = ColorFade.class.getSimpleName();
 
     private static AnimatorSet toolbarTitleAnimSet;
 
@@ -62,54 +61,11 @@ public class ColorFade {
         return (int) (start + (end - start) * animatedValue);
     }
 
-    // imageView saturation fade
-    public static void fadeSaturation(final ImageView imageView) {
-        if (!Settings.getInstance(imageView.getContext()).fadeImages()) {
+    public static void animateToAlpha(float alpha, final View view) {
+        if (!Settings.getInstance(view.getContext()).showAnimations()) {
             return;
         }
-
-        // code from: https://github.com/nickbutcher/plaid/blob/master/app/src/main/java/io/plaidapp/ui/FeedAdapter.java
-        imageView.setHasTransientState(true);
-        final AnimUtils.ObservableColorMatrix matrix = new AnimUtils.ObservableColorMatrix();
-        final ObjectAnimator saturation = ObjectAnimator.ofFloat(
-                matrix, AnimUtils.ObservableColorMatrix.SATURATION, 0f, 1f);
-        saturation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener
-                () {
-            @Override
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                // just animating the color matrix does not invalidate the
-                // drawable so need this update listener.  Also have to create a
-                // new CMCF as the matrix is immutable :(
-                imageView.setColorFilter(new ColorMatrixColorFilter(matrix));
-            }
-        });
-        saturation.setDuration(2000L);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            saturation.setInterpolator(AnimUtils.getFastOutSlowInInterpolator(imageView.getContext()));
-        }
-        saturation.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                imageView.clearColorFilter();
-                imageView.setHasTransientState(false);
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-                super.onAnimationCancel(animation);
-                imageView.clearColorFilter();
-                imageView.setHasTransientState(false);
-            }
-
-            @Override
-            public void onAnimationPause(Animator animation) {
-                super.onAnimationPause(animation);
-                imageView.clearColorFilter();
-                imageView.setHasTransientState(false);
-            }
-        });
-        saturation.start();
+        view.animate().setInterpolator(SubsamplingScaleImageView.Companion.getInterpolator()).alpha(alpha).start();
     }
 
     //fade Toolbar title text change
@@ -225,12 +181,7 @@ public class ColorFade {
 
     public static void fadeDrawableAlpha(final Drawable d, int endAlpha) {
         ValueAnimator animator = getDefaultValueAnimator(d.getAlpha(), endAlpha);
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                d.setAlpha((Integer) valueAnimator.getAnimatedValue());
-            }
-        });
+        animator.addUpdateListener(valueAnimator -> d.setAlpha((int) valueAnimator.getAnimatedFraction()));
         animator.start();
     }
 }

@@ -150,11 +150,10 @@ public class Util {
     }
 
     public static void showSnackbar(Snackbar snackbar) {
-        snackbar.getView().setTag(SNACKBAR);
-        TextView textView = snackbar.getView()
-                .findViewById(R.id.snackbar_text);
-        textView.setTypeface(ResourcesCompat
-                .getFont(textView.getContext(), R.font.roboto_mono_medium));
+        View snackbarView = snackbar.getView();
+        snackbarView.setTag(SNACKBAR);
+        TextView textView = snackbarView.findViewById(R.id.snackbar_text);
+        textView.setTypeface(ResourcesCompat.getFont(textView.getContext(), R.font.roboto_mono_medium));
         snackbar.show();
     }
 

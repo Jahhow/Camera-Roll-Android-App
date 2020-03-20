@@ -6,7 +6,13 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
+import com.davemorrissey.labs.subscaleview.DecoderFactory;
+import com.davemorrissey.labs.subscaleview.ImageDecoder;
+import com.davemorrissey.labs.subscaleview.ImageRegionDecoder;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
+
 import us.koller.cameraroll.data.models.AlbumItem;
+import us.koller.cameraroll.imageDecoder.RAWImageRegionDecoder;
 
 public class RAWImageViewHolder extends PhotoViewHolder {
 
@@ -18,9 +24,9 @@ public class RAWImageViewHolder extends PhotoViewHolder {
     }
 
     @Override
-    void bindImageView(View view, View transitionView) {
+    void bindImageView(SubsamplingScaleImageView scaleImageView, final View transitionView) {
         addProgressBar();
-        super.bindImageView(view, transitionView);
+        super.bindImageView(scaleImageView, transitionView);
     }
 
     @Override
@@ -54,7 +60,12 @@ public class RAWImageViewHolder extends PhotoViewHolder {
     }
 
     @Override
-    boolean tileEnabled() {
-        return false;
+    DecoderFactory<? extends ImageDecoder> getImageDecoderFactory() {
+        return null; // force use RAWImageRegionDecoder (prevents from loading twice for the same RAW file)
+    }
+
+    @Override
+    DecoderFactory<? extends ImageRegionDecoder> getImageRegionDecoderFactory() {
+        return RAWImageRegionDecoder::new;
     }
 }

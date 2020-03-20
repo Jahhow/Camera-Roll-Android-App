@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -12,49 +13,36 @@ import us.koller.cameraroll.util.Util;
 
 @SuppressWarnings("unused")
 public class FabSnackbarBehaviour extends CoordinatorLayout.Behavior<FloatingActionButton> {
-
-    private float fabTranslationY = -1;
-    private float fabBottom = -1;
+    static final String TAG = FabSnackbarBehaviour.class.getSimpleName();
 
     public FabSnackbarBehaviour(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
     @Override
-    public boolean layoutDependsOn(CoordinatorLayout parent, FloatingActionButton fab, View dependency) {
+    public boolean layoutDependsOn(@NonNull CoordinatorLayout parent, @NonNull FloatingActionButton fab, View dependency) {
         return Util.SNACKBAR.equals(dependency.getTag());
     }
 
-    @Override
-    public boolean onDependentViewChanged(CoordinatorLayout parent, FloatingActionButton fab, View dependency) {
-        if (Util.SNACKBAR.equals(dependency.getTag())) {
-            if (fabTranslationY == -1) {
-                fabTranslationY = fab.getTranslationY();
-                CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
-                int fabBottomMargin = lp.bottomMargin;
-                fabBottom = fab.getY() + fab.getHeight() + fabBottomMargin;
-            }
+    private boolean showingFab = true;
 
-            if (dependency.getVisibility() == View.INVISIBLE || dependency.getVisibility() == View.GONE) {
-                fab.animate()
-                        .translationY(fabTranslationY)
-                        .start();
-            } else if (dependency.getY() < fabBottom) {
-                float delta = fabBottom - dependency.getY();
-                float translationY = fabTranslationY - delta;
-                fab.setTranslationY(translationY);
-            } else {
-                fab.setTranslationY(fabTranslationY);
-            }
-        }
+    @Override
+    public boolean onDependentViewChanged(@NonNull CoordinatorLayout parent, @NonNull FloatingActionButton fab, View dependency) {
+        setShowFab(dependency.getVisibility() != View.VISIBLE, fab);
         return true;
     }
 
     @Override
-    public void onDependentViewRemoved(CoordinatorLayout parent, FloatingActionButton fab, View dependency) {
-        super.onDependentViewRemoved(parent, fab, dependency);
-        if (Util.SNACKBAR.equals(dependency.getTag()) && fabTranslationY != -1) {
-            fab.animate().translationY(fabTranslationY).start();
+    public void onDependentViewRemoved(@NonNull CoordinatorLayout parent, @NonNull FloatingActionButton fab, @NonNull View dependency) {
+        setShowFab(true, fab);
+    }
+
+    private void setShowFab(boolean show, @NonNull FloatingActionButton fab) {
+        if (show != showingFab) {
+            showingFab = show;
+            float alpha = show ? 1 : 0;
+            long duration = show ? 400 : 150;
+            fab.animate().setDuration(duration).alpha(alpha).start();
         }
     }
 }

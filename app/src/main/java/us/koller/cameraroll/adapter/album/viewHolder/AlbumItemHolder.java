@@ -14,6 +14,7 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
 import us.koller.cameraroll.R;
 import us.koller.cameraroll.data.models.AlbumItem;
@@ -72,6 +73,7 @@ public abstract class AlbumItemHolder extends RecyclerView.ViewHolder {
     }
 
     public void loadImage(final ImageView imageView, final AlbumItem albumItem) {
+        ColorFade.animateToAlpha(0f, itemView);
         Glide.with(imageView.getContext())
                 .asBitmap()
                 .load(albumItem.getPath())
@@ -80,17 +82,14 @@ public abstract class AlbumItemHolder extends RecyclerView.ViewHolder {
                     public boolean onLoadFailed(@Nullable GlideException e, Object model,
                                                 Target<Bitmap> target, boolean isFirstResource) {
                         albumItem.error = true;
+                        fadeIn();
                         return false;
                     }
 
                     @Override
                     public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target,
                                                    DataSource dataSource, boolean isFirstResource) {
-                        if (!albumItem.hasFadedIn) {
-                            fadeIn();
-                        } else {
-                            imageView.clearColorFilter();
-                        }
+                        fadeIn();
                         return false;
                     }
                 })
@@ -99,8 +98,8 @@ public abstract class AlbumItemHolder extends RecyclerView.ViewHolder {
     }
 
     void fadeIn() {
-        albumItem.hasFadedIn = true;
-        ColorFade.fadeSaturation((ImageView) itemView.findViewById(R.id.image));
+        //albumItem.hasFadedIn = true;
+        ColorFade.animateToAlpha(1, itemView);
     }
 
     public void setSelected(boolean selected) {
@@ -115,7 +114,7 @@ public abstract class AlbumItemHolder extends RecyclerView.ViewHolder {
         final View imageView = itemView.findViewById(R.id.image);
 
         float scale = selected ? 0.8f : 1.0f;
-        imageView.animate()
+        imageView.animate().setInterpolator(SubsamplingScaleImageView.Companion.getInterpolator())
                 .scaleX(scale)
                 .scaleY(scale)
                 .start();
@@ -124,23 +123,15 @@ public abstract class AlbumItemHolder extends RecyclerView.ViewHolder {
             selectorOverlay = Util.getAlbumItemSelectorOverlay(imageView.getContext());
         }
         if (selected) {
-            imageView.post(new Runnable() {
-                @Override
-                public void run() {
-                    imageView.getOverlay().remove(selectorOverlay);
-                    selectorOverlay.setBounds(0, 0,
-                            imageView.getWidth(),
-                            imageView.getHeight());
-                    imageView.getOverlay().add(selectorOverlay);
-                }
+            imageView.post(() -> {
+                imageView.getOverlay().remove(selectorOverlay);
+                selectorOverlay.setBounds(0, 0,
+                        imageView.getWidth(),
+                        imageView.getHeight());
+                imageView.getOverlay().add(selectorOverlay);
             });
         } else {
-            imageView.post(new Runnable() {
-                @Override
-                public void run() {
-                    imageView.getOverlay().remove(selectorOverlay);
-                }
-            });
+            imageView.post(() -> imageView.getOverlay().remove(selectorOverlay));
         }
     }
 }

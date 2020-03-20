@@ -1,8 +1,9 @@
 package us.koller.cameraroll.adapter.album.viewHolder;
 
-import androidx.annotation.Nullable;
 import android.view.View;
 import android.widget.ImageView;
+
+import androidx.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
@@ -14,6 +15,7 @@ import com.bumptech.glide.request.target.Target;
 
 import us.koller.cameraroll.R;
 import us.koller.cameraroll.data.models.AlbumItem;
+import us.koller.cameraroll.util.animators.ColorFade;
 
 public class GifViewHolder extends AlbumItemHolder {
 
@@ -28,7 +30,7 @@ public class GifViewHolder extends AlbumItemHolder {
 
     @Override
     public void loadImage(final ImageView imageView, final AlbumItem albumItem) {
-        //super.loadImage(imageView, albumItem);
+        ColorFade.animateToAlpha(0f, itemView);
 
         RequestOptions options = new RequestOptions()
                 .error(R.drawable.error_placeholder)
@@ -41,19 +43,16 @@ public class GifViewHolder extends AlbumItemHolder {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model,
                                                 Target<GifDrawable> target, boolean isFirstResource) {
-                        return false;
+                        fadeIn();
+                        return true;
                     }
 
                     @Override
                     public boolean onResourceReady(GifDrawable resource, Object model, Target<GifDrawable> target,
                                                    DataSource dataSource, boolean isFirstResource) {
-                        if (!albumItem.hasFadedIn) {
-                            fadeIn();
-                        } else {
-                            imageView.clearColorFilter();
-                        }
+                        fadeIn();
                         resource.start();
-                        return false;
+                        return true;
                     }
                 })
                 .apply(options)

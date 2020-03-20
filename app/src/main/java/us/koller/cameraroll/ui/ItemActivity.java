@@ -353,10 +353,10 @@ public class ItemActivity extends ThemeableActivity {
             final WindowManager.LayoutParams layoutParams = window.getAttributes();
             if (albumItem instanceof Photo) {
                 // set screenBrightness to max
-                layoutParams.screenBrightness = 1.0f;
+                layoutParams.screenBrightness = 1f;
             } else {
                 // restore user preferred screenBrightness => negative value
-                layoutParams.screenBrightness = -1.0f;
+                layoutParams.screenBrightness = -1f;
             }
             window.setAttributes(layoutParams);
         }

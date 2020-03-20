@@ -3,10 +3,8 @@ package us.koller.cameraroll.ui.widget;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapRegionDecoder;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -26,15 +24,13 @@ import android.widget.ProgressBar;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
+import com.davemorrissey.labs.subscaleview.ImageRegionDecoder;
 import com.davemorrissey.labs.subscaleview.ImageViewState;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-
 import us.koller.cameraroll.R;
 import us.koller.cameraroll.imageDecoder.CustomRegionDecoder;
-import us.koller.cameraroll.imageDecoder.RAWImageBitmapRegionDecoder;
+import us.koller.cameraroll.imageDecoder.RAWImageRegionDecoder;
 import us.koller.cameraroll.util.MediaType;
 import us.koller.cameraroll.util.Util;
 
@@ -205,7 +201,7 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
 
         String mimeType = MediaType.getMimeType(getContext(), imageUri);
         if (MediaType.checkRAWMimeType(mimeType)) {
-            setRegionDecoderFactory(RAWImageBitmapRegionDecoder::new);
+            setRegionDecoderFactory(RAWImageRegionDecoder::new);
         } else {
             setRegionDecoderFactory(CustomRegionDecoder::new);
         }
@@ -268,26 +264,33 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
         setProgressBarVisibility(VISIBLE);
         AsyncTask.execute(() -> {
             try {
-                //todo
-                ContentResolver resolver = getContext().getContentResolver();
-                InputStream inputStream = resolver.openInputStream(imageUri);
-                BitmapRegionDecoder decoder = BitmapRegionDecoder.newInstance(inputStream, false);
-                Bitmap bitmap = decoder.decodeRegion(cropRect, null);
-                decoder.recycle();
+                Bitmap croppedBitmap;
+                if (getBitmap() != null/*todo isPreview?*/) {
+                    croppedBitmap = Bitmap.createBitmap(getBitmap(), cropRect.left, cropRect.top, cropRect.width(), cropRect.height());
+                } else {
+                    ImageRegionDecoder regionDecoder = getRegionDecoder();
+                    if (regionDecoder == null) {
+                        regionDecoder = getRegionDecoderFactory().make();
+                        regionDecoder.init(getContext(), imageUri);
+                    }
+
+                    croppedBitmap = regionDecoder.decodeRegion(cropRect, 1);
+                }
                 //rotate image
                 Matrix matrix = new Matrix();
                 matrix.postRotate((float) getClosestRightAngleDegrees() + getRotation());
-                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
+                Bitmap rotatedBitmap = Bitmap.createBitmap(croppedBitmap, 0, 0, croppedBitmap.getWidth(), croppedBitmap.getHeight(), matrix, false);
+                croppedBitmap.recycle();
 
-                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream);
+                //ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                //rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream);
 
-                final Result result = new Result(imageUri, bitmap);
+                final Result result = new Result(imageUri, rotatedBitmap);
                 CropImageView.this.post(() -> {
                     onResultListener.onResult(result);
                     setProgressBarVisibility(GONE);
                 });
-            } catch (Exception | OutOfMemoryError e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 CropImageView.this.post(() -> {
                     onResultListener.onResult(new Result(getImageUri(), null));
@@ -337,9 +340,9 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
         }
 
         if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-            StartCropRect.set(cropRect);
             touchedCorner = getTouchedCorner(motionEvent);
             if (touchedCorner != NO_CORNER) {
+                StartCropRect.set(cropRect);
                 touching = true;
                 return true;
             }
@@ -666,15 +669,15 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
     }
 
     RectF rectF = new RectF();
-    RectF cropRectFPreRotate = new RectF();
+    RectF vCropRectF = new RectF();
 
     @Override
     protected void onDrawPreRotate(@NonNull Canvas canvas) {
         if (cropRect == null) {
             return;
         }
-        cropRectFPreRotate.set(cropRect);
-        sourceToViewRectPreRotate(cropRectFPreRotate, cropRectFPreRotate);
+        vCropRectF.set(cropRect);
+        sourceToViewRectPreRotate(vCropRectF, vCropRectF);
         drawBackground(canvas);
         if (showCroppingEdge)
             drawRect(canvas);
@@ -686,20 +689,20 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
 
     private void drawRect(Canvas canvas) {
         canvas.drawRect(
-                cropRectFPreRotate.left + strokeWidth / 2f,
-                cropRectFPreRotate.top + strokeWidth / 2f,
-                cropRectFPreRotate.right - strokeWidth / 2f,
-                cropRectFPreRotate.bottom - strokeWidth / 2f,
+                vCropRectF.left + strokeWidth / 2f,
+                vCropRectF.top + strokeWidth / 2f,
+                vCropRectF.right - strokeWidth / 2f,
+                vCropRectF.bottom - strokeWidth / 2f,
                 cropRectPaint);
     }
 
     PointF p = new PointF();
 
     private void drawCorners(Canvas canvas) {
-        drawCorner(cropRectFPreRotate.left, cropRectFPreRotate.top, canvas, 0);
-        drawCorner(cropRectFPreRotate.right, cropRectFPreRotate.top, canvas, 90);
-        drawCorner(cropRectFPreRotate.right, cropRectFPreRotate.bottom, canvas, 180);
-        drawCorner(cropRectFPreRotate.left, cropRectFPreRotate.bottom, canvas, 270);
+        drawCorner(vCropRectF.left, vCropRectF.top, canvas, 0);
+        drawCorner(vCropRectF.right, vCropRectF.top, canvas, 90);
+        drawCorner(vCropRectF.right, vCropRectF.bottom, canvas, 180);
+        drawCorner(vCropRectF.left, vCropRectF.bottom, canvas, 270);
     }
 
     Matrix m = new Matrix();
@@ -735,10 +738,10 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
 
         path.reset();
         path.setFillType(Path.FillType.EVEN_ODD);
-        path.moveTo(cropRectFPreRotate.left, cropRectFPreRotate.top);
-        path.lineTo(cropRectFPreRotate.right, cropRectFPreRotate.top);
-        path.lineTo(cropRectFPreRotate.right, cropRectFPreRotate.bottom);
-        path.lineTo(cropRectFPreRotate.left, cropRectFPreRotate.bottom);
+        path.moveTo(vCropRectF.left, vCropRectF.top);
+        path.lineTo(vCropRectF.right, vCropRectF.top);
+        path.lineTo(vCropRectF.right, vCropRectF.bottom);
+        path.lineTo(vCropRectF.left, vCropRectF.bottom);
         path.close();
 
         path.moveTo(rectF.left, rectF.top);
@@ -747,21 +750,23 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
         path.lineTo(rectF.left, rectF.bottom);
         path.close();
 
+        backgroundPaint.setAlpha(touching ? 100 : 200);
+
         canvas.drawPath(this.path, backgroundPaint);
     }
 
     private void drawGuidelines(Canvas canvas) {
-        float width = cropRectFPreRotate.right - cropRectFPreRotate.left;
-        float height = cropRectFPreRotate.bottom - cropRectFPreRotate.top;
+        float width = vCropRectF.right - vCropRectF.left;
+        float height = vCropRectF.bottom - vCropRectF.top;
         float thirdWidth = width / 3;
         float thirdHeight = height / 3;
         float strokeWidth = this.strokeWidth * 1.5f;
         path.reset();
         for (int i = 1; i <= 2; i++) {
-            path.moveTo(cropRectFPreRotate.left + thirdWidth * i, cropRectFPreRotate.top + strokeWidth);
-            path.lineTo(cropRectFPreRotate.left + thirdWidth * i, cropRectFPreRotate.bottom - strokeWidth);
-            path.moveTo(cropRectFPreRotate.left + strokeWidth, cropRectFPreRotate.top + thirdHeight * i);
-            path.lineTo(cropRectFPreRotate.right - strokeWidth, cropRectFPreRotate.top + thirdHeight * i);
+            path.moveTo(vCropRectF.left + thirdWidth * i, vCropRectF.top + strokeWidth);
+            path.lineTo(vCropRectF.left + thirdWidth * i, vCropRectF.bottom - strokeWidth);
+            path.moveTo(vCropRectF.left + strokeWidth, vCropRectF.top + thirdHeight * i);
+            path.lineTo(vCropRectF.right - strokeWidth, vCropRectF.top + thirdHeight * i);
         }
         canvas.drawPath(path, guidelinePaint);
     }

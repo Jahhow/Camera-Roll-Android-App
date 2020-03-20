@@ -5,6 +5,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.davemorrissey.labs.subscaleview.DecoderFactory;
+import com.davemorrissey.labs.subscaleview.ImageDecoder;
+import com.davemorrissey.labs.subscaleview.ImageRegionDecoder;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
 import us.koller.cameraroll.R;
@@ -13,7 +16,6 @@ import us.koller.cameraroll.data.models.Photo;
 import us.koller.cameraroll.imageDecoder.CustomImageDecoder;
 import us.koller.cameraroll.imageDecoder.CustomRegionDecoder;
 import us.koller.cameraroll.ui.ItemActivity;
-import us.koller.cameraroll.util.ExifUtil;
 import us.koller.cameraroll.util.ItemViewUtil;
 
 public class PhotoViewHolder extends ViewHolder {
@@ -30,32 +32,32 @@ public class PhotoViewHolder extends ViewHolder {
     @Override
     public View inflateView(ViewGroup container) {
         ViewGroup v = super.inflatePhotoView(container);
-        final View view = v.findViewById(R.id.subsampling);
-        final View transitionView = itemView.findViewById(R.id.image);
+        final View scaledImageView = v.findViewById(R.id.subsampling);
+        final ImageView transitionView = itemView.findViewById(R.id.image);
 
         //hide transitionView, when config was changed
         if (albumItem instanceof Photo
                 && ((Photo) albumItem).getImageViewSavedState() != null) {
             transitionView.setVisibility(View.INVISIBLE);
         }
-        ItemViewUtil.bindTransitionView((ImageView) transitionView, albumItem);
-        view.setVisibility(View.INVISIBLE);
+        ItemViewUtil.bindTransitionView(transitionView, albumItem);
+        scaledImageView.setVisibility(View.INVISIBLE);
         return v;
     }
 
     private void swapView(final boolean isReturning) {
-        final View view = itemView.findViewById(R.id.subsampling);
+        final SubsamplingScaleImageView scaleView = itemView.findViewById(R.id.subsampling);
         final View transitionView = itemView.findViewById(R.id.image);
         if (!isReturning) {
-            view.setVisibility(View.VISIBLE);
-            bindImageView(view, transitionView);
+            scaleView.setVisibility(View.VISIBLE);
+            bindImageView(scaleView, transitionView);
         } else {
-            view.setVisibility(View.INVISIBLE);
+            scaleView.setVisibility(View.INVISIBLE);
             transitionView.setVisibility(View.VISIBLE);
         }
     }
 
-    void bindImageView(View view, final View transitionView) {
+    void bindImageView(SubsamplingScaleImageView scaleImageView, final View transitionView) {
         if (albumItem.error) {
             transitionView.setVisibility(View.VISIBLE);
             ItemViewUtil.bindTransitionView((ImageView) transitionView, albumItem);
@@ -66,21 +68,19 @@ public class PhotoViewHolder extends ViewHolder {
             return;
         }
 
-        final SubsamplingScaleImageView imageView = (SubsamplingScaleImageView) view;
-
         // use custom decoders
-        imageView.setBitmapDecoderFactory(CustomImageDecoder::new);
-        imageView.setRegionDecoderFactory(CustomRegionDecoder::new);
+        scaleImageView.setDecoderFactory(getImageDecoderFactory());
+        scaleImageView.setRegionDecoderFactory(getImageRegionDecoderFactory());
 
-        //imageView.setMinimumTileDpi(196);
-        //imageView.setMinimumDpi(80);
-        //imageView.setDoubleTapZoomDpi(196);
-        //imageView.setDoubleTapZoomScale(1.0f);
+        //scaleImageView.setMinimumTileDpi(196);
+        //scaleImageView.setMinimumDpi(80);
+        //scaleImageView.setDoubleTapZoomDpi(196);
+        //scaleImageView.setDoubleTapZoomScale(1.0f);
 
-        int orientation = ExifUtil.getExifOrientationAngle(view.getContext(), albumItem);
-        //imageView.setOrientation(orientation);
+        //int orientation = ExifUtil.getExifOrientationAngle(scaleImageView.getContext(), albumItem);
+        //scaleImageView.setOrientation(orientation);
 
-        imageView.setOnClickListener(PhotoViewHolder.this::imageOnClick);
+        scaleImageView.setOnClickListener(PhotoViewHolder.this::imageOnClick);
 
         /*ImageViewState imageViewState = null;
         if (photo.getImageViewSavedState() != null) {
@@ -88,15 +88,16 @@ public class PhotoViewHolder extends ViewHolder {
             photo.putImageViewSavedState(null);
         }*/
 
-        imageView.setImage(albumItem.getPath(), tileEnabled());
-        imageView.setOnImageEventListener(new SubsamplingScaleImageView.DefaultOnImageEventListener() {
+        scaleImageView.setImage(albumItem.getPath());
+        //ItemViewUtil.setPreviewImage(scaleImageView, albumItem);
+        scaleImageView.setOnImageEventListener(new SubsamplingScaleImageView.DefaultOnImageEventListener() {
             @Override
             public void onImageLoaded() {
                 // onImageLoaded() might be called after onSharedElementExit()
                 if (!onSharedElementExit_called)
                     transitionView.setVisibility(View.INVISIBLE);
 
-                initialSubsamplingScale = imageView.getScale();
+                initialSubsamplingScale = scaleImageView.getScale();
                 imageViewWasBound = true;
                 PhotoViewHolder.this.onImageLoaded();
             }
@@ -142,13 +143,17 @@ public class PhotoViewHolder extends ViewHolder {
         super.onDestroy();
     }
 
+    DecoderFactory<? extends ImageRegionDecoder> getImageRegionDecoderFactory() {
+        return CustomRegionDecoder::new;
+    }
+
+    DecoderFactory<? extends ImageDecoder> getImageDecoderFactory() {
+        return CustomImageDecoder::new;
+    }
+
     void onImageLoaded() {
     }
 
     void onImageLoadError() {
-    }
-
-    boolean tileEnabled(){
-        return true;
     }
 }

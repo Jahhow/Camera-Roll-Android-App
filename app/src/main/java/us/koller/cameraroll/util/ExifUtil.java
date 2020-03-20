@@ -684,13 +684,14 @@ public class ExifUtil {
         return null;
     }
 
-    public static void saveExifData(String path, ExifItem[] exifData) {
+    public static void saveExifData(String path, ExifItem[] exifData, boolean resetOrientation) {
         try {
             ExifInterface exif = new ExifInterface(path);
-            for (int i = 0; i < exifData.length; i++) {
-                ExifItem exifItem = exifData[i];
+            for (ExifItem exifItem : exifData) {
                 exif.setAttribute(exifItem.getTag(), exifItem.getValue());
             }
+            if (resetOrientation)
+                exif.resetOrientation();
             exif.saveAttributes();
         } catch (IOException | IllegalArgumentException e) {
             e.printStackTrace();

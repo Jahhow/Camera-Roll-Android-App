@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,6 +19,7 @@ import android.view.ViewTreeObserver;
 import android.view.WindowInsets;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
@@ -476,11 +476,11 @@ public class MainActivity extends ThemeableActivity {
             mediaProvider = null;
         }
 
-        if (showSnackBar) {
-            snackbar = Snackbar.make(findViewById(R.id.root_view),
+        /*if (showSnackBar) {
+            Snackbar snackbar = Snackbar.make(findViewById(R.id.root_view),
                     R.string.loading, Snackbar.LENGTH_SHORT);
             Util.showSnackbar(snackbar);
-        }
+        }*/
 
         final MediaProvider.OnMediaLoadedCallback callback
                 = new MediaProvider.OnMediaLoadedCallback() {
@@ -496,7 +496,8 @@ public class MainActivity extends ThemeableActivity {
                             recyclerViewAdapter.setData(albumsWithVirtualDirs);
 
                             if (showSnackBar) {
-                                snackbar.setText(R.string.done);
+                                Snackbar snackbar = Snackbar.make(findViewById(R.id.root_view),
+                                        R.string.done, Snackbar.LENGTH_SHORT);
                                 Util.showSnackbar(snackbar);
                             }
 
@@ -512,7 +513,7 @@ public class MainActivity extends ThemeableActivity {
             @Override
             public void timeout() {
                 //handle timeout
-                snackbar = Snackbar.make(findViewById(R.id.root_view),
+                Snackbar snackbar = Snackbar.make(findViewById(R.id.root_view),
                         R.string.loading_failed, Snackbar.LENGTH_INDEFINITE);
                 snackbar.setAction(getString(R.string.retry), new View.OnClickListener() {
                     @Override
@@ -647,13 +648,10 @@ public class MainActivity extends ThemeableActivity {
             public void run() {
                 //SortUtil.sortAlbums(MainActivity.this, MediaProvider.getAlbums());
                 final ArrayList<Album> albums = MediaProvider.getAlbumsWithVirtualDirectories(MainActivity.this);
-                MainActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        MainActivity.this.albums = albums;
-                        recyclerViewAdapter.setData(albums);
-                        snackbar.dismiss();
-                    }
+                MainActivity.this.runOnUiThread(() -> {
+                    MainActivity.this.albums = albums;
+                    recyclerViewAdapter.setData(albums);
+                    snackbar.dismiss();
                 });
             }
         });
@@ -739,20 +737,17 @@ public class MainActivity extends ThemeableActivity {
         super.onPause();
 
         observer = new ContentObserver(new Handler());
-        observer.setListener(new ContentObserver.Listener() {
-            @Override
-            public void onChange(boolean selfChange, Uri uri) {
-                //Log.d("MainActivity", "onChange()");
-                MediaProvider.dataChanged = true;
-                //observer.unregister(MainActivity.this);
-                //observer = null;
-            }
+        observer.setListener((selfChange, uri) -> {
+            //Log.d("MainActivity", "onChange()");
+            MediaProvider.dataChanged = true;
+            //observer.unregister(MainActivity.this);
+            //observer = null;
         });
         observer.register(this);
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         //not able to save albums in Bundle, --> TransactionTooLargeException
         //outState.putParcelableArrayList(ALBUMS, albums);
@@ -815,6 +810,7 @@ public class MainActivity extends ThemeableActivity {
         return new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, final Intent intent) {
+                if (intent.getAction() == null) return;
                 switch (intent.getAction()) {
                     case FileOperation.RESULT_DONE:
                     case FileOperation.FAILED:

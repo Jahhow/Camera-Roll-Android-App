@@ -114,6 +114,7 @@ public abstract class AlbumHolder extends RecyclerView.ViewHolder {
                     public boolean onLoadFailed(@Nullable GlideException e, Object model,
                                                 Target<Bitmap> target, boolean isFirstResource) {
                         coverImage.error = true;
+                        ColorFade.animateToAlpha(1, itemView);
                         if (image instanceof ParallaxImageView) {
                             ((ParallaxImageView) image).setParallaxTranslation();
                         }
@@ -123,11 +124,7 @@ public abstract class AlbumHolder extends RecyclerView.ViewHolder {
                     @Override
                     public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target,
                                                    DataSource dataSource, boolean isFirstResource) {
-                        if (!coverImage.hasFadedIn) {
-                            coverImage.hasFadedIn = true;
-                            ColorFade.fadeSaturation(image);
-                        }
-
+                        ColorFade.animateToAlpha(1, itemView);
                         if (image instanceof ParallaxImageView) {
                             ((ParallaxImageView) image).setParallaxTranslation();
                         }
@@ -139,13 +136,9 @@ public abstract class AlbumHolder extends RecyclerView.ViewHolder {
     }
 
     public void onItemChanged() {
-
     }
 
     public Context getContext() {
-        if (itemView == null) {
-            return null;
-        }
         return itemView.getContext();
     }
 }
