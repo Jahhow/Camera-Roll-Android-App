@@ -4,12 +4,6 @@ import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.core.content.ContextCompat;
-import androidx.core.widget.NestedScrollView;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.widget.Toolbar;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.transition.Slide;
@@ -20,12 +14,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowInsets;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.core.widget.NestedScrollView;
+
 import us.koller.cameraroll.R;
+import us.koller.cameraroll.interpolator.MyInterpolator;
 import us.koller.cameraroll.ui.widget.SwipeBackCoordinatorLayout;
 import us.koller.cameraroll.util.Util;
 
@@ -62,13 +63,12 @@ public class AboutActivity extends ThemeableActivity
                     .getPackageInfo(getPackageName(), 0).versionName;
             final int versionCode = getPackageManager()
                     .getPackageInfo(getPackageName(), 0).versionCode;
-            //noinspection deprecation
             version.setText(Html.fromHtml(versionName));
             version.setTextColor(theme.getAccentTextColor(this));
             version.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
-                    Toast.makeText(view.getContext(), "versionCode: " + String.valueOf(versionCode), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(view.getContext(), "versionCode: " + versionCode, Toast.LENGTH_SHORT).show();
                     return false;
                 }
             });
@@ -77,7 +77,6 @@ public class AboutActivity extends ThemeableActivity
         }
 
         final TextView aboutText = findViewById(R.id.about_text);
-        //noinspection deprecation
         aboutText.setText(Html.fromHtml(getString(R.string.about_text)));
         aboutText.setMovementMethod(new LinkMovementMethod());
 
@@ -190,12 +189,8 @@ public class AboutActivity extends ThemeableActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                break;
-            default:
-                break;
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -207,8 +202,8 @@ public class AboutActivity extends ThemeableActivity
     }
 
     @Override
-    public void onSwipeProcess(float percent) {
-        getWindow().getDecorView().setBackgroundColor(SwipeBackCoordinatorLayout.getBackgroundColor(percent));
+    public void onSwipeProcess(float fraction) {
+        getWindow().getDecorView().setBackgroundColor(SwipeBackCoordinatorLayout.getBackgroundColor(fraction));
         SwipeBackCoordinatorLayout layout = findViewById(R.id.swipeBackView);
         Toolbar toolbar = findViewById(R.id.toolbar);
         View rootView = findViewById(R.id.root_view);
@@ -228,7 +223,7 @@ public class AboutActivity extends ThemeableActivity
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setReturnTransition(new TransitionSet()
                     .addTransition(new Slide(dir > 0 ? Gravity.TOP : Gravity.BOTTOM))
-                    .setInterpolator(new AccelerateDecelerateInterpolator()));
+                    .setInterpolator(MyInterpolator.accelerateDecelerateInterpolator));
         }
         onBackPressed();
     }

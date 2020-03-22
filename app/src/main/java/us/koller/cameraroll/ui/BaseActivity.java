@@ -10,8 +10,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -115,10 +113,11 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case MainActivity.REMOVABLE_STORAGE_PERMISSION_REQUEST_CODE:
-                if (resultCode == RESULT_OK && workIntent != null) {
-                    Uri treeUri = data.getData();
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == MainActivity.REMOVABLE_STORAGE_PERMISSION_REQUEST_CODE) {
+            if (resultCode == RESULT_OK && workIntent != null) {
+                Uri treeUri = data.getData();
+                if (treeUri != null) {
                     getContentResolver().takePersistableUriPermission(treeUri,
                             Intent.FLAG_GRANT_READ_URI_PERMISSION |
                                     Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
@@ -129,35 +128,22 @@ public abstract class BaseActivity extends AppCompatActivity {
                     startService(workIntent);
                     workIntent = null;
                 }
-                break;
-            default:
-                break;
+            }
         }
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case MediaProvider.PERMISSION_REQUEST_CODE: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    //permission granted
-                    onPermissionGranted();
-                } else {
-                    // permission denied
-                    snackbar = Util.getPermissionDeniedSnackbar(findViewById(R.id.root_view));
-                    snackbar.setAction(R.string.retry, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            MediaProvider.checkPermission(BaseActivity.this);
-                        }
-                    });
-                    Util.showSnackbar(snackbar);
-                }
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == MediaProvider.PERMISSION_REQUEST_CODE) {// If request is cancelled, the result arrays are empty.
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                //permission granted
+                onPermissionGranted();
+            } else {
+                // permission denied
+                snackbar = Util.getPermissionDeniedSnackbar(findViewById(R.id.root_view));
+                snackbar.setAction(R.string.retry, view -> MediaProvider.checkPermission(BaseActivity.this));
+                Util.showSnackbar(snackbar);
             }
-            break;
-            default:
-                break;
         }
     }
 
@@ -169,7 +155,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-       //Log.d("BaseActivity", "onDestroy() called " + this);
+        //Log.d("BaseActivity", "onDestroy() called " + this);
         //unregister LocalBroadcastReceivers
         for (int i = 0; i < broadcastReceivers.size(); i++) {
             BroadcastReceiver broadcastReceiver = broadcastReceivers.get(i);
@@ -201,36 +187,34 @@ public abstract class BaseActivity extends AppCompatActivity {
         return new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-               //Log.d("BaseActivity", "onReceive: " + intent.getAction() + ", " + BaseActivity.this);
-                switch (intent.getAction()) {
-                    case FileOperation.NEED_REMOVABLE_STORAGE_PERMISSION:
-                        final Intent workIntent = intent.getParcelableExtra(FileOperation.WORK_INTENT);
-                        if (workIntent != null) {
-                            new AlertDialog.Builder(BaseActivity.this)
-                                    .setTitle(R.string.grant_removable_storage_permission)
-                                    .setMessage(R.string.grant_removable_storage_permission_message)
-                                    .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            BaseActivity.this.workIntent = workIntent;
-                                            try {
-                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                                    Intent requestIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-                                                    startActivityForResult(requestIntent, MainActivity.REMOVABLE_STORAGE_PERMISSION_REQUEST_CODE);
-                                                }
-                                            } catch (ActivityNotFoundException e) {
-                                                Toast.makeText(BaseActivity.this, "Error!!!", Toast.LENGTH_SHORT).show();
-                                                e.printStackTrace();
+                //Log.d("BaseActivity", "onReceive: " + intent.getAction() + ", " + BaseActivity.this);
+                String action = intent.getAction();
+                if (action == null) return;
+                if (FileOperation.NEED_REMOVABLE_STORAGE_PERMISSION.equals(action)) {
+                    final Intent workIntent = intent.getParcelableExtra(FileOperation.WORK_INTENT);
+                    if (workIntent != null) {
+                        new AlertDialog.Builder(BaseActivity.this)
+                                .setTitle(R.string.grant_removable_storage_permission)
+                                .setMessage(R.string.grant_removable_storage_permission_message)
+                                .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        BaseActivity.this.workIntent = workIntent;
+                                        try {
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                                Intent requestIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+                                                startActivityForResult(requestIntent, MainActivity.REMOVABLE_STORAGE_PERMISSION_REQUEST_CODE);
                                             }
-                                            dialog.dismiss();
+                                        } catch (ActivityNotFoundException e) {
+                                            Toast.makeText(BaseActivity.this, "Error!!!", Toast.LENGTH_SHORT).show();
+                                            e.printStackTrace();
                                         }
-                                    }).setNegativeButton(getString(R.string.cancel), null)
-                                    .create()
-                                    .show();
-                        }
-                        break;
-                    default:
-                        break;
+                                        dialog.dismiss();
+                                    }
+                                }).setNegativeButton(getString(R.string.cancel), null)
+                                .create()
+                                .show();
+                    }
                 }
             }
         };

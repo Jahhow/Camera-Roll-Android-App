@@ -2,23 +2,26 @@ package us.koller.cameraroll.ui.widget;
 
 import android.content.Context;
 import android.graphics.Color;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 
+import androidx.annotation.FloatRange;
+import androidx.annotation.NonNull;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.view.ViewCompat;
+
 //Solution heavily inspired by:
 //https://github.com/WangDaYeeeeee/Mysplash/blob/master/app/src/main/java/com/wangdaye/mysplash/common/ui/widget/SwipeBackCoordinatorLayout.java
 public class SwipeBackCoordinatorLayout extends CoordinatorLayout {
+    static final String TAG = SwipeBackCoordinatorLayout.class.getSimpleName();
     // widget
     public OnSwipeListener listener;
 
     // data
     private int swipeDistance = 0;
-    private static float SWIPE_TRIGGER = 100;
-    private static final float SWIPE_RADIO = 2.5F;
+    private int TRANSLATION_Y_FINISH_THRESHOLD;
 
     private int swipeDir = NULL_DIR;
     public static final int NULL_DIR = 0;
@@ -41,16 +44,12 @@ public class SwipeBackCoordinatorLayout extends CoordinatorLayout {
     }
 
     private void initialize() {
-        SWIPE_TRIGGER = (float) (getResources().getDisplayMetrics().heightPixels / 5.0);
+        TRANSLATION_Y_FINISH_THRESHOLD = getResources().getDisplayMetrics().heightPixels / 5;
     }
 
     @Override
     public boolean onStartNestedScroll(View child, View target, int axes, int type) {
-        if (type == ViewCompat.TYPE_TOUCH) {
-            return super.onStartNestedScroll(child, target, axes, type)
-                    || ((axes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0);
-        }
-        return super.onStartNestedScroll(child, target, axes, type);
+        return ((type == ViewCompat.TYPE_TOUCH) && (axes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0) || super.onStartNestedScroll(child, target, axes, type);
     }
 
     @Override
@@ -68,25 +67,23 @@ public class SwipeBackCoordinatorLayout extends CoordinatorLayout {
     }
 
     @Override
-    public void onNestedScroll(View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed, int type) {
-        int newDyConsumed = dyConsumed;
-        int newDyUnconsumed = dyUnconsumed;
+    public void onNestedScroll(@NonNull View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed, int type, @NonNull int[] consumed) {
         if (swipeDistance == 0) {
             int dir = dyUnconsumed < 0 ? DOWN_DIR : UP_DIR;
             if (listener.canSwipeBack(dir)) {
                 onScroll(dyUnconsumed);
-                newDyConsumed = dyConsumed + dyUnconsumed;
-                newDyUnconsumed = 0;
+                dyConsumed += dyUnconsumed;
+                consumed[1] += dyUnconsumed;
+                dyUnconsumed = 0;
             }
         }
-
-        super.onNestedScroll(target, dxConsumed, newDyConsumed, dxUnconsumed, newDyUnconsumed, type);
+        super.onNestedScroll(target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, type, consumed);
     }
 
     @Override
     public void onStopNestedScroll(View child, int type) {
         super.onStopNestedScroll(child, type);
-        if (Math.abs(swipeDistance) >= SWIPE_TRIGGER) {
+        if (Math.abs(swipeDistance) >= TRANSLATION_Y_FINISH_THRESHOLD) {
             swipeBack();
         } else {
             reset();
@@ -134,15 +131,14 @@ public class SwipeBackCoordinatorLayout extends CoordinatorLayout {
     }
 
     private void setSwipeTranslation() {
-        float translationY = (float) (1.0 * swipeDistance / SWIPE_RADIO);
-        setTranslationY(translationY);
+        setTranslationY(swipeDistance * .5f);
         if (listener != null) {
-            listener.onSwipeProcess(Math.min(1, Math.abs(translationY)));
+            listener.onSwipeProcess(Math.min(1, Math.abs(swipeDistance) / (float) TRANSLATION_Y_FINISH_THRESHOLD));
         }
     }
 
-    public static int getBackgroundColor(float percent) {
-        return Color.argb((int) (255 * 0.5 * (2 - percent)), 0, 0, 0);
+    public static int getBackgroundColor(@FloatRange(from = 0, to = 1) float fraction) {
+        return Color.argb((int) (255 * (1 - fraction)), 0, 0, 0);
     }
 
     public static boolean canSwipeBackForThisView(View v, int dir) {
@@ -179,14 +175,13 @@ public class SwipeBackCoordinatorLayout extends CoordinatorLayout {
 
         @Override
         public void onAnimationRepeat(Animation animation) {
-            // do nothing.
         }
     };
 
     public interface OnSwipeListener {
         boolean canSwipeBack(int dir);
 
-        void onSwipeProcess(float percent);
+        void onSwipeProcess(@FloatRange(from = 0, to = 1) float fraction);
 
         void onSwipeFinish(int dir);
     }

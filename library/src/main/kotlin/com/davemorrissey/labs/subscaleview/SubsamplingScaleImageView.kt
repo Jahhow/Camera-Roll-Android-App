@@ -39,7 +39,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         const val SCALE_TYPE_CENTER_CROP = 2
 
         val interpolator = SigmoidInterpolator()
-        val easeOutInterpolator = SigmoidInterpolator(7.0, 0.0)
+        val easeEndInterpolator = SigmoidInterpolator(7.0, 0.0)
 
         private const val TILE_SIZE_AUTO = Integer.MAX_VALUE
         private const val ANIMATION_DURATION = 366L
@@ -100,8 +100,6 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
 
     private var pendingScale: Float? = null
     private var sPendingCenter: PointF? = null
-
-    private var sOrientation = 0
 
     private var twoFingerZooming = false
     private var isPanning = false
@@ -255,7 +253,6 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
             prevDegreesInt = 0
             sWidth = 0
             sHeight = 0
-            sOrientation = 0
             isReady = false
             isImageLoaded = false
             sin = 0f
@@ -287,7 +284,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                     }
                     AnimationBuilder(targetSFocus, getClosestRightAngleDegrees(rotationDegrees)).apply {
                         interruptible = true
-                        interpolator = easeOutInterpolator
+                        interpolator = easeEndInterpolator
                         duration = FLING_DURATION
                         start()
                     }
@@ -1810,12 +1807,10 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         refreshRequiredTiles(true)
     }
 
-    fun isAnimating() = anim != null
-
     class SigmoidInterpolator @JvmOverloads
-    constructor(easeOut: Double = 6.0, easeIn: Double = 1.0) : Interpolator {
-        private val xStart = -easeIn
-        private val xEnd = easeOut
+    constructor(easeEnd: Double = 6.0, easeStart: Double = 1.0) : Interpolator {
+        private val xStart = -easeStart
+        private val xEnd = easeEnd
         private val xDiff = xEnd - xStart
         private val yStart = sigmoid(xStart)
         private val yEnd = sigmoid(xEnd)
@@ -1829,8 +1824,8 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         }
 
         fun sigmoid(x: Double): Double {
-            if (x <= 0) return Math.exp(x)
-            else return 2 - Math.exp(-x)
+            return if (x <= 0) Math.exp(x)
+            else 2 - Math.exp(-x)
         }
     }
 

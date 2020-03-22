@@ -4,6 +4,8 @@ import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+
 import us.koller.cameraroll.R;
 import us.koller.cameraroll.util.Util;
 
@@ -21,6 +23,7 @@ public class Gif extends AlbumItem implements Parcelable {
         return Util.getImageDimensions(context, getUri(context));
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Gif: " + super.toString();

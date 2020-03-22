@@ -6,6 +6,8 @@ import android.media.MediaFormat;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -54,6 +56,7 @@ public class Video extends AlbumItem implements Parcelable {
         return frameRate;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Video: " + super.toString();

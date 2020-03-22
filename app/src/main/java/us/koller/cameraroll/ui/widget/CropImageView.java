@@ -18,7 +18,6 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
@@ -31,6 +30,7 @@ import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import us.koller.cameraroll.R;
 import us.koller.cameraroll.imageDecoder.CustomRegionDecoder;
 import us.koller.cameraroll.imageDecoder.RAWImageRegionDecoder;
+import us.koller.cameraroll.interpolator.MyInterpolator;
 import us.koller.cameraroll.util.MediaType;
 import us.koller.cameraroll.util.Util;
 
@@ -235,7 +235,7 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
     public void rotate90Degree() {
         aspectRatio = 1 / aspectRatio;
         float oldRotationDegrees;
-        if (isAnimating()) oldRotationDegrees = getAnim().getRotationDegreesEnd();
+        if (getAnim() != null) oldRotationDegrees = getAnim().getRotationDegreesEnd();
         else oldRotationDegrees = getRotationDegrees();
         float rotationDegrees = oldRotationDegrees - 90;
         new AnimationBuilder(getCenterOfCropRect(), getFullScale(cropRect.width(), cropRect.height(), getClosestRightAngleDegreesNormalized(rotationDegrees)), rotationDegrees).start(true);
@@ -261,7 +261,6 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
      * @param onResultListener listener for the resulting cropped bitmap
      **/
     public void getCroppedBitmap(final OnResultListener onResultListener) {
-        setProgressBarVisibility(VISIBLE);
         AsyncTask.execute(() -> {
             try {
                 Bitmap croppedBitmap;
@@ -288,13 +287,11 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
                 final Result result = new Result(imageUri, rotatedBitmap);
                 CropImageView.this.post(() -> {
                     onResultListener.onResult(result);
-                    setProgressBarVisibility(GONE);
                 });
             } catch (Exception e) {
                 e.printStackTrace();
                 CropImageView.this.post(() -> {
                     onResultListener.onResult(new Result(getImageUri(), null));
-                    setProgressBarVisibility(GONE);
                 });
             }
         });
@@ -898,7 +895,7 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
 
         ValueAnimator animator = ValueAnimator.ofInt(0, 100);
         animator.setDuration(300);
-        animator.setInterpolator(new AccelerateDecelerateInterpolator());
+        animator.setInterpolator(MyInterpolator.accelerateDecelerateInterpolator);
         animator.addUpdateListener(valueAnimator -> {
             float animatedValue = valueAnimator.getAnimatedFraction();
             setCropRect(new Rect(

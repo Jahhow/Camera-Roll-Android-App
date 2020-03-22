@@ -3,7 +3,6 @@ package us.koller.cameraroll.adapter.main;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -64,13 +63,13 @@ public class MainAdapter extends AbstractRecyclerViewAdapter<ArrayList<Album>> {
         ((AlbumHolder) holder).setAlbum(album);
 
         holder.itemView.setOnClickListener(view -> {
-            Intent intent = new Intent(holder.itemView.getContext(), AlbumActivity.class);
+            Intent intent = new Intent(view.getContext(), AlbumActivity.class);
 
             //intent.putExtra(AlbumActivity.ALBUM, album);
             intent.putExtra(AlbumActivity.ALBUM_PATH, album.getPath());
 
             if (pickPhotos()) {
-                Context c = holder.itemView.getContext();
+                Context c = view.getContext();
                 boolean allowMultiple = false;
                 if (c instanceof Activity) {
                     Activity a = (Activity) c;
@@ -84,18 +83,20 @@ public class MainAdapter extends AbstractRecyclerViewAdapter<ArrayList<Album>> {
             }
 
             ActivityOptionsCompat options;
-            Activity context = (Activity) holder.itemView.getContext();
-            if (!pickPhotos()) {
-                //noinspection unchecked
-                options = ActivityOptionsCompat.makeSceneTransitionAnimation(context);
-                context.startActivityForResult(intent,
-                        MainActivity.REFRESH_PHOTOS_REQUEST_CODE);
-            } else {
-                View toolbar = context.findViewById(R.id.toolbar);
+            Activity activity = (Activity) view.getContext();
+            if (pickPhotos()) {
+                View toolbar = activity.findViewById(R.id.toolbar);
                 options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                        context, toolbar, context.getString(R.string.toolbar_transition_name));
-                context.startActivityForResult(intent,
+                        activity, toolbar, activity.getString(R.string.toolbar_transition_name));
+                activity.startActivityForResult(intent,
                         MainActivity.PICK_PHOTOS_REQUEST_CODE, options.toBundle());
+            } else {
+                //todo
+                //options = ActivityOptionsCompat.makeCustomAnimation(activity, R.anim.enter, R.anim.enter);
+                //noinspection unchecked
+                options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
+                activity.startActivityForResult(intent,
+                        MainActivity.REFRESH_PHOTOS_REQUEST_CODE, options.toBundle());
             }
         });
     }

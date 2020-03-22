@@ -4,7 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
-import android.preference.PreferenceManager;
+
+import androidx.preference.PreferenceManager;
 
 import us.koller.cameraroll.R;
 import us.koller.cameraroll.styles.Cards;
@@ -36,8 +37,6 @@ public class Settings {
     private boolean cameraShortcut;
     private Uri removableStorageTreeUri;
     private boolean virtualDirectories;
-    @SuppressWarnings("FieldCanBeLocal")
-    private boolean fadeImages = false;
     private boolean showAnimations;
     private boolean maxBrightness;
     private float prevBrightness;
@@ -56,8 +55,8 @@ public class Settings {
     }
 
     private Settings(Context context) {
-        SharedPreferences sharedPreferences
-                = PreferenceManager.getDefaultSharedPreferences(context);
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         theme = sharedPreferences.getString(
                 context.getString(R.string.pref_key_theme),
@@ -268,10 +267,6 @@ public class Settings {
         this.virtualDirectories = virtualDirectories;
         saveBoolean(context, context.getString(R.string.pref_key_virtual_directories),
                 virtualDirectories);
-    }
-
-    public boolean fadeImages() {
-        return fadeImages;
     }
 
     public boolean noFolderMode() {

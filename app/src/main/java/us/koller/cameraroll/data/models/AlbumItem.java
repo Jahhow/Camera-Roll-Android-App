@@ -6,6 +6,8 @@ import android.os.AsyncTask;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+
 import com.bumptech.glide.load.Key;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
@@ -207,6 +209,7 @@ public abstract class AlbumItem
         this.uri = Uri.parse(parcel.readString());
     }
 
+    @NonNull
     @Override
     public String toString() {
         return getName() + ", " + getPath();

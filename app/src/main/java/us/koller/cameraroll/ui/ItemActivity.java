@@ -25,7 +25,6 @@ import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowInsets;
 import android.view.WindowManager;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -64,6 +63,7 @@ import us.koller.cameraroll.data.models.Gif;
 import us.koller.cameraroll.data.models.Photo;
 import us.koller.cameraroll.data.models.Video;
 import us.koller.cameraroll.data.provider.MediaProvider;
+import us.koller.cameraroll.interpolator.MyInterpolator;
 import us.koller.cameraroll.util.MediaType;
 import us.koller.cameraroll.util.ParallaxTransformer;
 import us.koller.cameraroll.util.SimpleTransitionListener;
@@ -190,14 +190,14 @@ public class ItemActivity extends ThemeableActivity {
                 @Override
                 @RequiresApi(api = Build.VERSION_CODES.KITKAT_WATCH)
                 public WindowInsets onApplyWindowInsets(View view, WindowInsets insets) {
-                    toolbar.setPadding(toolbar.getPaddingStart() + insets.getSystemWindowInsetLeft(),
+                    toolbar.setPadding(toolbar.getPaddingLeft() + insets.getSystemWindowInsetLeft(),
                             toolbar.getPaddingTop() + insets.getSystemWindowInsetTop(),
-                            toolbar.getPaddingEnd() + insets.getSystemWindowInsetRight(),
+                            toolbar.getPaddingRight() + insets.getSystemWindowInsetRight(),
                             toolbar.getPaddingBottom());
 
-                    bottomBar.setPadding(bottomBar.getPaddingStart() + insets.getSystemWindowInsetLeft(),
+                    bottomBar.setPadding(bottomBar.getPaddingLeft() + insets.getSystemWindowInsetLeft(),
                             bottomBar.getPaddingTop(),
-                            bottomBar.getPaddingEnd() + insets.getSystemWindowInsetRight(),
+                            bottomBar.getPaddingRight() + insets.getSystemWindowInsetRight(),
                             bottomBar.getPaddingBottom() + insets.getSystemWindowInsetBottom());
 
                     // clear this listener so insets aren't re-applied
@@ -220,14 +220,14 @@ public class ItemActivity extends ThemeableActivity {
                                             Math.abs(screenSize[2] - rootView.getRight()),
                                             Math.abs(screenSize[3] - rootView.getBottom())};
 
-                                    toolbar.setPadding(toolbar.getPaddingStart() + windowInsets[0],
+                                    toolbar.setPadding(toolbar.getPaddingLeft() + windowInsets[0],
                                             toolbar.getPaddingTop() + windowInsets[1],
-                                            toolbar.getPaddingEnd() + windowInsets[2],
+                                            toolbar.getPaddingRight() + windowInsets[2],
                                             toolbar.getPaddingBottom());
 
-                                    bottomBar.setPadding(bottomBar.getPaddingStart() + windowInsets[0],
+                                    bottomBar.setPadding(bottomBar.getPaddingLeft() + windowInsets[0],
                                             bottomBar.getPaddingTop(),
-                                            bottomBar.getPaddingEnd() + windowInsets[2],
+                                            bottomBar.getPaddingRight() + windowInsets[2],
                                             bottomBar.getPaddingBottom() + windowInsets[3]);
 
                                     rootView.getViewTreeObserver()
@@ -794,17 +794,21 @@ public class ItemActivity extends ThemeableActivity {
     }
 
     private void showUI(boolean show) {
-        float toolbar_translationY = show ? 0 : -(toolbar.getHeight());
-        float bottomBar_translationY = show ? 0
-                : ((View) bottomBar.getParent()).getHeight();
+        float translationY = show ? 0 : 16 * getResources().getDisplayMetrics().density;
+        float alpha = show ? 1 : 0;
+        long duration = show ? 250 : 500;
         toolbar.animate()
-                .translationY(toolbar_translationY)
-                .setInterpolator(new AccelerateDecelerateInterpolator())
+                .translationY(-translationY)
+                .alpha(alpha)
+                .setDuration(duration)
+                .setInterpolator(MyInterpolator.accelerateDecelerateInterpolator)
                 .start();
 
-        ((View) bottomBar.getParent()).animate()
-                .translationY(bottomBar_translationY)
-                .setInterpolator(new AccelerateDecelerateInterpolator())
+        bottomBar.animate()
+                .translationY(translationY)
+                .alpha(alpha)
+                .setDuration(duration)
+                .setInterpolator(MyInterpolator.accelerateDecelerateInterpolator)
                 .start();
     }
 

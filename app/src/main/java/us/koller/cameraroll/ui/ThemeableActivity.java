@@ -176,7 +176,6 @@ public abstract class ThemeableActivity extends BaseActivity {
     public abstract int getLightThemeRes();
 
     public void onThemeApplied(Theme theme) {
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)

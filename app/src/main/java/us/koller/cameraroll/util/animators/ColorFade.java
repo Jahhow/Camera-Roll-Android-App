@@ -45,7 +45,7 @@ public class ColorFade {
     private static ValueAnimator getDefaultValueAnimator(int startValue, int endValue) {
         ValueAnimator animator = ValueAnimator.ofInt(startValue, endValue);
         animator.setDuration(500);
-        animator.setInterpolator(new AccelerateDecelerateInterpolator());
+        animator.setInterpolator(SubsamplingScaleImageView.Companion.getInterpolator());
         return animator;
     }
 

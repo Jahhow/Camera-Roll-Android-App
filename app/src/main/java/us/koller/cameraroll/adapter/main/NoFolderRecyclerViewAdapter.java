@@ -1,8 +1,10 @@
 package us.koller.cameraroll.adapter.main;
 
 import android.content.Context;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
@@ -63,8 +65,9 @@ public class NoFolderRecyclerViewAdapter extends AbstractRecyclerViewAdapter<Arr
         return albumAdapter.getItemViewType(position);
     }
 
+    @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return albumAdapter.onCreateViewHolder(parent, viewType);
     }
 

@@ -7,7 +7,6 @@ import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.net.Uri;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -20,7 +19,6 @@ public class RAWImageRegionDecoder implements ImageRegionDecoder {
     @Override
     @NonNull
     public Point init(Context context, @NonNull Uri uri) throws Exception {
-        Log.i(TAG, "init");
         bitmap = BitmapFactory.decodeStream(context.getContentResolver().openInputStream(uri));
         return new Point(bitmap.getWidth(), bitmap.getHeight());
     }
@@ -28,7 +26,6 @@ public class RAWImageRegionDecoder implements ImageRegionDecoder {
     @Override
     @NonNull
     public Bitmap decodeRegion(Rect rect, int sampleSize) {
-        Log.i(TAG, "decodeRegion");
         float scale = 1f / sampleSize;
         Matrix matrix = new Matrix();
         matrix.setScale(scale, scale);

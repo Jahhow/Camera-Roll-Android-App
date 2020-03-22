@@ -29,14 +29,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowInsets;
-import android.view.animation.AccelerateDecelerateInterpolator;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.SharedElementCallback;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -46,8 +44,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import us.koller.cameraroll.R;
 import us.koller.cameraroll.adapter.SelectorModeManager;
@@ -86,9 +82,9 @@ public class AlbumActivity extends ThemeableActivity
     public static final String EXTRA_CURRENT_ALBUM_POSITION = "EXTRA_CURRENT_ALBUM_POSITION";
     public static final String RECYCLER_VIEW_SCROLL_STATE = "RECYCLER_VIEW_STATE";
 
-    private int sharedElementReturnPosition = -1;
+    //private int sharedElementReturnPosition = -1;
 
-    private final SharedElementCallback mCallback = new SharedElementCallback() {
+    /*private final SharedElementCallback mCallback = new SharedElementCallback() {
         @Override
         @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
         public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
@@ -117,7 +113,7 @@ public class AlbumActivity extends ThemeableActivity
                 }
             }
         }
-    };
+    };*/
 
     private Album album;
 
@@ -133,6 +129,9 @@ public class AlbumActivity extends ThemeableActivity
 
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setEnterTransition(new TransitionSet().addTransition(new Fade()).addTransition(new ChangeTransform()));
+        }*/
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album);
 
@@ -142,19 +141,7 @@ public class AlbumActivity extends ThemeableActivity
 
         MediaProvider.checkPermission(this);
 
-        setExitSharedElementCallback(mCallback);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setEnterTransition(new TransitionSet()
-                    .setOrdering(TransitionSet.ORDERING_TOGETHER)
-                    .addTransition(new Slide(Gravity.BOTTOM))
-                    .addTransition(new Fade())
-                    .setInterpolator(new AccelerateDecelerateInterpolator()));
-            getWindow().setReturnTransition(new TransitionSet()
-                    .setOrdering(TransitionSet.ORDERING_TOGETHER)
-                    .addTransition(new Slide(Gravity.BOTTOM))
-                    .addTransition(new Fade())
-                    .setInterpolator(new AccelerateDecelerateInterpolator()));
-        }
+        //setExitSharedElementCallback(mCallback);
 
         final ViewGroup swipeBackView = findViewById(R.id.swipeBackView);
         if (swipeBackView instanceof SwipeBackCoordinatorLayout) {
@@ -587,12 +574,12 @@ public class AlbumActivity extends ThemeableActivity
 
                                     @Override
                                     public void timeout() {
-                                        finish();
+                                        supportFinishAfterTransition();
                                     }
 
                                     @Override
                                     public void needPermission() {
-                                        finish();
+                                        supportFinishAfterTransition();
                                     }
                                 });
                     }
@@ -619,19 +606,15 @@ public class AlbumActivity extends ThemeableActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch (resultCode) {
-            default:
-                if (data != null && data.getAction() != null) {
-                    onNewIntent(data);
-                }
-                break;
+        if (data != null && data.getAction() != null) {
+            onNewIntent(data);
         }
     }
 
     @Override
     public void onPermissionGranted() {
         super.onPermissionGranted();
-        this.finish();
+        this.supportFinishAfterTransition();
     }
 
     public void deleteAlbumItemsSnackbar(String[] selected_items) {
@@ -747,12 +730,7 @@ public class AlbumActivity extends ThemeableActivity
             intent.setData(selected_items[0].getUri(this));
         }
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        setResult(RESULT_OK, intent);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            finishAfterTransition();
-        } else {
-            finish();
-        }
+        supportFinishAfterTransition();
     }
 
     @Override
@@ -1041,9 +1019,9 @@ public class AlbumActivity extends ThemeableActivity
     }
 
     @Override
-    public void onSwipeProcess(float percent) {
+    public void onSwipeProcess(float fraction) {
         getWindow().getDecorView().setBackgroundColor(
-                SwipeBackCoordinatorLayout.getBackgroundColor(percent));
+                SwipeBackCoordinatorLayout.getBackgroundColor(fraction));
         boolean selectorModeActive = recyclerViewAdapter.isSelectorModeActive();
         if (!theme.darkStatusBarIcons() && selectorModeActive) {
             SwipeBackCoordinatorLayout layout = findViewById(R.id.swipeBackView);
@@ -1068,10 +1046,9 @@ public class AlbumActivity extends ThemeableActivity
             getWindow().setReturnTransition(new TransitionSet()
                     .setOrdering(TransitionSet.ORDERING_TOGETHER)
                     .addTransition(new Slide(dir > 0 ? Gravity.TOP : Gravity.BOTTOM))
-                    .addTransition(new Fade())
-                    .setInterpolator(new AccelerateDecelerateInterpolator()));
-        }
-        finish();
+                    .addTransition(new Fade()));
+            finishAfterTransition();
+        } else finish();
     }
 
     @Override
@@ -1122,7 +1099,9 @@ public class AlbumActivity extends ThemeableActivity
         return new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                switch (intent.getAction()) {
+                String action = intent.getAction();
+                if (action == null) return;
+                switch (action) {
                     case FileOperation.RESULT_DONE:
                         int type = intent.getIntExtra(FileOperation.TYPE, FileOperation.EMPTY);
                         if (type == FileOperation.MOVE) {
@@ -1174,7 +1153,7 @@ public class AlbumActivity extends ThemeableActivity
         recyclerViewAdapter.notifyDataSetChanged();
 
         if (album.getAlbumItems().size() == 0) {
-            finish();
+            supportFinishAfterTransition();
         }
     }
 }

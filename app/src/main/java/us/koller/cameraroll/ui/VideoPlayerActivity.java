@@ -16,7 +16,6 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowInsets;
 import android.view.WindowManager;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageButton;
 
 import androidx.annotation.Nullable;
@@ -46,6 +45,7 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
 import us.koller.cameraroll.R;
+import us.koller.cameraroll.interpolator.MyInterpolator;
 
 public class VideoPlayerActivity extends ThemeableActivity {
 
@@ -116,7 +116,7 @@ public class VideoPlayerActivity extends ThemeableActivity {
                                 : -(toolbar.getHeight());
                         toolbar.animate()
                                 .translationY(toolbar_translationY)
-                                .setInterpolator(new AccelerateDecelerateInterpolator())
+                                .setInterpolator(MyInterpolator.accelerateDecelerateInterpolator)
                                 .setListener(new AnimatorListenerAdapter() {
                                     @Override
                                     public void onAnimationEnd(Animator animation) {
@@ -130,7 +130,7 @@ public class VideoPlayerActivity extends ThemeableActivity {
                                 : bottomBarControls.getHeight();
                         bottomBarControls.animate()
                                 .translationY(controls_translationY)
-                                .setInterpolator(new AccelerateDecelerateInterpolator())
+                                .setInterpolator(MyInterpolator.accelerateDecelerateInterpolator)
                                 .start();
 
                         //show/hide Nav-/StatusBar

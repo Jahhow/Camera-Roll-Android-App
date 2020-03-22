@@ -22,6 +22,7 @@ import us.koller.cameraroll.adapter.album.viewHolder.GifViewHolder;
 import us.koller.cameraroll.adapter.album.viewHolder.PhotoViewHolder;
 import us.koller.cameraroll.adapter.album.viewHolder.RAWImageHolder;
 import us.koller.cameraroll.adapter.album.viewHolder.VideoViewHolder;
+import us.koller.cameraroll.data.Settings;
 import us.koller.cameraroll.data.models.Album;
 import us.koller.cameraroll.data.models.AlbumItem;
 import us.koller.cameraroll.data.models.Gif;
@@ -96,11 +97,9 @@ public class AlbumAdapter extends AbstractRecyclerViewAdapter<Album> {
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return onCreateViewHolder(parent, viewType, R.layout.albumitem_cover);
-    }
-
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType, int layoutRes) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(layoutRes, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.albumitem_cover, parent, false);
+        if (Settings.getInstance(parent.getContext()).showAnimations())
+            v.setAlpha(0);
         switch (viewType) {
             case VIEW_TYPE_RAW:
                 return new RAWImageHolder(v);
@@ -108,12 +107,9 @@ public class AlbumAdapter extends AbstractRecyclerViewAdapter<Album> {
                 return new GifViewHolder(v);
             case VIEW_TYPE_VIDEO:
                 return new VideoViewHolder(v);
-            case VIEW_TYPE_PHOTO:
-                return new PhotoViewHolder(v);
             default:
-                break;
+                return new PhotoViewHolder(v);
         }
-        return null;
     }
 
     @Override
@@ -123,10 +119,6 @@ public class AlbumAdapter extends AbstractRecyclerViewAdapter<Album> {
         AlbumItem albumItem = getData().getAlbumItems().get(position);
 
         if (!albumItem.equals(albumItemHolder.getAlbumItem())) {
-            /*if (Settings.getInstance(itemView.getContext()).showAnimations()) {
-                itemView.clearAnimation();
-                itemView.setAlpha(0);
-            }*/
             albumItemHolder.setAlbumItem(albumItem);
             itemView.setTag(albumItem.getPath());
         }

@@ -3,15 +3,16 @@ package us.koller.cameraroll;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
+import us.koller.cameraroll.data.models.Album;
 import us.koller.cameraroll.data.models.AlbumItem;
 import us.koller.cameraroll.data.models.Video;
 import us.koller.cameraroll.ui.EditImageActivity;
 import us.koller.cameraroll.ui.ItemActivity;
-import us.koller.cameraroll.data.models.Album;
 import us.koller.cameraroll.ui.MainActivity;
 import us.koller.cameraroll.ui.VideoPlayerActivity;
 
@@ -20,8 +21,9 @@ public class IntentReceiver extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        switch (getIntent().getAction()) {
+        String action = getIntent().getAction();
+        if (action == null) return;
+        switch (action) {
             case "com.android.camera.action.REVIEW":
             case Intent.ACTION_VIEW:
                 view(getIntent());

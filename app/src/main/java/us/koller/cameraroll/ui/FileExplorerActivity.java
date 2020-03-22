@@ -30,7 +30,6 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowInsets;
 import android.view.WindowManager;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -60,6 +59,7 @@ import us.koller.cameraroll.data.models.StorageRoot;
 import us.koller.cameraroll.data.models.VirtualAlbum;
 import us.koller.cameraroll.data.provider.FilesProvider;
 import us.koller.cameraroll.data.provider.Provider;
+import us.koller.cameraroll.interpolator.MyInterpolator;
 import us.koller.cameraroll.themes.Theme;
 import us.koller.cameraroll.ui.widget.SwipeBackCoordinatorLayout;
 import us.koller.cameraroll.util.Util;
@@ -104,12 +104,12 @@ public class FileExplorerActivity extends ThemeableActivity
                     .setOrdering(TransitionSet.ORDERING_TOGETHER)
                     .addTransition(new Slide(Gravity.BOTTOM))
                     .addTransition(new Fade())
-                    .setInterpolator(new AccelerateDecelerateInterpolator()));
+                    .setInterpolator(MyInterpolator.accelerateDecelerateInterpolator));
             getWindow().setReturnTransition(new TransitionSet()
                     .setOrdering(TransitionSet.ORDERING_TOGETHER)
                     .addTransition(new Slide(Gravity.BOTTOM))
                     .addTransition(new Fade())
-                    .setInterpolator(new AccelerateDecelerateInterpolator()));
+                    .setInterpolator(MyInterpolator.accelerateDecelerateInterpolator));
         }
 
         final Toolbar toolbar = findViewById(R.id.toolbar);
@@ -332,7 +332,7 @@ public class FileExplorerActivity extends ThemeableActivity
     }
 
     public void loadDirectory(final String path) {
-       //Log.d("FileExplorerActivity", "loadDirectory(): " + path);
+        //Log.d("FileExplorerActivity", "loadDirectory(): " + path);
         final Snackbar snackbar = Snackbar.make(findViewById(R.id.root_view),
                 getString(R.string.loading), Snackbar.LENGTH_INDEFINITE);
         Util.showSnackbar(snackbar);
@@ -662,9 +662,9 @@ public class FileExplorerActivity extends ThemeableActivity
     }
 
     @Override
-    public void onSwipeProcess(float percent) {
+    public void onSwipeProcess(float fraction) {
         getWindow().getDecorView().setBackgroundColor(
-                SwipeBackCoordinatorLayout.getBackgroundColor(percent));
+                SwipeBackCoordinatorLayout.getBackgroundColor(fraction));
         boolean selectorModeActive = ((FileExplorerAdapter) recyclerView.getAdapter()).isModeActive();
         if (!theme.darkStatusBarIcons() && selectorModeActive) {
             SwipeBackCoordinatorLayout layout = findViewById(R.id.swipeBackView);
@@ -687,9 +687,9 @@ public class FileExplorerActivity extends ThemeableActivity
                     .setOrdering(TransitionSet.ORDERING_TOGETHER)
                     .addTransition(new Slide(dir > 0 ? Gravity.TOP : Gravity.BOTTOM))
                     .addTransition(new Fade())
-                    .setInterpolator(new AccelerateDecelerateInterpolator()));
-        }
-        this.finish();
+                    .setInterpolator(MyInterpolator.accelerateDecelerateInterpolator));
+            finishAfterTransition();
+        } else finish();
     }
 
     @Override
