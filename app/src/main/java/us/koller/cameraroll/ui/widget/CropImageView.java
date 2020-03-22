@@ -210,7 +210,7 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
             cropRect = state.getCropRect();
             setAspectRatio(state.getAspectRatio());
         }
-        setImage(uri.toString());
+        loadImage(uri.toString());
     }
 
     public Uri getImageUri() {

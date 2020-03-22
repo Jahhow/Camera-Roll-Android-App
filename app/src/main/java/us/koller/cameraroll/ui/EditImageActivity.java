@@ -309,7 +309,7 @@ public class EditImageActivity extends AppCompatActivity {
             rotate.setIcon(avd);
         }
         MenuItem antiAlias = menu.findItem(R.id.antiAlias);
-        imageView.setFilterBitmap(antiAlias.isChecked());
+        imageView.setFilterBitmapEnabled(antiAlias.isChecked());
 
         MenuItem showCropRect = menu.findItem(R.id.showCropRect);
         imageView.setShowCroppingEdge(showCropRect.isChecked());
@@ -365,7 +365,7 @@ public class EditImageActivity extends AppCompatActivity {
             case R.id.antiAlias: {
                 boolean checked = !item.isChecked();
                 item.setChecked(checked);
-                imageView.setFilterBitmap(checked);
+                imageView.setFilterBitmapEnabled(checked);
                 break;
             }
             case R.id.showCropRect: {

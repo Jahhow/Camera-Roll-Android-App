@@ -3,8 +3,8 @@ package us.koller.cameraroll.util;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Build;
-import android.os.Handler;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
@@ -15,21 +15,25 @@ import androidx.core.view.ViewCompat;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.load.resource.bitmap.Rotate;
 import com.bumptech.glide.load.resource.gif.GifDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
-import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
 import us.koller.cameraroll.R;
 import us.koller.cameraroll.adapter.item.viewHolder.GifViewHolder;
 import us.koller.cameraroll.data.models.AlbumItem;
 
 public class ItemViewUtil {
+    static final String TAG = ItemViewUtil.class.getSimpleName();
 
-    public static ViewGroup inflatePhotoView(ViewGroup container) {
-        return (ViewGroup) LayoutInflater.from(container.getContext())
+    public static View inflatePhotoView(ViewGroup container) {
+        return LayoutInflater.from(container.getContext())
                 .inflate(R.layout.photo_view, container, false);
+    }
+
+    public static View inflateGifView(ViewGroup container) {
+        return LayoutInflater.from(container.getContext())
+                .inflate(R.layout.gif_view, container, false);
     }
 
     public static ViewGroup inflateVideoView(ViewGroup container) {
@@ -38,14 +42,6 @@ public class ItemViewUtil {
     }
 
     public static void bindTransitionView(final ImageView imageView, final AlbumItem albumItem) {
-        //handle timeOut
-        if (albumItem.isSharedElement && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            new Handler().postDelayed(() -> {
-                albumItem.isSharedElement = false;
-                ((AppCompatActivity) imageView.getContext())
-                        .startPostponedEnterTransition();
-            }, 100);
-        }
         ViewCompat.setTransitionName(imageView, albumItem.getPath());
         Context context = imageView.getContext();
         Glide.with(context)
@@ -81,17 +77,7 @@ public class ItemViewUtil {
                 .into(imageView);
     }
 
-    public static void setPreviewImage(final SubsamplingScaleImageView scaleImageView, final AlbumItem albumItem) {
-        //handle timeOut
-        /*if (albumItem.isSharedElement && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            new Handler().postDelayed(() -> {
-                albumItem.isSharedElement = false;
-                ((AppCompatActivity) scaleImageView.getContext())
-                        .startPostponedEnterTransition();
-            }, 100);
-        }
-        ViewCompat.setTransitionName(scaleImageView, albumItem.getPath());
-        */
+    /*public static void setPreviewImage(final SubsamplingScaleImageView scaleImageView, final AlbumItem albumItem) {
         Context context = scaleImageView.getContext();
         int orientationAngle = ExifUtil.getExifOrientationAngle(context, albumItem);
         Glide.with(context)
@@ -101,34 +87,21 @@ public class ItemViewUtil {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model,
                                                 Target<Bitmap> target, boolean isFirstResource) {
-                        albumItem.error = true;
-                        if (albumItem.isSharedElement
-                                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            albumItem.isSharedElement = false;
-                            ((AppCompatActivity) scaleImageView.getContext())
-                                    .startPostponedEnterTransition();
-                        }
+                        Log.i(TAG, "onLoadFailed");
                         return true;
                     }
 
                     @Override
                     public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target,
                                                    DataSource dataSource, boolean isFirstResource) {
-                        if (albumItem.isSharedElement
-                                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            albumItem.isSharedElement = false;
-                            ((AppCompatActivity) scaleImageView.getContext())
-                                    .startPostponedEnterTransition();
-                        }
                         scaleImageView.setPreviewImage(resource, orientationAngle);
                         return true;
                     }
                 })
-                .apply(albumItem.getGlideRequestOptions(scaleImageView.getContext())
-                        .transform(new Rotate(-orientationAngle))
-                )
-                .submit(scaleImageView.getInnerWidth(), scaleImageView.getInnerHeight());
-    }
+                .apply(albumItem.getGlideRequestOptions(context).transform(new Rotate(-orientationAngle)))
+                .submit(1440 / 4, 2560 / 4);
+        //Log.i(TAG, "scaleImageView.getInnerWidth(), getInnerHeight() " + scaleImageView.getInnerWidth() + ", " + scaleImageView.getInnerHeight());
+    }*/
 
     public static void bindGif(final GifViewHolder gifViewHolder,
                                final ImageView imageView,

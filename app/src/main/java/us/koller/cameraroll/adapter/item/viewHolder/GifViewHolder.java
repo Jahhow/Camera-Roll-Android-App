@@ -7,7 +7,6 @@ import android.widget.ImageView;
 import uk.co.senab.photoview.PhotoViewAttacher;
 import us.koller.cameraroll.R;
 import us.koller.cameraroll.data.models.AlbumItem;
-import us.koller.cameraroll.ui.ItemActivity;
 import us.koller.cameraroll.util.ItemViewUtil;
 
 public class GifViewHolder extends ViewHolder {
@@ -20,17 +19,15 @@ public class GifViewHolder extends ViewHolder {
 
     @Override
     public View inflateView(ViewGroup container) {
-        ViewGroup v = super.inflatePhotoView(container);
-        v.removeView(v.findViewById(R.id.subsampling));
-        View view = v.findViewById(R.id.image);
-
-        ItemViewUtil.bindTransitionView((ImageView) view, albumItem);
-        return v;
+        View view = ItemViewUtil.inflateGifView(container);
+        ImageView imageView = view.findViewById(R.id.image);
+        ItemViewUtil.bindTransitionView(imageView, albumItem);
+        return view;
     }
 
     private void reloadGif() {
-        View view = itemView.findViewById(R.id.image);
-        ItemViewUtil.bindGif(this, (ImageView) view, albumItem);
+        ImageView view = itemView.findViewById(R.id.image);
+        ItemViewUtil.bindGif(this, view, albumItem);
     }
 
     public void setAttacher(ImageView imageView) {
@@ -44,17 +41,8 @@ public class GifViewHolder extends ViewHolder {
     }
 
     @Override
-    public void onSharedElementEnter() {
+    public void onShowViewHolder() {
         reloadGif();
-    }
-
-    @Override
-    public void onSharedElementExit(final ItemActivity.Callback callback) {
-        if (attacher != null) {
-            attacher.cleanup();
-            attacher = null;
-        }
-        callback.done();
     }
 
     @Override

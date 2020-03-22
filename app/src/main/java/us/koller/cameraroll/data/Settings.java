@@ -91,7 +91,7 @@ public class Settings {
 
         use8BitColor = sharedPreferences.getBoolean(
                 context.getString(R.string.pref_key_8_bit_color),
-                false);
+                true);
 
         cameraShortcut = sharedPreferences.getBoolean(
                 context.getString(R.string.pref_key_camera_shortcut),

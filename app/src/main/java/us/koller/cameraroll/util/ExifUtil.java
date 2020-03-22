@@ -596,6 +596,7 @@ public class ExifUtil {
         void done(boolean success);
     }
 
+    @Nullable
     public static ExifInterface getExifInterface(Context context, AlbumItem albumItem) {
         if (albumItem == null) {
             return null;
@@ -698,22 +699,10 @@ public class ExifUtil {
         }
     }
 
-    public static int getExifOrientationAngle(Context context, AlbumItem albumItem) {
+    static int getExifOrientationAngle(Context context, AlbumItem albumItem) {
         ExifInterface exif = getExifInterface(context, albumItem);
-        if (exif == null) {
-            return 0;
-        }
-        int orientation = (int) getCastValue(exif, ExifInterface.TAG_ORIENTATION);
-        switch (orientation) {
-            case ExifInterface.ORIENTATION_ROTATE_90:
-                return 90;
-            case ExifInterface.ORIENTATION_ROTATE_180:
-                return 180;
-            case ExifInterface.ORIENTATION_ROTATE_270:
-                return 270;
-            default:
-                return 0;
-        }
+        if (exif == null) return 0;
+        return exif.getRotationDegrees();
     }
 
     @SuppressWarnings("unused")

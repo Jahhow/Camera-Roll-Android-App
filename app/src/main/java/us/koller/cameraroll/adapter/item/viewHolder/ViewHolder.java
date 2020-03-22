@@ -24,17 +24,17 @@ public abstract class ViewHolder {
         return position;
     }
 
-    ViewGroup inflatePhotoView(ViewGroup container) {
-        ViewGroup v = ItemViewUtil.inflatePhotoView(container);
+    View inflatePhotoView(ViewGroup container) {
+        View v = ItemViewUtil.inflatePhotoView(container);
         v.setTag(albumItem.getPath());
-        this.itemView = v;
+        itemView = v;
         return v;
     }
 
     ViewGroup inflateVideoView(ViewGroup container) {
         ViewGroup v = ItemViewUtil.inflateVideoView(container);
         v.setTag(albumItem.getPath());
-        this.itemView = v;
+        itemView = v;
         return v;
     }
 
@@ -66,8 +66,5 @@ public abstract class ViewHolder {
     }
 
     //called when the viewHolder is shown after shared element transition
-    public abstract void onSharedElementEnter();
-
-    //called when shared element is about to start
-    public abstract void onSharedElementExit(ItemActivity.Callback callback);
+    public abstract void onShowViewHolder();
 }

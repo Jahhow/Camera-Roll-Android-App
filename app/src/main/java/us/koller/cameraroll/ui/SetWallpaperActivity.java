@@ -84,7 +84,7 @@ public class SetWallpaperActivity extends AppCompatActivity {
             }
         });
 
-        imageView.setImage(imageUri.toString());
+        imageView.loadImage(imageUri.toString());
         imageView.setMinimumScaleType(SubsamplingScaleImageView.SCALE_TYPE_CENTER_CROP);
 
         if (imageViewState == null) {

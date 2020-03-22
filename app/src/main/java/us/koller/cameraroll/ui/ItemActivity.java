@@ -15,7 +15,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
-import android.transition.Transition;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,7 +27,6 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
@@ -66,7 +64,6 @@ import us.koller.cameraroll.data.provider.MediaProvider;
 import us.koller.cameraroll.interpolator.MyInterpolator;
 import us.koller.cameraroll.util.MediaType;
 import us.koller.cameraroll.util.ParallaxTransformer;
-import us.koller.cameraroll.util.SimpleTransitionListener;
 import us.koller.cameraroll.util.Util;
 import us.koller.cameraroll.util.animators.ColorFade;
 
@@ -120,36 +117,6 @@ public class ItemActivity extends ThemeableActivity {
                     sharedElements.put(sharedElement.getTransitionName(), sharedElement);
                 }
             }
-        }
-    };
-
-    private final SimpleTransitionListener transitionListener
-            = new SimpleTransitionListener() {
-        @Override
-        public void onTransitionStart(@NonNull Transition transition) {
-            /*if (!isReturning) {
-                //hide toolbar & statusbar
-                float toolbar_translationY = -(toolbar.getHeight());
-                float bottomBar_translationY = ((View) bottomBar.getParent()).getHeight();
-                toolbar.setTranslationY(toolbar_translationY);
-                ((View) bottomBar.getParent()).setTranslationY(bottomBar_translationY);
-                super.onTransitionStart(transition);
-            }*/
-        }
-
-        @Override
-        public void onTransitionEnd(@NonNull Transition transition) {
-            ViewHolder viewHolder = ((ItemAdapter)
-                    viewPager.getAdapter()).findViewHolderByTag(albumItem.getPath());
-            if (viewHolder == null) {
-                return;
-            }
-
-            if (!isReturning) {
-                onShowViewHolder(viewHolder);
-            }
-
-            albumItem.isSharedElement = false;
         }
     };
 
@@ -339,7 +306,7 @@ public class ItemActivity extends ThemeableActivity {
     }
 
     public void onShowViewHolder(ViewHolder viewHolder) {
-        viewHolder.onSharedElementEnter();
+        viewHolder.onShowViewHolder();
 
         if (menu != null) {
             menu.findItem(R.id.set_as).setVisible(albumItem instanceof Photo);

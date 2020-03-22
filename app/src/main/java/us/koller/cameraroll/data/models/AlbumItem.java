@@ -40,8 +40,7 @@ public abstract class AlbumItem
     private List<String> tags;
 
     public boolean error = false;
-    public boolean isSharedElement = false;
-    public boolean hasFadedIn = false;
+    public boolean isSharedElement = false;//todo
 
     //factory method
     public static AlbumItem getInstance(String path) {
