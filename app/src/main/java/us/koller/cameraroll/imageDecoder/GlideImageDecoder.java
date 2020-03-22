@@ -1,0 +1,38 @@
+package us.koller.cameraroll.imageDecoder;
+
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.util.DisplayMetrics;
+
+import androidx.annotation.NonNull;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.bitmap.Rotate;
+import com.bumptech.glide.request.RequestOptions;
+import com.davemorrissey.labs.subscaleview.ImageDecoder;
+
+import java.util.concurrent.ExecutionException;
+
+public class GlideImageDecoder implements ImageDecoder {
+    static final String TAG = GlideImageDecoder.class.getSimpleName();
+
+    @Override
+    public Bitmap decode(@NonNull Context context, @NonNull Uri uri, int orientationAngle) {
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        int px = Math.min(displayMetrics.heightPixels, displayMetrics.widthPixels) / 4;
+        try {
+            return Glide.with(context)
+                    .asBitmap()
+                    .fitCenter()
+                    .load(uri)
+                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                    .apply(new RequestOptions().transform(new Rotate(-orientationAngle)))
+                    .submit(px, px).get();
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+}

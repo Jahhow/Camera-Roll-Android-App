@@ -9,13 +9,14 @@ import androidx.annotation.NonNull;
 
 import com.davemorrissey.labs.subscaleview.ImageDecoder;
 
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 import us.koller.cameraroll.data.Settings;
 
 public class CustomImageDecoder implements ImageDecoder {
     @Override
-    public Bitmap decode(@NonNull Context context, @NonNull Uri uri) throws Exception {
+    public Bitmap decode(@NonNull Context context, @NonNull Uri uri, int orientationAngle) throws FileNotFoundException {
         boolean use8BitColor = Settings.getInstance(context).use8BitColor();
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = use8BitColor ? Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565;

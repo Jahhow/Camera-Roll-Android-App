@@ -12,6 +12,7 @@ import us.koller.cameraroll.R;
 import us.koller.cameraroll.data.models.AlbumItem;
 import us.koller.cameraroll.imageDecoder.CustomImageDecoder;
 import us.koller.cameraroll.imageDecoder.CustomRegionDecoder;
+import us.koller.cameraroll.imageDecoder.GlideImageDecoder;
 
 public class PhotoViewHolder extends ViewHolder {
     static final String TAG = PhotoViewHolder.class.getSimpleName();
@@ -30,7 +31,7 @@ public class PhotoViewHolder extends ViewHolder {
         return view;
     }
 
-    void loadImage(SubsamplingScaleImageView scaleImageView) {
+    private void loadImage(SubsamplingScaleImageView scaleImageView) {
         if (albumItem.error) {
             return;
         }
@@ -38,6 +39,7 @@ public class PhotoViewHolder extends ViewHolder {
         // use custom decoders
         scaleImageView.setDecoderFactory(getImageDecoderFactory());
         scaleImageView.setRegionDecoderFactory(getImageRegionDecoderFactory());
+        scaleImageView.setPreviewDecoderFactory(getPreviewImageDecoderFactory());
 
         scaleImageView.setOnClickListener(PhotoViewHolder.this::imageOnClick);
 
@@ -82,6 +84,10 @@ public class PhotoViewHolder extends ViewHolder {
 
     DecoderFactory<? extends ImageDecoder> getImageDecoderFactory() {
         return CustomImageDecoder::new;
+    }
+
+    DecoderFactory<? extends ImageDecoder> getPreviewImageDecoderFactory() {
+        return GlideImageDecoder::new;
     }
 
     void onImageLoaded() {

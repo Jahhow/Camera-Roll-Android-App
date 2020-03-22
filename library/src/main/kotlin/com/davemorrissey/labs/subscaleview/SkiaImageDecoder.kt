@@ -8,7 +8,7 @@ import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView.Companion.A
 import java.io.InputStream
 
 class SkiaImageDecoder : ImageDecoder {
-    override fun decode(context: Context, uri: Uri): Bitmap {
+    override fun decode(context: Context, uri: Uri, orientationDegrees: Int): Bitmap? {
         val uriString = uri.toString()
         val options = BitmapFactory.Options()
         val bitmap: Bitmap?

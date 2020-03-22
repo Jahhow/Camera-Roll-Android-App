@@ -57,8 +57,8 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
     var eagerLoadingEnabled = false
     var onImageEventListener: OnImageEventListener? = null
     var doubleTapZoomScale = 1f
-    var decoderFactory: DecoderFactory<out ImageDecoder>? = CompatDecoderFactory(SkiaImageDecoder::class.java)
     var regionDecoderFactory: DecoderFactory<out ImageRegionDecoder> = CompatDecoderFactory(SkiaImageRegionDecoder::class.java)
+    var decoderFactory: DecoderFactory<out ImageDecoder>? = CompatDecoderFactory(SkiaImageDecoder::class.java)
     var previewDecoderFactory: DecoderFactory<out ImageDecoder>? = null
     var scale = 0f
     var sWidth = 0
@@ -92,7 +92,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
     private var cos = 1f
 
     private var vTranslate = PointF(0f, 0f)
-    private var vTranslateStart: PointF? = null
+    private var vTranslateStart = PointF(0f, 0f)
     private var diffMove = PointF(0f, 0f)
 
     private var pendingScale: Float? = null
@@ -110,9 +110,9 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
     protected var regionDecoder: ImageRegionDecoder? = null
     private val decoderLock = ReentrantReadWriteLock(true)
 
-    private var sCenterStart: PointF? = null
-    private var vCenterStart: PointF? = null
-    private var vCenterStartNow: PointF? = null
+    private var sCenterStart = PointF(0f, 0f)
+    private var vCenterStart = PointF(0f, 0f)
+    private var vCenterStartNow = PointF(0f, 0f)
     private var vCenterBefore = PointF()
     private var vDistStart = 0f
     private var originDegrees = 0f
@@ -215,7 +215,6 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         scaleStart = 0f
         rotationDegrees = 0f
         vTranslate.set(0f, 0f)
-        vTranslateStart = null
         pendingScale = null
         sPendingCenter = null
         twoFingerZooming = false
@@ -223,9 +222,6 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         isQuickScaling = false
         maxTouchCount = 0
         fullImageSampleSize = 0
-        sCenterStart = null
-        vCenterStart = null
-        vCenterStartNow = null
         vDistStart = 0f
         originDegrees = 0f
         quickScaleLastDistance = 0f
@@ -296,7 +292,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                     scaleStart = scale
                     isQuickScaling = true
                     quickScaleLastDistance = -1f
-                    quickScaleSCenter = viewToSourceCoord(vCenterStart!!)
+                    quickScaleSCenter = viewToSourceCoord(vCenterStart)
                     quickScaleVStart = PointF(event.x, event.y)
                     quickScaleVLastPoint = PointF(quickScaleSCenter!!.x, quickScaleSCenter!!.y)
                     quickScaleMoved = false
@@ -355,22 +351,6 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         detector?.onTouchEvent(event)
-        if (vTranslateStart == null) {
-            vTranslateStart = PointF(0f, 0f)
-        }
-
-        if (sCenterStart == null) {
-            sCenterStart = PointF(0f, 0f)
-        }
-
-        if (vCenterStart == null) {
-            vCenterStart = PointF(0f, 0f)
-        }
-
-        if (vCenterStartNow == null) {
-            vCenterStartNow = PointF(0f, 0f)
-        }
-
         return onTouchEventInternal(event) || super.onTouchEvent(event)
     }
 
@@ -382,8 +362,8 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                 maxTouchCount = Math.max(maxTouchCount, touchCount)
                 did2FingerZoomIn = false
                 if (!isQuickScaling) {
-                    vTranslateStart!!.set(vTranslate.x, vTranslate.y)
-                    vCenterStart!!.set(event.x, event.y)
+                    vTranslateStart.set(vTranslate.x, vTranslate.y)
+                    vCenterStart.set(event.x, event.y)
                 }
                 if (anim?.interruptible == true)
                     stopAnimation()
@@ -395,9 +375,9 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                 triggeredRotation = false
                 scaleStart = scale
                 vDistStart = distance(event.getX(0), event.getX(1), event.getY(0), event.getY(1))
-                vTranslateStart!!.set(vTranslate)
-                vCenterStart!!.set((event.getX(0) + event.getX(1)) / 2f, (event.getY(0) + event.getY(1)) / 2f)
-                viewToSourceCoord(vCenterStart!!, sCenterStart!!)
+                vTranslateStart.set(vTranslate)
+                vCenterStart.set((event.getX(0) + event.getX(1)) / 2f, (event.getY(0) + event.getY(1)) / 2f)
+                viewToSourceCoord(vCenterStart, sCenterStart)
 
                 if (rotationEnabled) {
                     originDegrees = Math.toDegrees(Math.atan2((event.getY(0) - event.getY(1)).toDouble(), (event.getX(0) - event.getX(1)).toDouble())).toFloat()
@@ -426,7 +406,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                         val vDistEnd = distance(event.getX(0), event.getX(1), event.getY(0), event.getY(1))
                         val vCenterEndX = (event.getX(0) + event.getX(1)) / 2f
                         val vCenterEndY = (event.getY(0) + event.getY(1)) / 2f
-                        if (isPanning || distance(vCenterStart!!.x, vCenterEndX, vCenterStart!!.y, vCenterEndY) > 5 || Math.abs(vDistEnd - vDistStart) > 5) {
+                        if (isPanning || distance(vCenterStart.x, vCenterEndX, vCenterStart.y, vCenterEndY) > 5 || Math.abs(vDistEnd - vDistStart) > 5) {
                             did2FingerZoomIn = true
                             twoFingerZooming = true
                             isPanning = true
@@ -435,10 +415,10 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                             val previousScale = scale.toDouble()
                             scale = vDistEnd / vDistStart * scaleStart
 
-                            sourceToViewCoord(sCenterStart!!, vCenterStartNow!!)
+                            sourceToViewCoord(sCenterStart, vCenterStartNow)
 
-                            val dx = vCenterEndX - vCenterStartNow!!.x
-                            val dy = vCenterEndY - vCenterStartNow!!.y
+                            val dx = vCenterEndX - vCenterStartNow.x
+                            val dy = vCenterEndY - vCenterStartNow.y
 
                             val dxR = (dx * cos - dy * -sin)
                             val dyR = (dx * -sin + dy * cos)
@@ -447,8 +427,8 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                             vTranslate.y += dyR
 
                             if (previousScale * sHeight < height && scale * sHeight >= height || previousScale * sWidth < width && scale * sWidth >= width) {
-                                vCenterStart!!.set(vCenterEndX, vCenterEndY)
-                                vTranslateStart!!.set(vTranslate)
+                                vCenterStart.set(vCenterEndX, vCenterEndY)
+                                vTranslateStart.set(vTranslate)
                                 scaleStart = scale
                                 vDistStart = vDistEnd
                             }
@@ -477,15 +457,15 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                             val previousScale = scale.toDouble()
                             scale = scale * multiplier
 
-                            val vLeftStart = vCenterStart!!.x - vTranslateStart!!.x
-                            val vTopStart = vCenterStart!!.y - vTranslateStart!!.y
+                            val vLeftStart = vCenterStart.x - vTranslateStart.x
+                            val vTopStart = vCenterStart.y - vTranslateStart.y
                             val vLeftNow = vLeftStart * (scale / scaleStart)
                             val vTopNow = vTopStart * (scale / scaleStart)
-                            vTranslate.x = vCenterStart!!.x - vLeftNow
-                            vTranslate.y = vCenterStart!!.y - vTopNow
+                            vTranslate.x = vCenterStart.x - vLeftNow
+                            vTranslate.y = vCenterStart.y - vTopNow
                             if (previousScale * sHeight < height && scale * sHeight >= height || previousScale * sWidth < width && scale * sWidth >= width) {
-                                vCenterStart!!.set(sourceToViewCoord(quickScaleSCenter!!))
-                                vTranslateStart!!.set(vTranslate)
+                                vCenterStart.set(sourceToViewCoord(quickScaleSCenter!!))
+                                vTranslateStart.set(vTranslate)
                                 scaleStart = scale
                                 dist = 0f
                             }
@@ -496,8 +476,8 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                         refreshRequiredTiles(eagerLoadingEnabled)
                         consumed = true
                     } else if (!twoFingerZooming) {
-                        val dx = event.x - vCenterStart!!.x
-                        val dy = event.y - vCenterStart!!.y
+                        val dx = event.x - vCenterStart.x
+                        val dy = event.y - vCenterStart.y
                         val dxA = Math.abs(dx)
                         val dyA = Math.abs(dy)
 
@@ -510,8 +490,8 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                             val lastX = vTranslate.x
                             val lastY = vTranslate.y
 
-                            val newX = vTranslateStart!!.x + dxR
-                            val newY = vTranslateStart!!.y + dyR
+                            val newX = vTranslateStart.x + dxR
+                            val newY = vTranslateStart.y + dyR
 
                             if (anim == null || !isPanning) {
                                 vTranslate.x = newX
@@ -562,7 +542,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                                     maxTouchCount = 0
                                     parent?.requestDisallowInterceptTouchEvent(false)
                                 } else {
-                                    vCenterStart!!.set(event.x, event.y)
+                                    vCenterStart.set(event.x, event.y)
                                     isPanning = true
                                     diffMove.set(0f, 0f)
                                 }
@@ -599,8 +579,8 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                         twoFingerZooming = false
                         animateToBounds()
                         val i = if (event.actionIndex == 0) 1 else 0
-                        vCenterStart!!.set(event.getX(i), event.getY(i))
-                        vTranslateStart!!.set(vTranslate.x, vTranslate.y)
+                        vCenterStart.set(event.getX(i), event.getY(i))
+                        vTranslateStart.set(vTranslate.x, vTranslate.y)
                         diffMove.set(0f, 0f)
                     } else if (touchCount == 1) {
                         maxTouchCount = 0
@@ -683,8 +663,8 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
             if (elapsed == 1f) {
                 stopAnimation()
                 if (isPanning) {
-                    vTranslateStart!!.set(vTranslate)
-                    vCenterStart!!.set(vCenterBefore)
+                    vTranslateStart.set(vTranslate)
+                    vCenterStart.set(vCenterBefore)
                 }
                 val degreesInt = Math.round(rotationDegrees)
                 if (degreesInt != prevDegreesInt) {
@@ -768,10 +748,8 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                 canvas.drawCircle(vFocus.x, vFocus.y, px(24).toFloat(), debugLinePaint!!)
             }
 
-            if (vCenterStart != null) {
-                debugLinePaint!!.color = Color.LTGRAY
-                canvas.drawCircle(vCenterStart!!.x, vCenterStart!!.y, px(24).toFloat(), debugLinePaint!!)
-            }
+            debugLinePaint!!.color = Color.LTGRAY
+            canvas.drawCircle(vCenterStart.x, vCenterStart.y, px(24).toFloat(), debugLinePaint!!)
 
             if (quickScaleSCenter != null) {
                 debugLinePaint!!.color = Color.BLUE
@@ -1338,7 +1316,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
 
                 if (uri != null && decoderFactory != null && view != null) {
                     //view.debug("BitmapLoadTask.doInBackground")
-                    bitmap = decoderFactory.make().decode(view.context, uri)
+                    bitmap = decoderFactory.make().decode(view.context, uri, view.orientationDegrees)
                 }
             } catch (e: Exception) {
                 //Log.e(TAG, "Failed to load bitmap", e)
@@ -1357,6 +1335,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                 if (isPreview) {
                     if (view.bitmap == null)
                         if (bitmap != null) {
+                            view.debug("Preview Loaded")
                             view.bitmap = bitmap
                             view.invalidate()
                         }
