@@ -489,23 +489,20 @@ public class MainActivity extends ThemeableActivity {
                 final ArrayList<Album> albumsWithVirtualDirs =
                         MediaProvider.getAlbumsWithVirtualDirectories(MainActivity.this);
                 if (albums != null) {
-                    MainActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            MainActivity.this.albums = albumsWithVirtualDirs;
-                            recyclerViewAdapter.setData(albumsWithVirtualDirs);
+                    MainActivity.this.runOnUiThread(() -> {
+                        MainActivity.this.albums = albumsWithVirtualDirs;
+                        recyclerViewAdapter.setData(albumsWithVirtualDirs);
 
-                            if (showSnackBar) {
-                                Snackbar snackbar = Snackbar.make(findViewById(R.id.root_view),
-                                        R.string.done, Snackbar.LENGTH_SHORT);
-                                Util.showSnackbar(snackbar);
-                            }
-
-                            if (mediaProvider != null) {
-                                mediaProvider.onDestroy();
-                            }
-                            mediaProvider = null;
+                        if (showSnackBar) {
+                            Snackbar snackbar = Snackbar.make(findViewById(R.id.root_view),
+                                    R.string.done, Snackbar.LENGTH_SHORT);
+                            Util.showSnackbar(snackbar);
                         }
+
+                        if (mediaProvider != null) {
+                            mediaProvider.onDestroy();
+                        }
+                        mediaProvider = null;
                     });
                 }
             }
@@ -539,7 +536,7 @@ public class MainActivity extends ThemeableActivity {
         };
 
         mediaProvider = new MediaProvider(this);
-        mediaProvider.loadAlbums(MainActivity.this, hiddenFolders, callback);
+        mediaProvider.loadAlbums(this, hiddenFolders, callback);
     }
 
     @Override

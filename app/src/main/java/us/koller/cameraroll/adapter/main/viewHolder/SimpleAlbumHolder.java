@@ -5,7 +5,6 @@ import android.widget.ImageView;
 
 import us.koller.cameraroll.R;
 import us.koller.cameraroll.data.models.Album;
-import us.koller.cameraroll.ui.widget.ParallaxImageView;
 
 public class SimpleAlbumHolder extends AlbumHolder {
 
@@ -17,9 +16,6 @@ public class SimpleAlbumHolder extends AlbumHolder {
     public void setAlbum(Album album) {
         super.setAlbum(album);
         final ImageView image = itemView.findViewById(R.id.image);
-        if (image instanceof ParallaxImageView) {
-            ((ParallaxImageView) image).setParallaxTranslation();
-        }
         loadImage(image);
     }
 }

@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Environment;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -26,10 +27,10 @@ import us.koller.cameraroll.data.models.Album;
 import us.koller.cameraroll.data.models.AlbumItem;
 import us.koller.cameraroll.data.models.VirtualAlbum;
 import us.koller.cameraroll.data.provider.MediaProvider;
-import us.koller.cameraroll.ui.widget.ParallaxImageView;
 import us.koller.cameraroll.util.animators.ColorFade;
 
 public abstract class AlbumHolder extends RecyclerView.ViewHolder {
+    static final String TAG = AlbumHolder.class.getSimpleName();
 
     private Album album;
 
@@ -105,6 +106,7 @@ public abstract class AlbumHolder extends RecyclerView.ViewHolder {
             return;
         }
 
+        ColorFade.animateToAlpha(0, itemView);
         final AlbumItem coverImage = album.getAlbumItems().get(0);
         Glide.with(getContext())
                 .asBitmap()
@@ -115,9 +117,6 @@ public abstract class AlbumHolder extends RecyclerView.ViewHolder {
                                                 Target<Bitmap> target, boolean isFirstResource) {
                         coverImage.error = true;
                         ColorFade.animateToAlpha(1, itemView);
-                        if (image instanceof ParallaxImageView) {
-                            ((ParallaxImageView) image).setParallaxTranslation();
-                        }
                         return false;
                     }
 
@@ -125,9 +124,7 @@ public abstract class AlbumHolder extends RecyclerView.ViewHolder {
                     public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target,
                                                    DataSource dataSource, boolean isFirstResource) {
                         ColorFade.animateToAlpha(1, itemView);
-                        if (image instanceof ParallaxImageView) {
-                            ((ParallaxImageView) image).setParallaxTranslation();
-                        }
+                        Log.i(TAG, "cover loadImage onResourceReady");
                         return false;
                     }
                 })
