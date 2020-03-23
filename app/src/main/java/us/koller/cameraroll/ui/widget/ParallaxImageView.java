@@ -2,13 +2,10 @@ package us.koller.cameraroll.ui.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import java.util.Arrays;
 
 import us.koller.cameraroll.R;
 
@@ -19,9 +16,10 @@ public class ParallaxImageView extends androidx.appcompat.widget.AppCompatImageV
 
     private final int MAX_PARALLAX_OFFSET = (int) getContext().getResources().getDimension(R.dimen.parallax_image_view_offset);
 
+    View itemView;
     RecyclerView recyclerView;
-    private int recyclerView_height = -1;
-    private int[] recyclerView_location = {-1, -1};
+    int itemView_height;
+    private int recyclerView_height;
 
     public ParallaxImageView(Context context) {
         super(context);
@@ -45,63 +43,53 @@ public class ParallaxImageView extends androidx.appcompat.widget.AppCompatImageV
         super.onAttachedToWindow();
         View view = getRootView().findViewWithTag(RECYCLER_VIEW_TAG);
         if (view instanceof RecyclerView) {
-            Log.i(TAG, "onAttachedToWindow addOnScrollListener");
+            itemView = (View) getParent();
             recyclerView = (RecyclerView) view;
             recyclerView.addOnScrollListener(scrollListener);
         }
     }
 
     @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        Log.i(TAG, "onLayout W,H: " + getWidth() + ", " + getHeight());
-        super.onLayout(changed, left, top, right, bottom);
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
         if (recyclerView != null) {
-            recyclerView_height = recyclerView.getHeight();
-            recyclerView.getLocationOnScreen(recyclerView_location);
-            setParallaxTranslation();
+            recyclerView.removeOnScrollListener(scrollListener);
+            recyclerView = null;
         }
     }
 
     @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        Log.i(TAG, "onDetachedFromWindow");
-        recyclerView.removeOnScrollListener(scrollListener);
-        recyclerView = null;
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+        if (recyclerView != null) {
+            recyclerView_height = recyclerView.getHeight();
+            itemView_height = itemView.getHeight();
+            setParallaxTranslation();
+        }
     }
 
     public void setParallaxTranslation() {
         if (!isAttachedToWindow()) {
-            Log.w(TAG, "setParallaxTranslation is NOT AttachedToWindow");
             return;
         }
 
-        int[] location = new int[2];
-        getLocationOnScreen(location);
-        Log.i(TAG, "LocationOnScreen " + Arrays.toString(location));
-
-        float _height = getHeight() - MAX_PARALLAX_OFFSET;
-
-        boolean visible = location[1] + _height > recyclerView_location[1]
-                || location[1] < recyclerView_location[1] + recyclerView_height;
+        int itemViewTop = itemView.getTop();
+        boolean visible = itemViewTop + itemView_height > 0 && itemViewTop < recyclerView_height;
 
         if (!visible) {
-            Log.w(TAG, "setParallaxTranslation view is invisible");
             return;
         }
 
-        float dy = ((location[1] + _height / 2f) - (recyclerView_location[1] + recyclerView_height / 2f))
-                / (recyclerView_height + _height);
+        float dy = (itemViewTop + itemView_height - recyclerView_height) * .5f
+                / (recyclerView_height + itemView_height);
         float translationY = -MAX_PARALLAX_OFFSET * dy;
         setTranslationY(translationY - MAX_PARALLAX_OFFSET / 2f);
-        Log.i(TAG, "setParallaxTranslation");
     }
 
     RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {
         @Override
         public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
             setParallaxTranslation();
-            Log.i(TAG, "recyclerView offset y " + recyclerView.computeVerticalScrollOffset());
         }
     };
 }

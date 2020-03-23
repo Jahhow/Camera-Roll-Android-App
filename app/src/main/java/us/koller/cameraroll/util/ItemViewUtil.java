@@ -87,7 +87,7 @@ public class ItemViewUtil {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model,
                                                 Target<Bitmap> target, boolean isFirstResource) {
-                        Log.i(TAG, "onLoadFailed");
+                        //Log.i(TAG, "onLoadFailed");
                         return true;
                     }
 

@@ -59,9 +59,10 @@ public class MainAdapter extends AbstractRecyclerViewAdapter<ArrayList<Album>> {
     @Override
     public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder, int position) {
         final Album album = getData().get(position);
-
-        ((AlbumHolder) holder).setAlbum(album);
-
+        AlbumHolder albumHolder = (AlbumHolder) holder;
+        if (albumHolder.getAlbum() == album)
+            return;
+        albumHolder.setAlbum(album);
         holder.itemView.setOnClickListener(view -> {
             Intent intent = new Intent(view.getContext(), AlbumActivity.class);
 

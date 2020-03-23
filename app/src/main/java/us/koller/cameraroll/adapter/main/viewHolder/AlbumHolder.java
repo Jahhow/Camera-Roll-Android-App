@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Environment;
 import android.text.Html;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -124,11 +123,10 @@ public abstract class AlbumHolder extends RecyclerView.ViewHolder {
                     public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target,
                                                    DataSource dataSource, boolean isFirstResource) {
                         ColorFade.animateToAlpha(1, itemView);
-                        Log.i(TAG, "cover loadImage onResourceReady");
                         return false;
                     }
                 })
-                .apply(coverImage.getGlideRequestOptions(getContext()))
+                .apply(coverImage.getGlideRequestOptions(getContext()).dontTransform())
                 .into(image);
     }
 
