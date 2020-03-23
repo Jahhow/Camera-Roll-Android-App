@@ -69,21 +69,15 @@ public class ParallaxImageView extends androidx.appcompat.widget.AppCompatImageV
     }
 
     public void setParallaxTranslation() {
-        if (!isAttachedToWindow()) {
-            return;
-        }
-
         int itemViewTop = itemView.getTop();
-        boolean visible = itemViewTop + itemView_height > 0 && itemViewTop < recyclerView_height;
-
-        if (!visible) {
+        boolean invisible = itemViewTop <= -itemView_height || itemViewTop >= recyclerView_height;
+        if (invisible)
             return;
-        }
 
-        float dy = (itemViewTop + itemView_height - recyclerView_height) * .5f
-                / (recyclerView_height + itemView_height);
-        float translationY = -MAX_PARALLAX_OFFSET * dy;
-        setTranslationY(translationY - MAX_PARALLAX_OFFSET / 2f);
+        int remainHeight = recyclerView_height - itemView_height;
+        float distanceWithVerticalCenter = itemViewTop - remainHeight * .5f;
+        float translationY = -MAX_PARALLAX_OFFSET * distanceWithVerticalCenter / remainHeight;
+        setTranslationY(translationY - MAX_PARALLAX_OFFSET * .5f);
     }
 
     RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {
