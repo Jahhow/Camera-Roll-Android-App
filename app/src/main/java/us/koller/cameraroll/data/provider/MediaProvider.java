@@ -5,20 +5,22 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
+
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
 
+import us.koller.cameraroll.data.Settings;
 import us.koller.cameraroll.data.models.Album;
 import us.koller.cameraroll.data.models.AlbumItem;
 import us.koller.cameraroll.data.models.VirtualAlbum;
 import us.koller.cameraroll.data.provider.retriever.MediaStoreRetriever;
-import us.koller.cameraroll.data.Settings;
 import us.koller.cameraroll.data.provider.retriever.StorageRetriever;
 import us.koller.cameraroll.util.SortUtil;
 
 public class MediaProvider extends Provider {
+    static final String TAG = MediaProvider.class.getSimpleName();
 
     private static ArrayList<Album> albums;
 
@@ -176,8 +178,13 @@ public class MediaProvider extends Provider {
         return albumsWithVirtualDirs;
     }
 
-    public static void loadAlbum(final Activity context, final String path,
-                                 final OnAlbumLoadedCallback callback) {
+    public static void getAlbum(final Activity context, final String path,
+                                final OnAlbumLoadedCallback callback) {
+        getAlbum(context, path, callback, false);
+    }
+
+    public static void getAlbum(final Activity context, final String path,
+                                final OnAlbumLoadedCallback callback, boolean reload) {
         if (path == null) {
             context.runOnUiThread(new Runnable() {
                 @Override
@@ -188,13 +195,13 @@ public class MediaProvider extends Provider {
             return;
         }
 
-        if (albums == null) {
+        if (reload || albums == null) {
             Settings s = Settings.getInstance(context);
             boolean hiddenFolders = s.getHiddenFolders();
             new MediaProvider(context).loadAlbums(context, hiddenFolders, new OnMediaLoadedCallback() {
                 @Override
                 public void onMediaLoaded(ArrayList<Album> albums) {
-                    loadAlbum(context, path, callback);
+                    getAlbum(context, path, callback);
                 }
 
                 @Override

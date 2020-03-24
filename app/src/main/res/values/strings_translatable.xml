@@ -1,4 +1,5 @@
 <resources>
+    <string name="app_name">Camera Roll</string>
     <!--error messages-->
     <string name="read_permission_denied">Camera Roll needs permission to access your Storage to be able to depict your pictures.</string>
     <string name="grant_removable_storage_permission">Grant removable Storage Permission</string>

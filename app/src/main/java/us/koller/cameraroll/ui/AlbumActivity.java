@@ -195,6 +195,7 @@ public class AlbumActivity extends ThemeableActivity
         });
 
         recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setItemViewCacheSize(40);
         final int columnCount = Settings.getInstance(this).getColumnCount(this);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, columnCount);
         recyclerView.setLayoutManager(gridLayoutManager);
@@ -352,7 +353,7 @@ public class AlbumActivity extends ThemeableActivity
         } else {
             path = getIntent().getStringExtra(ALBUM_PATH);
         }
-        MediaProvider.loadAlbum(this, path,
+        MediaProvider.getAlbum(this, path,
                 new MediaProvider.OnAlbumLoadedCallback() {
                     @Override
                     public void onAlbumLoaded(Album album) {
@@ -562,7 +563,7 @@ public class AlbumActivity extends ThemeableActivity
                                     @Override
                                     public void onMediaLoaded(ArrayList<Album> albums) {
                                         //reload activity
-                                        MediaProvider.loadAlbum(activity, newFilePath,
+                                        MediaProvider.getAlbum(activity, newFilePath,
                                                 new MediaProvider.OnAlbumLoadedCallback() {
                                                     @Override
                                                     public void onAlbumLoaded(Album album) {
@@ -1101,16 +1102,49 @@ public class AlbumActivity extends ThemeableActivity
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
                 if (action == null) return;
+                //Log.i(TAG, "BroadcastReceiver " + action);
                 switch (action) {
                     case FileOperation.RESULT_DONE:
                         int type = intent.getIntExtra(FileOperation.TYPE, FileOperation.EMPTY);
-                        if (type == FileOperation.MOVE) {
-                            ArrayList<String> movedFilesPaths = intent
-                                    .getStringArrayListExtra(Move.MOVED_FILES_PATHS);
-                            for (int i = 0; i < movedFilesPaths.size(); i++) {
-                                String path = movedFilesPaths.get(i);
-                                removeAlbumItem(path);
+                        String actionString = FileOperation.Util.getActionString(context, type);
+                        //Log.i(TAG, "RESULT_DONE: FileOperation " + actionString);
+                        switch (type) {
+                            case FileOperation.MOVE: {
+                                ArrayList<String> movedFilesPaths = intent
+                                        .getStringArrayListExtra(Move.MOVED_FILES_PATHS);
+                                for (int i = 0; i < movedFilesPaths.size(); i++) {
+                                    String path = movedFilesPaths.get(i);
+                                    removeAlbumItem(path);
+                                }
+                                break;
                             }
+                            case FileOperation.COPY:
+                                //todo animate
+                                String albumPath = getIntent().getStringExtra(ALBUM_PATH);
+                                MediaProvider.getAlbum(AlbumActivity.this, albumPath,
+                                        new MediaProvider.OnAlbumLoadedCallback() {
+                                            @Override
+                                            public void onAlbumLoaded(Album newAlbum) {
+                                                ArrayList<AlbumItem> oldItems = album.getAlbumItems();
+                                                ArrayList<AlbumItem> newItems = newAlbum.getAlbumItems();
+                                                SortUtil.sort(newItems, Settings.getInstance(context).sortAlbumBy());
+                                                String curOldItemPath = oldItems.get(0).getPath();
+                                                for (int i = 0; i < newItems.size(); ++i) {
+                                                    AlbumItem curNewItem = newItems.get(i);
+                                                    if (curOldItemPath != null && curOldItemPath.equals(curNewItem.getPath())) {
+                                                        if (i + 1 < oldItems.size())
+                                                            curOldItemPath = oldItems.get(i + 1).getPath();
+                                                        else {
+                                                            curOldItemPath = null;
+                                                        }
+                                                    } else {
+                                                        oldItems.add(i, curNewItem);
+                                                        recyclerViewAdapter.notifyItemInserted(i);
+                                                    }
+                                                }
+                                            }
+                                        }, true);
+                                break;
                         }
                         break;
                     case ALBUM_ITEM_REMOVED:
@@ -1120,7 +1154,7 @@ public class AlbumActivity extends ThemeableActivity
                     case ALBUM_ITEM_RENAMED:
                     case DATA_CHANGED:
                         String albumPath = getIntent().getStringExtra(ALBUM_PATH);
-                        MediaProvider.loadAlbum(AlbumActivity.this, albumPath,
+                        MediaProvider.getAlbum(AlbumActivity.this, albumPath,
                                 new MediaProvider.OnAlbumLoadedCallback() {
                                     @Override
                                     public void onAlbumLoaded(Album album) {
@@ -1139,21 +1173,22 @@ public class AlbumActivity extends ThemeableActivity
     private void removeAlbumItem(String path) {
         //Log.d("AlbumActivity", "removeAlbumItem() called with: path = [" + path + "]");
         int index = -1;
-        for (int i = 0; i < album.getAlbumItems().size(); i++) {
-            AlbumItem albumItem = album.getAlbumItems().get(i);
+        ArrayList<AlbumItem> items = album.getAlbumItems();
+        for (int i = 0; i < items.size(); i++) {
+            AlbumItem albumItem = items.get(i);
             if (albumItem.getPath().equals(path)) {
                 index = i;
                 break;
             }
         }
-        //Log.d("AlbumActivity", "removeAlbumItem: " + index);
-        if (index > -1) {
-            album.getAlbumItems().remove(index);
-        }
-        recyclerViewAdapter.notifyDataSetChanged();
-
-        if (album.getAlbumItems().size() == 0) {
+        if (items.size() == 0) {
             supportFinishAfterTransition();
+            return;
+        }
+
+        if (index > -1) {
+            items.remove(index);
+            recyclerViewAdapter.notifyItemRemoved(index);
         }
     }
 }

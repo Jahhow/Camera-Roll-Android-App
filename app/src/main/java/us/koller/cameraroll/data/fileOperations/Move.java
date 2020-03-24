@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.util.Log;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -14,7 +13,7 @@ import us.koller.cameraroll.R;
 import us.koller.cameraroll.data.models.File_POJO;
 
 public class Move extends FileOperation {
-
+    public static final String TAG = Move.class.getSimpleName();
     public static final String MOVED_FILES_PATHS = "MOVED_FILES_PATHS";
 
     private ArrayList<String> movedFilePaths;
@@ -72,16 +71,15 @@ public class Move extends FileOperation {
                 }
                 result = copyAndDeleteFiles(getApplicationContext(), treeUri,
                         files[i].getPath(), target.getPath());
-                //break;
             } else {
                 result = moveFile(files[i].getPath(), target.getPath());
             }
 
-            //boolean result = moveFile(files[i].getPath(), target.getPath());
             if (result) {
                 movedFilePaths.add(files[i].getPath());
             }
-            success_count += result ? 1 : 0;
+            if (result)
+                success_count += 1;
             onProgress(success_count, files.length);
         }
         //}
@@ -100,16 +98,18 @@ public class Move extends FileOperation {
     }
 
     private boolean moveFile(String path, String destination) {
-        ArrayList<String> oldPaths = Util.getAllChildPaths(new ArrayList<String>(), path);
+        ArrayList<String> oldPaths = Util.getAllChildPaths(new ArrayList<>(), path);
 
         File file = new File(path);
-        File newFile = new File(destination, file.getName());
-
+        File dstFile = new File(destination, file.getName());
+        if (file.equals(dstFile)) {
+            return false;
+        }
         //moving file
-        boolean success = renameFile(file, newFile);
+        boolean success = renameFile(file, dstFile);
 
         //re-scan all paths
-        ArrayList<String> newPaths = Util.getAllChildPaths(new ArrayList<String>(), newFile.getPath());
+        ArrayList<String> newPaths = Util.getAllChildPaths(new ArrayList<>(), dstFile.getPath());
         addPathsToScan(oldPaths);
         addPathsToScan(newPaths);
         return success;
@@ -128,7 +128,7 @@ public class Move extends FileOperation {
                     path, destination, true);
         }
         addPathsToScan(copy.getPathsToScan());
-       //Log.d("Move", "copyAndDeleteFiles(): " + result);
+        //Log.d("Move", "copyAndDeleteFiles(): " + result);
         if (result) {
             Delete delete = new Delete();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP

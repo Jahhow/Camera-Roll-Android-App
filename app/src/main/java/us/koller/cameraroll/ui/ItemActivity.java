@@ -214,7 +214,7 @@ public class ItemActivity extends ThemeableActivity {
                 path = getIntent().getStringExtra(ALBUM_PATH);
             }
             //Log.d("ItemActivity", "loadAlbum() " + path);
-            MediaProvider.loadAlbum(this, path,
+            MediaProvider.getAlbum(this, path,
                     new MediaProvider.OnAlbumLoadedCallback() {
                         @Override
                         public void onAlbumLoaded(Album album) {
@@ -590,7 +590,7 @@ public class ItemActivity extends ThemeableActivity {
                                     @Override
                                     public void onMediaLoaded(ArrayList<Album> albums) {
                                         //reload activity
-                                        MediaProvider.loadAlbum(activity, albumPath,
+                                        MediaProvider.getAlbum(activity, albumPath,
                                                 new MediaProvider.OnAlbumLoadedCallback() {
                                                     @Override
                                                     public void onAlbumLoaded(Album album) {
@@ -880,7 +880,7 @@ public class ItemActivity extends ThemeableActivity {
                     case DATA_CHANGED:
                         final int albumItemIndex = album.getAlbumItems().indexOf(albumItem);
                         String albumPath = getIntent().getStringExtra(ALBUM_PATH);
-                        MediaProvider.loadAlbum(ItemActivity.this, albumPath,
+                        MediaProvider.getAlbum(ItemActivity.this, albumPath,
                                 new MediaProvider.OnAlbumLoadedCallback() {
                                     @Override
                                     public void onAlbumLoaded(Album album) {

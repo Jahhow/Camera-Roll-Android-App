@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import com.michaelflisar.dragselectrecyclerview.DragSelectTouchListener;
 
@@ -60,7 +59,7 @@ public class AlbumAdapter extends AbstractRecyclerViewAdapter<Album> {
         }
 
         //disable default change animation
-        ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
+        //((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
 
         if (callback != null && dragSelectEnabled()) {
             dragSelectTouchListener = new DragSelectTouchListener()

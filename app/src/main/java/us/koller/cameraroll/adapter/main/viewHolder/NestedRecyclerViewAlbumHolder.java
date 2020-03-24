@@ -184,6 +184,7 @@ public class NestedRecyclerViewAlbumHolder extends AlbumHolder
             itemDecoration = new EqualSpacesItemDecoration(
                     (int) getContext().getResources().getDimension(R.dimen.album_grid_spacing), 2, true);
             nestedRecyclerView.addItemDecoration(itemDecoration);
+            nestedRecyclerView.setItemViewCacheSize(20);
         }
     }
 

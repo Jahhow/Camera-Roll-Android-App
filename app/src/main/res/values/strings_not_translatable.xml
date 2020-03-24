@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!--"app_name" defined in build.gradle to have different names for .debug and normal version
-    <string name="app_name" translatable="false">Camera Roll</string>-->
     <string name="task_description_label">@string/app_name</string>
     <string name="toolbar_title">@string/app_name</string>
 
@@ -9,9 +7,10 @@
     <string name="about_text" translatable="false">
         <![CDATA[
             © 2017 Lukas Koller, Munich, Germany<br/>
+            © 2020 涂 家 浩 Jahhow, Taiwan<br/>
             <br/>
-            <b><a href=\"https://github.com/kollerlukas/Camera-Roll-Android-App\">Source Code</a></b> for this App<br/>
-            <b><a href=\"https://github.com/kollerlukas/Camera-Roll-Android-App/blob/master/PRIVACY.md\">Privacy Policy</a></b><br/>
+            <b><a href=\"https://github.com/Jahhow/Camera-Roll-Android-App\">Source Code</a></b> |
+            <b><a href=\"https://github.com/Jahhow/Camera-Roll-Android-App/blob/master/PRIVACY.md\">Privacy Policy</a></b><br/>
             <br/>
             <br/>
             <b>Licenses:</b><br/>
@@ -80,7 +79,7 @@
                 Bulgarian: psydex<br>
                 Croatian: <a href=\"https://github.com/krux3r\">Ivan Krušlin</a><br>
                 Portuguese: <a href=\"https://github.com/marciozomb13\">Marcio Zomb13</a><br>
-                Chinese: Yixuan Wang<br>
+                Chinese: Yixuan Wang, <a href=\"https://github.com/Jahhow\">涂 家 浩 Jahhow</a><br>
                 Ukrainian: <a href=\"https://vlad2.carrd.co/\">Владислав Книжник</a><br>
                 Hungarian: nvi9<br>
             <br>

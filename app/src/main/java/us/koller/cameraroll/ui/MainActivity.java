@@ -24,7 +24,6 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityOptionsCompat;
-import androidx.core.app.SharedElementCallback;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -35,15 +34,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import us.koller.cameraroll.R;
 import us.koller.cameraroll.adapter.AbstractRecyclerViewAdapter;
 import us.koller.cameraroll.adapter.SelectorModeManager;
 import us.koller.cameraroll.adapter.main.MainAdapter;
 import us.koller.cameraroll.adapter.main.NoFolderRecyclerViewAdapter;
-import us.koller.cameraroll.adapter.main.viewHolder.NestedRecyclerViewAlbumHolder;
 import us.koller.cameraroll.data.ContentObserver;
 import us.koller.cameraroll.data.Settings;
 import us.koller.cameraroll.data.fileOperations.FileOperation;
@@ -69,47 +65,6 @@ public class MainActivity extends ThemeableActivity {
     public static final int REFRESH_PHOTOS_REQUEST_CODE = 7;
     public static final int REMOVABLE_STORAGE_PERMISSION_REQUEST_CODE = 8;
     public static final int SETTINGS_REQUEST_CODE = 9;
-
-    //needed for sharedElement-Transition in Nested RecyclerView Style
-    private NestedRecyclerViewAlbumHolder sharedElementViewHolder;
-    private final SharedElementCallback mCallback
-            = new SharedElementCallback() {
-        @Override
-        @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-        public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
-            if (sharedElementViewHolder == null) {
-                return;
-            }
-
-            if (sharedElementViewHolder.sharedElementReturnPosition != -1
-                    && sharedElementViewHolder.sharedElementReturnPosition <
-                    sharedElementViewHolder.getAlbum().getAlbumItems().size()) {
-                String newTransitionName = sharedElementViewHolder.getAlbum().getAlbumItems()
-                        .get(sharedElementViewHolder.sharedElementReturnPosition).getPath();
-                View layout = sharedElementViewHolder.nestedRecyclerView.findViewWithTag(newTransitionName);
-                View newSharedElement = layout != null ? layout.findViewById(R.id.image) : null;
-                if (newSharedElement != null) {
-                    names.clear();
-                    names.add(newTransitionName);
-                    sharedElements.clear();
-                    sharedElements.put(newTransitionName, newSharedElement);
-                }
-                sharedElementViewHolder.sharedElementReturnPosition = -1;
-            } else {
-                View v = sharedElementViewHolder.itemView.getRootView();
-                View navigationBar = v.findViewById(android.R.id.navigationBarBackground);
-                View statusBar = v.findViewById(android.R.id.statusBarBackground);
-                if (navigationBar != null) {
-                    names.add(navigationBar.getTransitionName());
-                    sharedElements.put(navigationBar.getTransitionName(), navigationBar);
-                }
-                if (statusBar != null) {
-                    names.add(statusBar.getTransitionName());
-                    sharedElements.put(statusBar.getTransitionName(), statusBar);
-                }
-            }
-        }
-    };
 
     private ArrayList<Album> albums;
 
@@ -210,6 +165,7 @@ public class MainActivity extends ThemeableActivity {
         }
         recyclerView.setAdapter(recyclerViewAdapter);
         recyclerView.setLayoutManager(new GridLayoutManager(this, spanCount));
+        recyclerView.setItemViewCacheSize(20);
 
         if (recyclerView instanceof FastScrollerRecyclerView) {
             ((FastScrollerRecyclerView) recyclerView).addOuterGridSpacing(spacing);

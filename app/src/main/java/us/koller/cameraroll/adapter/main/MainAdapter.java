@@ -29,6 +29,7 @@ public class MainAdapter extends AbstractRecyclerViewAdapter<ArrayList<Album>> {
     static final String TAG = MainAdapter.class.getSimpleName();
 
     private Style style;
+    RecyclerView.RecycledViewPool nestedRecyclerViewRecycledViewPool = null;
 
     public MainAdapter(Context context, boolean pick_photos) {
         super(pick_photos);
@@ -47,7 +48,12 @@ public class MainAdapter extends AbstractRecyclerViewAdapter<ArrayList<Album>> {
 
         viewHolder = style.createViewHolderInstance(parent);
         if (viewHolder instanceof NestedRecyclerViewAlbumHolder) {
-            ((NestedRecyclerViewAlbumHolder) viewHolder).setSelectorModeManager(getSelectorManager());
+            NestedRecyclerViewAlbumHolder nestedHolder = (NestedRecyclerViewAlbumHolder) viewHolder;
+            if (nestedRecyclerViewRecycledViewPool == null)
+                nestedRecyclerViewRecycledViewPool = nestedHolder.nestedRecyclerView.getRecycledViewPool();
+            else
+                nestedHolder.nestedRecyclerView.setRecycledViewPool(nestedRecyclerViewRecycledViewPool);
+            nestedHolder.setSelectorModeManager(getSelectorManager());
         }
 
         Context context = viewHolder.itemView.getContext();
