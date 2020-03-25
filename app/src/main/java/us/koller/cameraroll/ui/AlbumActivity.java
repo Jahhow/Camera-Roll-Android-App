@@ -469,10 +469,9 @@ public class AlbumActivity extends ThemeableActivity
         }
 
         MenuItem selectAll = menu.findItem(R.id.select_all);
-        Drawable d = selectAll.getIcon();
-        DrawableCompat.wrap(d);
-        DrawableCompat.setTint(d, accentTextColor);
-        DrawableCompat.unwrap(d);
+        Drawable drawable = DrawableCompat.wrap(selectAll.getIcon());
+        DrawableCompat.setTint(drawable, accentTextColor);
+        selectAll.setIcon(DrawableCompat.unwrap(drawable));
 
         return super.onCreateOptionsMenu(menu);
     }

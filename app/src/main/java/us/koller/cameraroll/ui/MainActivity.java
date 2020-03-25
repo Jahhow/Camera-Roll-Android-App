@@ -6,11 +6,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -97,6 +99,9 @@ public class MainActivity extends ThemeableActivity {
         albums = MediaProvider.getAlbumsWithVirtualDirectories(this);
         if (albums == null) {
             albums = new ArrayList<>();
+        }
+        if (savedInstanceState == null) {
+            refreshPhotos();
         }
 
         final Toolbar toolbar = findViewById(R.id.toolbar);
@@ -496,12 +501,6 @@ public class MainActivity extends ThemeableActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        refreshPhotos();
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.main, menu);
@@ -690,11 +689,14 @@ public class MainActivity extends ThemeableActivity {
         super.onPause();
 
         observer = new ContentObserver(new Handler());
-        observer.setListener((selfChange, uri) -> {
-            //Log.d("MainActivity", "onChange()");
-            MediaProvider.dataChanged = true;
-            //observer.unregister(MainActivity.this);
-            //observer = null;
+        observer.setListener(new ContentObserver.Listener() {
+            @Override
+            public void onChange(boolean selfChange, Uri uri) {
+                Log.d(TAG, "onChange()");
+                MediaProvider.dataChanged = true;
+                //observer.unregister(MainActivity.this);
+                //observer = null;
+            }
         });
         observer.register(this);
     }
@@ -763,6 +765,7 @@ public class MainActivity extends ThemeableActivity {
         return new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, final Intent intent) {
+                Log.i(TAG, "BroadcastReceiver " + intent.getAction());
                 if (intent.getAction() == null) return;
                 switch (intent.getAction()) {
                     case FileOperation.RESULT_DONE:

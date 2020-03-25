@@ -181,7 +181,7 @@ public class ColorFade {
 
     public static void fadeDrawableAlpha(final Drawable d, int endAlpha) {
         ValueAnimator animator = getDefaultValueAnimator(d.getAlpha(), endAlpha);
-        animator.addUpdateListener(valueAnimator -> d.setAlpha((int) valueAnimator.getAnimatedFraction()));
+        animator.addUpdateListener(valueAnimator -> d.setAlpha((int) valueAnimator.getAnimatedValue()));
         animator.start();
     }
 }
