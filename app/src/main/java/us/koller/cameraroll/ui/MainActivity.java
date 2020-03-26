@@ -68,12 +68,8 @@ public class MainActivity extends ThemeableActivity {
     public static final int REMOVABLE_STORAGE_PERMISSION_REQUEST_CODE = 8;
     public static final int SETTINGS_REQUEST_CODE = 9;
 
-    private ArrayList<Album> albums;
-
     private RecyclerView recyclerView;
     private AbstractRecyclerViewAdapter<ArrayList<Album>> recyclerViewAdapter;
-
-    private Snackbar snackbar;
 
     private MediaProvider mediaProvider;
 
@@ -96,7 +92,7 @@ public class MainActivity extends ThemeableActivity {
         hiddenFolders = settings.getHiddenFolders();
 
         //load media
-        albums = MediaProvider.getAlbumsWithVirtualDirectories(this);
+       ArrayList<Album> albums = MediaProvider.getAlbumsWithVirtualDirectories(this);
         if (albums == null) {
             albums = new ArrayList<>();
         }
@@ -451,7 +447,6 @@ public class MainActivity extends ThemeableActivity {
                         MediaProvider.getAlbumsWithVirtualDirectories(MainActivity.this);
                 if (albums != null) {
                     MainActivity.this.runOnUiThread(() -> {
-                        MainActivity.this.albums = albumsWithVirtualDirs;
                         recyclerViewAdapter.setData(albumsWithVirtualDirs);
 
                         if (showSnackBar) {
@@ -601,7 +596,6 @@ public class MainActivity extends ThemeableActivity {
                 //SortUtil.sortAlbums(MainActivity.this, MediaProvider.getAlbums());
                 final ArrayList<Album> albums = MediaProvider.getAlbumsWithVirtualDirectories(MainActivity.this);
                 MainActivity.this.runOnUiThread(() -> {
-                    MainActivity.this.albums = albums;
                     recyclerViewAdapter.setData(albums);
                     snackbar.dismiss();
                 });
@@ -776,8 +770,7 @@ public class MainActivity extends ThemeableActivity {
                         resortAlbums();
                         break;
                     case DATA_CHANGED:
-                        albums = MediaProvider.getAlbums();
-                        recyclerViewAdapter.setData(albums);
+                        recyclerViewAdapter.setData(MediaProvider.getAlbums());
                     default:
                         break;
                 }

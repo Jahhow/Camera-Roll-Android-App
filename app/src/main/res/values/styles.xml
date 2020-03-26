@@ -6,6 +6,7 @@
 
     <!--Base Theme-->
     <style name="CameraRoll.Theme" parent="Theme.MaterialComponents.NoActionBar">
+        <!--colorPrimary is used instead of colorAccent for Theme.MaterialComponents.NoActionBar-->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -112,14 +113,12 @@
         <item name="android:windowBackground">@null</item>
         <item name="android:windowTranslucentStatus">true</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
-        <item name="alertDialogTheme">@style/CameraRoll.Theme.Dialog</item>
     </style>
 
     <style name="CameraRoll.Theme.Light.Settings" parent="CameraRoll.Theme.Light">
         <item name="android:windowBackground">@null</item>
         <item name="android:windowTranslucentStatus">true</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
-        <item name="alertDialogTheme">@style/CameraRoll.Theme.Light.Dialog</item>
     </style>
 
     <!--AboutActivity Theme-->
@@ -166,29 +165,6 @@
     <style name="CameraRoll.Theme.Light.VirtualDirectories" parent="CameraRoll.Theme.Light">
         <item name="android:windowBackground">@null</item>
         <item name="android:windowTranslucentStatus">true</item>
-    </style>
-
-    <!--Dialog Style-->
-    <style name="CameraRoll.Theme.Dialog" parent="Theme.MaterialComponents.Dialog.Alert">
-        <item name="buttonBarButtonStyle">@style/CameraRoll.Theme.Dialog.buttonBarButtonStyle</item>
-        <item name="android:colorBackground">@color/dark_bg</item>
-    </style>
-
-    <style name="CameraRoll.Theme.Light.Dialog" parent="Theme.MaterialComponents.Light.Dialog.Alert">
-        <item name="buttonBarButtonStyle">
-            @style/CameraRoll.Theme.Light.Dialog.buttonBarButtonStyle
-        </item>
-        <item name="android:colorBackground">@color/light_bg</item>
-    </style>
-
-    <style name="CameraRoll.Theme.Dialog.buttonBarButtonStyle" parent="Widget.MaterialComponents.Button.TextButton">
-        <item name="android:textColor">@color/colorAccent</item>
-        <item name="rippleColor">@color/accentRippleColor</item>
-    </style>
-
-    <style name="CameraRoll.Theme.Light.Dialog.buttonBarButtonStyle" parent="Widget.MaterialComponents.Button.TextButton">
-        <item name="android:textColor">@color/colorAccent_light</item>
-        <item name="rippleColor">@color/accentRippleColor</item>
     </style>
 
     <!-- Style for a DialogPreference Entry -->

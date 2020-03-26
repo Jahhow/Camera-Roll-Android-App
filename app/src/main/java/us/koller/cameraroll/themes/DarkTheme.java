@@ -36,7 +36,7 @@ public class DarkTheme extends Theme {
 
     @Override
     public int getToolbarColorRes() {
-        return R.color.grey_900_translucent;
+        return R.color.grey_900_translucent1;
     }
 
     @Override
@@ -62,10 +62,5 @@ public class DarkTheme extends Theme {
     @Override
     public int getAccentTextColorRes() {
         return R.color.colorAccent_text;
-    }
-
-    @Override
-    public int getDialogThemeRes() {
-        return R.style.CameraRoll_Theme_Dialog;
     }
 }

@@ -96,23 +96,22 @@ public class MediaStoreRetriever extends Retriever {
                             albumItem.setUri(uri);
 
                             //search bucket
-                            boolean foundBucket = false;
+                            Album album = null;
+                            String albumPath = FileOperation.Util.getParentPath(path);
                             for (int i = 0; i < albums.size(); i++) {
-                                if (albums.get(i).getPath().equals(FileOperation.Util.getParentPath(path))) {
-                                    albums.get(i).getAlbumItems().add(0, albumItem);
-                                    foundBucket = true;
+                                Album curAlbum = albums.get(i);
+                                if (curAlbum.getPath().equals(albumPath)) {
+                                    album = curAlbum;
                                     break;
                                 }
                             }
 
-                            if (!foundBucket) {
+                            if (album == null) {
                                 //no bucket found
-                                String bucketPath = FileOperation.Util.getParentPath(path);
-                                if (bucketPath != null) {
-                                    albums.add(new Album().setPath(bucketPath));
-                                    albums.get(albums.size() - 1).getAlbumItems().add(0, albumItem);
-                                }
+                                album = new Album().setPath(albumPath);
+                                albums.add(album);
                             }
+                            album.getAlbumItems().add(albumItem);
                         }
 
                     } while (cursor.moveToNext());

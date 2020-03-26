@@ -60,7 +60,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         BroadcastReceiver defaultBroadcastReceiver = getDefaultLocalBroadcastReceiver();
         if (defaultBroadcastReceiver != null) {
             registerLocalBroadcastReceiver(defaultBroadcastReceiver);
-            broadcastReceivers.add(defaultBroadcastReceiver);
         }
     }
 
@@ -156,17 +155,16 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         //Log.d("BaseActivity", "onDestroy() called " + this);
-        //unregister LocalBroadcastReceivers
-        for (int i = 0; i < broadcastReceivers.size(); i++) {
+        int size = broadcastReceivers.size();
+        for (int i = 0; i < size; i++) {
             BroadcastReceiver broadcastReceiver = broadcastReceivers.get(i);
-            if (broadcastReceiver != null) {
-                unregisterLocalBroadcastReceiver(broadcastReceiver);
-            }
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
         }
+        broadcastReceivers=null;
         super.onDestroy();
     }
 
-    public void registerLocalBroadcastReceiver(BroadcastReceiver broadcastReceiver) {
+    public void registerLocalBroadcastReceiver(@NonNull BroadcastReceiver broadcastReceiver) {
         broadcastReceivers.add(broadcastReceiver);
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(broadcastReceiver, getBroadcastIntentFilter());

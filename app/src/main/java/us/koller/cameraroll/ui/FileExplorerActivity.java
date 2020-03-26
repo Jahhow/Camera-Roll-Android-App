@@ -551,7 +551,7 @@ public class FileExplorerActivity extends ThemeableActivity
 
         final EditText editText = dialogLayout.findViewById(R.id.edit_text);
 
-        AlertDialog dialog = new AlertDialog.Builder(this, theme.getDialogThemeRes())
+        AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle(R.string.new_folder)
                 .setView(dialogLayout)
                 .setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
@@ -778,7 +778,7 @@ public class FileExplorerActivity extends ThemeableActivity
                         title = getString(R.string.delete_files, count);
                     }
 
-                    new AlertDialog.Builder(this, theme.getDialogThemeRes())
+                    new AlertDialog.Builder(this)
                             .setTitle(title)
                             .setNegativeButton(getString(R.string.no), null)
                             .setPositiveButton(getString(R.string.delete), new DialogInterface.OnClickListener() {

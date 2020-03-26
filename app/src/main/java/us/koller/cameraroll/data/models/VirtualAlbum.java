@@ -5,9 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.PorterDuff;
 import android.os.Parcel;
-import androidx.appcompat.app.AlertDialog;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +13,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -178,7 +179,7 @@ public class VirtualAlbum extends Album {
 
             Theme theme = Settings.getInstance(context).getThemeInstance(context);
 
-            final AlertDialog dialog = new AlertDialog.Builder(context, theme.getDialogThemeRes())
+            final AlertDialog dialog = new AlertDialog.Builder(context)
                     .setTitle(R.string.create_virtual_album)
                     .setView(dialogLayout)
                     .setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
@@ -225,7 +226,7 @@ public class VirtualAlbum extends Album {
 
             Theme theme = Settings.getInstance(context).getThemeInstance(context);
 
-            final AlertDialog dialog = new AlertDialog.Builder(context, theme.getDialogThemeRes())
+            final AlertDialog dialog = new AlertDialog.Builder(context)
                     .setTitle(R.string.add_path_to_virtual_album)
                     .setView(dialogLayout)
                     .setNeutralButton(R.string.create_virtual_album, new DialogInterface.OnClickListener() {

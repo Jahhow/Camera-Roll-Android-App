@@ -27,7 +27,7 @@
                 style="?android:attr/listSeparatorTextViewStyle"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/black_translucent1"/>
+                android:background="@color/black_translucent3"/>
 
         <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"
@@ -40,6 +40,6 @@
                 style="?android:attr/listSeparatorTextViewStyle"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/black_translucent1"/>
+                android:background="@color/black_translucent3"/>
     </LinearLayout>
 </LinearLayout>

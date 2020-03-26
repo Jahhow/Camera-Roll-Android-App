@@ -898,11 +898,12 @@ public class AlbumActivity extends ThemeableActivity
         }
     }
 
+    //todo keep the UI items selected until user click delete
     public void deleteSelectedItems() {
         //deleteAlbumItemsSnackbar();
         final String[] selected_items = recyclerViewAdapter
                 .cancelSelectorMode(AlbumActivity.this);
-        new AlertDialog.Builder(AlbumActivity.this, theme.getDialogThemeRes())
+        new AlertDialog.Builder(AlbumActivity.this)
                 .setTitle(getString(R.string.delete_files, selected_items.length) + "?")
                 .setNegativeButton(getString(R.string.no), null)
                 .setPositiveButton(getString(R.string.delete), new DialogInterface.OnClickListener() {

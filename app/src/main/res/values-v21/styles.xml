@@ -1,6 +1,7 @@
 <resources>
     <!--Base Theme-->
     <style name="CameraRoll.Theme" parent="Theme.MaterialComponents.NoActionBar">
+        <!--colorPrimary is used instead of colorAccent for where colorAccent used to be-->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -77,14 +78,12 @@
         <item name="android:windowBackground">@null</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
         <item name="android:windowTranslucentNavigation">false</item>
-        <item name="alertDialogTheme">@style/CameraRoll.Theme.Dialog</item>
     </style>
 
     <style name="CameraRoll.Theme.Light.Settings" parent="CameraRoll.Theme.Light">
         <item name="android:windowBackground">@null</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
         <item name="android:windowTranslucentNavigation">false</item>
-        <item name="alertDialogTheme">@style/CameraRoll.Theme.Light.Dialog</item>
     </style>
 
     <!--ExifEditor Theme-->

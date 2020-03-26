@@ -71,10 +71,6 @@ public abstract class Theme {
         return ContextCompat.getColor(context, res);
     }
 
-
-    /*Dialog theme*/
-    public abstract int getDialogThemeRes();
-
     @Override
     public boolean equals(Object obj) {
         Class c = this.getClass();

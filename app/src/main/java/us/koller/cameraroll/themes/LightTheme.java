@@ -36,7 +36,7 @@ public class LightTheme extends Theme {
 
     @Override
     public int getToolbarColorRes() {
-        return R.color.colorPrimary_light;
+        return R.color.light_bg;
     }
 
     @Override
@@ -46,7 +46,7 @@ public class LightTheme extends Theme {
 
     @Override
     public int getTextColorSecondaryRes() {
-        return R.color.grey_900_translucent;
+        return R.color.grey_900_translucent1;
     }
 
     @Override
@@ -62,10 +62,5 @@ public class LightTheme extends Theme {
     @Override
     public int getAccentTextColorRes() {
         return R.color.colorAccent_text_light;
-    }
-
-    @Override
-    public int getDialogThemeRes() {
-        return R.style.CameraRoll_Theme_Light_Dialog;
     }
 }

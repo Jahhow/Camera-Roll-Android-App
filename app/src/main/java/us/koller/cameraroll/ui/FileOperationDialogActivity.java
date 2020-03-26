@@ -178,7 +178,7 @@ public class FileOperationDialogActivity extends ThemeableActivity {
         }
         String title = getString(stringRes, files.length);
 
-        dialog = new AlertDialog.Builder(this, theme.getDialogThemeRes())
+        dialog = new AlertDialog.Builder(this)
                 .setTitle(title)
                 .setView(v)
                 .setPositiveButton(R.string.ok,
@@ -236,7 +236,7 @@ public class FileOperationDialogActivity extends ThemeableActivity {
 
         final EditText editText = dialogLayout.findViewById(R.id.edit_text);
 
-        dialog = new AlertDialog.Builder(this, theme.getDialogThemeRes())
+        dialog = new AlertDialog.Builder(this)
                 .setTitle(R.string.new_folder)
                 .setView(dialogLayout)
                 .setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
