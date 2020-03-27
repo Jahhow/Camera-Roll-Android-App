@@ -13,6 +13,7 @@ interface ImageRegionDecoder {
     @Throws(Exception::class)
     fun init(context: Context, uri: Uri): Point
 
+    @Throws(Exception::class)
     fun decodeRegion(sRect: Rect, sampleSize: Int): Bitmap
 
     fun recycle()

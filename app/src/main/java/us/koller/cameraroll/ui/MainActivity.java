@@ -12,7 +12,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,7 +29,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -172,8 +170,7 @@ public class MainActivity extends ThemeableActivity {
             ((FastScrollerRecyclerView) recyclerView).addOuterGridSpacing(spacing);
         }
 
-        //disable default change animation
-        ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
+        //((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
 
         //restore Selector mode, when needed
         if (savedInstanceState != null) {
@@ -447,16 +444,15 @@ public class MainActivity extends ThemeableActivity {
                         MediaProvider.getAlbumsWithVirtualDirectories(MainActivity.this);
                 if (albumsWithVirtualDirs != null) {
                     ArrayList<Album> oldAlbums = recyclerViewAdapter.getData();
-                    if (oldAlbums.equals(albumsWithVirtualDirs)) {
-                        runOnUiThread(() -> {
+                    boolean alreadyUpToDate = oldAlbums.equals(albumsWithVirtualDirs);
+                    runOnUiThread(() -> {
+                        if (alreadyUpToDate) {
                             if (showSnackBar) {
                                 Snackbar snackbar = Snackbar.make(findViewById(R.id.root_view),
                                         R.string.up_to_date, Snackbar.LENGTH_SHORT);
                                 Util.showSnackbar(snackbar);
                             }
-                        });
-                    } else {
-                        MainActivity.this.runOnUiThread(() -> {
+                        } else {
                             recyclerViewAdapter.setData(albumsWithVirtualDirs);
 
                             if (showSnackBar) {
@@ -469,8 +465,8 @@ public class MainActivity extends ThemeableActivity {
                                 mediaProvider.onDestroy();
                             }
                             mediaProvider = null;
-                        });
-                    }
+                        }
+                    });
                 }
             }
 
@@ -697,7 +693,7 @@ public class MainActivity extends ThemeableActivity {
         observer.setListener(new ContentObserver.Listener() {
             @Override
             public void onChange(boolean selfChange, Uri uri) {
-                Log.d(TAG, "onChange()");
+                //Log.d(TAG, "onChange()");
                 MediaProvider.dataChanged = true;
                 //observer.unregister(MainActivity.this);
                 //observer = null;
@@ -770,7 +766,7 @@ public class MainActivity extends ThemeableActivity {
         return new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, final Intent intent) {
-                Log.i(TAG, "BroadcastReceiver " + intent.getAction());
+                //Log.i(TAG, "BroadcastReceiver " + intent.getAction());
                 if (intent.getAction() == null) return;
                 switch (intent.getAction()) {
                     case FileOperation.RESULT_DONE:

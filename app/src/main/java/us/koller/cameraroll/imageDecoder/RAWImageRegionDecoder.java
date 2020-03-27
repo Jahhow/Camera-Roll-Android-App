@@ -7,25 +7,39 @@ import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.net.Uri;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import com.davemorrissey.labs.subscaleview.ImageRegionDecoder;
 
+import java.io.IOException;
+
 public class RAWImageRegionDecoder implements ImageRegionDecoder {
-    static final String TAG = RAWImageRegionDecoder.class.getSimpleName();
-    Bitmap bitmap = null;
+    private static final String TAG = RAWImageRegionDecoder.class.getSimpleName();
+    private Context context;
+    private Uri uri;
+    private Bitmap bitmap = null;
 
     @Override
     @NonNull
     public Point init(Context context, @NonNull Uri uri) throws Exception {
-        bitmap = BitmapFactory.decodeStream(context.getContentResolver().openInputStream(uri));
-        return new Point(bitmap.getWidth(), bitmap.getHeight());
+        this.context = context;
+        this.uri = uri;
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeStream(context.getContentResolver().openInputStream(uri), null, options);
+        //Log.i(TAG, "dimen " + options.outWidth + ", " + options.outHeight);
+        return new Point(options.outWidth, options.outHeight);
     }
 
     @Override
     @NonNull
-    public Bitmap decodeRegion(Rect rect, int sampleSize) {
+    public Bitmap decodeRegion(@NonNull Rect rect, int sampleSize) throws IOException {
+        Log.i(TAG, "decodeRegion");
+        if (bitmap == null) {
+            bitmap = BitmapFactory.decodeStream(context.getContentResolver().openInputStream(uri));
+        }
         float scale = 1f / sampleSize;
         Matrix matrix = new Matrix();
         matrix.setScale(scale, scale);
@@ -34,16 +48,12 @@ public class RAWImageRegionDecoder implements ImageRegionDecoder {
 
     @Override
     public boolean isReady() {
-        return bitmap != null;
+        return true;
     }
 
     @Override
     public void recycle() {
         bitmap.recycle();
         bitmap = null;
-    }
-
-    public Bitmap getBitmap() {
-        return bitmap;
     }
 }

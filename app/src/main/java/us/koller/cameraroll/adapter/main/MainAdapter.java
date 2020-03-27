@@ -3,7 +3,6 @@ package us.koller.cameraroll.adapter.main;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -67,9 +66,9 @@ public class MainAdapter extends AbstractRecyclerViewAdapter<ArrayList<Album>> {
     public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder, int position) {
         final Album album = getData().get(position);
         AlbumHolder albumHolder = (AlbumHolder) holder;
-        if (albumHolder.getAlbum() == album)
+        if (albumHolder.getAlbum() != null && albumHolder.getAlbum().equals(album))
             return;
-        Log.i(TAG,"bind album");
+        //Log.i(TAG, "bind album");
         albumHolder.setAlbum(album);
         holder.itemView.setOnClickListener(view -> {
             Intent intent = new Intent(view.getContext(), AlbumActivity.class);

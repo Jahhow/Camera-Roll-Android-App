@@ -283,7 +283,7 @@ public abstract class AlbumItem
 
     @Override
     public boolean equals(@Nullable Object obj) {
-        if(!(obj instanceof AlbumItem))
+        if (!(obj instanceof AlbumItem))
             return false;
         return ((AlbumItem) obj).path.equals(path);
     }

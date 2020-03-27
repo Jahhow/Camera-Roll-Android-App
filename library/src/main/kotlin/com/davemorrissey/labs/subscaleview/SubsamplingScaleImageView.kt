@@ -738,6 +738,8 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
             canvas.drawText(String.format(Locale.ENGLISH, "Orientation: %d°, Total Rotation: %.0f°", orientationDegrees, rotationDegrees), px(5).toFloat(), px(45).toFloat(), debugTextPaint!!)
             val center = getCenter()
             canvas.drawText(String.format(Locale.ENGLISH, "Source Center: %.0f, %.0f", center!!.x, center.y), px(5).toFloat(), px(60).toFloat(), debugTextPaint!!)
+            if (bitmap != null && bitmap!!.width != sWidth)
+                canvas.drawText("Preview", px(5).toFloat(), px(75).toFloat(), debugTextPaint!!)
             if (anim != null) {
                 val vFocus = sourceToViewCoord(anim!!.sFocus!!)
 
@@ -1175,10 +1177,10 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         private var exception: Exception? = null
 
         override fun doInBackground(vararg params: Void): IntArray? {
+            val context = contextRef.get()
+            val decoderFactory = decoderFactoryRef.get()
+            val view = viewRef.get()
             try {
-                val context = contextRef.get()
-                val decoderFactory = decoderFactoryRef.get()
-                val view = viewRef.get()
                 if (context != null && decoderFactory != null && view != null) {
                     //view.debug("TilesInitTask.doInBackground")
                     decoder = decoderFactory.make()
@@ -1188,6 +1190,9 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                     return intArrayOf(sWidth, sHeight, view.getExifOrientation())
                 }
             } catch (e: Exception) {
+                if (debug) {
+                    Log.e(TAG, e.toString())
+                }
                 exception = e
             }
 
@@ -1251,10 +1256,12 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                     tile?.loading = false
                 }
             } catch (e: OutOfMemoryError) {
-                //Log.e(TAG, "Failed to decode tile - OutOfMemoryError $e")
+                if (debug)
+                    Log.e(TAG, "Failed to decode tile - OutOfMemoryError $e")
                 exception = RuntimeException(e)
             } catch (e: Exception) {
-                //Log.e(TAG, "Failed to decode tile $e")
+                if (debug)
+                    Log.e(TAG, "Failed to decode tile $e")
                 exception = e
             }
 
@@ -1317,6 +1324,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                 if (uri != null && decoderFactory != null && view != null) {
                     //view.debug("BitmapLoadTask.doInBackground")
                     bitmap = decoderFactory.make().decode(view.context, uri, view.orientationDegrees)
+                    view.debug("BitmapLoadTask done ${uri.lastPathSegment}. isPreview: $isPreview")
                 }
             } catch (e: Exception) {
                 //Log.e(TAG, "Failed to load bitmap", e)

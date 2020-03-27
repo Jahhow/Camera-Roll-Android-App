@@ -20,8 +20,9 @@ public class GlideImageDecoder implements ImageDecoder {
 
     @Override
     public Bitmap decode(@NonNull Context context, @NonNull Uri uri, int orientationAngle) {
+        //Log.i(TAG, "decode");
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
-        int px = Math.min(displayMetrics.heightPixels, displayMetrics.widthPixels) / 4;
+        int px = Math.min(displayMetrics.heightPixels, displayMetrics.widthPixels) >> 1;
         try {
             return Glide.with(context)
                     .asBitmap()
@@ -33,6 +34,7 @@ public class GlideImageDecoder implements ImageDecoder {
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
+        //Log.i(TAG, "error");
         return null;
     }
 }

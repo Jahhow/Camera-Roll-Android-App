@@ -225,10 +225,10 @@ public class NestedRecyclerViewAlbumHolder extends AlbumHolder
     public void setAlbum(Album album) {
         Album oldAlbum = getAlbum();
         super.setAlbum(album);
-        if (album.equals(oldAlbum)) {
+        /*if (album.equals(oldAlbum)) {
             onItemChanged();
             return;
-        }
+        }*/
 
         int oldHeight = nestedRecyclerView.getHeight();
         //make RecyclerView either single ore double lined, depending on the album size

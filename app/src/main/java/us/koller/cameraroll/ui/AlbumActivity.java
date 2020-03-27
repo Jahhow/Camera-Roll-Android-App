@@ -35,6 +35,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -518,8 +519,9 @@ public class AlbumActivity extends ThemeableActivity
                         FileOperationDialogActivity.ACTION_COPY :
                         FileOperationDialogActivity.ACTION_MOVE);
                 intent.putExtra(FileOperationDialogActivity.FILES, selected_items_paths);
-
-                startActivityForResult(intent, FILE_OP_DIALOG_REQUEST);
+                //noinspection unchecked
+                startActivityForResult(intent, FILE_OP_DIALOG_REQUEST,
+                        ActivityOptionsCompat.makeSceneTransitionAnimation(this).toBundle());
                 break;
             case R.id.delete:
                 deleteSelectedItems();
@@ -1106,7 +1108,7 @@ public class AlbumActivity extends ThemeableActivity
                 switch (action) {
                     case FileOperation.RESULT_DONE:
                         int type = intent.getIntExtra(FileOperation.TYPE, FileOperation.EMPTY);
-                        String actionString = FileOperation.Util.getActionString(context, type);
+                        //String actionString = FileOperation.Util.getActionString(context, type);
                         //Log.i(TAG, "RESULT_DONE: FileOperation " + actionString);
                         switch (type) {
                             case FileOperation.MOVE: {
