@@ -7,6 +7,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.bumptech.glide.load.Key;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -278,5 +279,12 @@ public abstract class AlbumItem
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .error(Util.getErrorPlaceholder(context))
                 .signature(getGlideSignature());
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if(!(obj instanceof AlbumItem))
+            return false;
+        return ((AlbumItem) obj).path.equals(path);
     }
 }

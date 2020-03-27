@@ -19,6 +19,7 @@
     <string name="no">No</string>
     <string name="undo">Undo</string>
     <string name="done">Done</string>
+    <string name="up_to_date">Up to Date</string>
     <string name="retry">Retry</string>
     <string name="excluded">Excluded</string>
     <string name="error">Error</string>

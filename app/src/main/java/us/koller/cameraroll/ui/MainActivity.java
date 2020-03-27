@@ -92,7 +92,7 @@ public class MainActivity extends ThemeableActivity {
         hiddenFolders = settings.getHiddenFolders();
 
         //load media
-       ArrayList<Album> albums = MediaProvider.getAlbumsWithVirtualDirectories(this);
+        ArrayList<Album> albums = MediaProvider.getAlbumsWithVirtualDirectories(this);
         if (albums == null) {
             albums = new ArrayList<>();
         }
@@ -445,21 +445,32 @@ public class MainActivity extends ThemeableActivity {
             public void onMediaLoaded(final ArrayList<Album> albums) {
                 final ArrayList<Album> albumsWithVirtualDirs =
                         MediaProvider.getAlbumsWithVirtualDirectories(MainActivity.this);
-                if (albums != null) {
-                    MainActivity.this.runOnUiThread(() -> {
-                        recyclerViewAdapter.setData(albumsWithVirtualDirs);
+                if (albumsWithVirtualDirs != null) {
+                    ArrayList<Album> oldAlbums = recyclerViewAdapter.getData();
+                    if (oldAlbums.equals(albumsWithVirtualDirs)) {
+                        runOnUiThread(() -> {
+                            if (showSnackBar) {
+                                Snackbar snackbar = Snackbar.make(findViewById(R.id.root_view),
+                                        R.string.up_to_date, Snackbar.LENGTH_SHORT);
+                                Util.showSnackbar(snackbar);
+                            }
+                        });
+                    } else {
+                        MainActivity.this.runOnUiThread(() -> {
+                            recyclerViewAdapter.setData(albumsWithVirtualDirs);
 
-                        if (showSnackBar) {
-                            Snackbar snackbar = Snackbar.make(findViewById(R.id.root_view),
-                                    R.string.done, Snackbar.LENGTH_SHORT);
-                            Util.showSnackbar(snackbar);
-                        }
+                            if (showSnackBar) {
+                                Snackbar snackbar = Snackbar.make(findViewById(R.id.root_view),
+                                        R.string.done, Snackbar.LENGTH_SHORT);
+                                Util.showSnackbar(snackbar);
+                            }
 
-                        if (mediaProvider != null) {
-                            mediaProvider.onDestroy();
-                        }
-                        mediaProvider = null;
-                    });
+                            if (mediaProvider != null) {
+                                mediaProvider.onDestroy();
+                            }
+                            mediaProvider = null;
+                        });
+                    }
                 }
             }
 

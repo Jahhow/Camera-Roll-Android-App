@@ -3,6 +3,8 @@ package us.koller.cameraroll.data.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.Nullable;
+
 import java.io.File;
 import java.util.ArrayList;
 
@@ -134,4 +136,14 @@ public class Album
             return new Album[i];
         }
     };
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (!(obj instanceof Album))
+            return false;
+        Album album = (Album) obj;
+        if (!album.getPath().equals(path))
+            return false;
+        return album.getAlbumItems().equals(albumItems);
+    }
 }
