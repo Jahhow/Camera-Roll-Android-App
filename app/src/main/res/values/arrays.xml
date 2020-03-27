@@ -22,24 +22,10 @@
 
     <!--Style preference-->
     <integer name="STYLE_PARALLAX_VALUE">0</integer>
-    <integer name="STYLE_PARALLAX_EXCLUDED_VALUE">1</integer>
-
     <integer name="STYLE_CARDS_VALUE">2</integer>
-    <integer name="STYLE_CARDS_EXCLUDED_VALUE">3</integer>
-
     <integer name="STYLE_CARDS_2_VALUE">6</integer>
-    <integer name="STYLE_CARDS_2_EXCLUDED_VALUE">7</integer>
-
     <integer name="STYLE_NESTED_RECYCLER_VIEW_VALUE">4</integer>
-    <integer name="STYLE_NESTED_RECYCLER_VIEW_EXCLUDED_VALUE">5</integer>
-
     <integer name="STYLE_LIST_VALUE">8</integer>
-
-    <string name="STYLE_PARALLAX_NAME" translatable="false">Parallax</string>
-    <string name="STYLE_CARDS_NAME" translatable="false">Cards</string>
-    <string name="STYLE_CARDS_2_NAME" translatable="false">Cards 2</string>
-    <string name="STYLE_NESTED_RECYCLER_VIEW_NAME" translatable="false">Nested RecyclerView</string>
-    <string name="STYLE_LIST_NAME" translatable="false">List</string>
 
     <!--Keys to store individual columnCounts-->
     <string name="STYLE_PARALLAX_COLUMN_COUNT_PREF_KEY" translatable="false">STYLE_PARALLAX_COLUMN_COUNT_PREF_KEY</string>

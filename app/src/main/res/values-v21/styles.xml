@@ -1,6 +1,6 @@
 <resources>
     <!--Base Theme-->
-    <style name="CameraRoll.Theme" parent="Theme.MaterialComponents.NoActionBar">
+    <style name="CameraRoll.Theme" parent="Theme.MaterialComponents.NoActionBar.Bridge">
         <!--colorPrimary is used instead of colorAccent for where colorAccent used to be-->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -14,7 +14,7 @@
         <item name="android:windowActivityTransitions">true</item>
     </style>
 
-    <style name="CameraRoll.Theme.Light" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="CameraRoll.Theme.Light" parent="Theme.MaterialComponents.Light.NoActionBar.Bridge">
         <item name="colorPrimary">@color/colorPrimary_light</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark_light</item>
         <item name="colorAccent">@color/colorAccent_light</item>

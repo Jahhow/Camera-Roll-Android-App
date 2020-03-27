@@ -1,15 +1,16 @@
 package us.koller.cameraroll.styles;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
 import us.koller.cameraroll.R;
 
-public class Cards2 extends Style {
+public class Squares extends Style {
 
     public static int getValue(Context context) {
         return context.getResources().getInteger(R.integer.STYLE_CARDS_2_VALUE);
@@ -37,7 +38,7 @@ public class Cards2 extends Style {
 
     @Override
     int getGridSpacingRes() {
-        return R.dimen.cards_style_grid_spacing;
+        return R.dimen.squares_style_grid_spacing;
     }
 
     @Override

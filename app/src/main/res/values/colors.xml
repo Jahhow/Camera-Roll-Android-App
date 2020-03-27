@@ -7,15 +7,15 @@
     <color name="colorAccent_text">#8A212121</color>
 
     <!--dark theme colors-->
-    <color name="colorPrimary">@color/colorAccent</color>
-    <color name="colorPrimaryDark">@color/colorAccent</color>
+    <color name="colorPrimary">@color/grey_900</color>
+    <color name="colorPrimaryDark">@color/grey_900</color>
     <color name="dark_bg">@color/grey_900</color>
     <!--black theme colors-->
     <color name="black_bg">@color/black</color>
 
     <!--light theme colors-->
-    <color name="colorPrimary_light">@color/colorAccent</color>
-    <color name="colorPrimaryDark_light">@color/colorAccent</color>
+    <color name="colorPrimary_light">@color/light_bg</color>
+    <color name="colorPrimaryDark_light">@color/light_bg</color>
     <color name="light_bg">#FAFAFA</color>
     <color name="light_bg_translucent1">#64FAFAFA</color>
     <!--light accent color-->

@@ -30,7 +30,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
 
         const val FILE_SCHEME = "file://"
         const val ASSET_PREFIX = "$FILE_SCHEME/android_asset/"
-        const val debug = true
+        const val debug = false
 
         const val SCALE_TYPE_CENTER_CROP = 2
 
@@ -40,7 +40,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         private const val TILE_SIZE_AUTO = Integer.MAX_VALUE
         private const val ANIMATION_DURATION = 366L
         private const val FLING_DURATION = 1000L
-        private val ROTATION_THRESHOLD_DEGREES = 10f
+        private const val ROTATION_THRESHOLD_DEGREES = 10f
 
         const val ANIM_FINISH_EDGE_NONE = 0.toByte()
         const val ANIM_FINISH_EDGE_LEFT = 0b1000.toByte()
@@ -1306,6 +1306,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         invalidate()
     }
 
+    //todo cancel unneeded tasks
     private class BitmapLoadTask internal
     constructor(view: SubsamplingScaleImageView, decoderFactory: DecoderFactory<out ImageDecoder>,
                 uri: Uri, val isPreview: Boolean) : AsyncTask<Void, Void, Unit>() {

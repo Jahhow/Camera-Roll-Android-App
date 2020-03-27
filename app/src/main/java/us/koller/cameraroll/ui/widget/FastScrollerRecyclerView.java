@@ -2,12 +2,13 @@ package us.koller.cameraroll.ui.widget;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewParent;
+
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.pluscubed.recyclerfastscroll.RecyclerFastScroller;
 
@@ -91,9 +92,9 @@ public class FastScrollerRecyclerView extends RecyclerView {
     public void addOuterGridSpacing(int outerGridSpacing) {
         this.outerGridSpacing += outerGridSpacing;
 
-        setPadding(getPaddingStart() + outerGridSpacing,
+        setPadding(getPaddingLeft() + outerGridSpacing,
                 getPaddingTop() + outerGridSpacing,
-                getPaddingEnd() + outerGridSpacing,
+                getPaddingRight() + outerGridSpacing,
                 getPaddingBottom() + outerGridSpacing);
     }
 

@@ -9,7 +9,7 @@ import androidx.preference.PreferenceManager;
 
 import us.koller.cameraroll.R;
 import us.koller.cameraroll.styles.Cards;
-import us.koller.cameraroll.styles.Cards2;
+import us.koller.cameraroll.styles.Squares;
 import us.koller.cameraroll.styles.List;
 import us.koller.cameraroll.styles.NestedRecyclerView;
 import us.koller.cameraroll.styles.Parallax;
@@ -68,7 +68,7 @@ public class Settings {
 
         style = sharedPreferences.getInt(
                 context.getString(R.string.pref_key_style),
-                context.getResources().getInteger(R.integer.STYLE_PARALLAX_VALUE));
+                context.getResources().getInteger(R.integer.STYLE_NESTED_RECYCLER_VIEW_VALUE));
 
         columnCount = sharedPreferences.getInt(
                 context.getString(R.string.pref_key_column_count),
@@ -145,7 +145,7 @@ public class Settings {
 
     public int getStyle(Context context, boolean pickPhotos) {
         if (pickPhotos && style == NestedRecyclerView.getValue(context)) {
-            return Cards2.getValue(context);
+            return Squares.getValue(context);
         }
         return style;
     }
@@ -164,8 +164,8 @@ public class Settings {
             return new Parallax();
         } else if (style == Cards.getValue(context)) {
             return new Cards();
-        } else if (style == Cards2.getValue(context)) {
-            return new Cards2();
+        } else if (style == Squares.getValue(context)) {
+            return new Squares();
         } else if (style == NestedRecyclerView.getValue(context)) {
             return new NestedRecyclerView();
         } else if (style == List.getValue(context)) {

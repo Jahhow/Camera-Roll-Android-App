@@ -152,7 +152,6 @@ public class MainActivity extends ThemeableActivity {
         if (settings.noFolderMode()) {
             spanCount = settings.getColumnCount(this);
             spacing = (int) getResources().getDimension(R.dimen.album_grid_spacing) / 2;
-            recyclerView.addItemDecoration(new GridMarginDecoration(spacing + spacing));
             recyclerViewAdapter = new NoFolderRecyclerViewAdapter(callback, recyclerView, pick_photos)
                     .setData(albums);
         } else {
@@ -162,6 +161,7 @@ public class MainActivity extends ThemeableActivity {
             recyclerViewAdapter = new MainAdapter(this, pick_photos).setData(albums);
             recyclerViewAdapter.getSelectorManager().addCallback(callback);
         }
+        recyclerView.addItemDecoration(new GridMarginDecoration(spacing + spacing));
         recyclerView.setAdapter(recyclerViewAdapter);
         recyclerView.setLayoutManager(new GridLayoutManager(this, spanCount));
         recyclerView.setItemViewCacheSize(20);

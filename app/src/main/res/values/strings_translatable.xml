@@ -101,6 +101,12 @@
     <string name="show_videos_summary">Show videos in gallery</string>
     <string name="maximum_brightness">Maximum Brightness</string>
     <string name="maximum_brightness_summary">Set Screen Brightness to maximum when viewing images</string>
+    <!--Styles-->
+    <string name="STYLE_PARALLAX_NAME">Parallax</string>
+    <string name="STYLE_CARDS_NAME">Cards</string>
+    <string name="STYLE_CARDS_2_NAME">Squares</string>
+    <string name="STYLE_NESTED_RECYCLER_VIEW_NAME">Nested</string>
+    <string name="STYLE_LIST_NAME">List</string>
     <!--EditImageActivity-->
     <string name="resize">Resize</string>
     <string name="rotate">Rotate</string>

@@ -9,7 +9,6 @@
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="@dimen/cards_style_grid_spacing"
         android:foreground="?selectableItemBackground"
         app:cardCornerRadius="4dp">
 

@@ -21,14 +21,12 @@
 
         <!--suppress AndroidElementNotAllowed -->
         <us.koller.cameraroll.preferences.StylePreference
-            style="@style/CameraRoll.Theme.DialogPreference"
             android:defaultValue="@integer/STYLE_PARALLAX_VALUE"
             android:key="@string/pref_key_style"
             android:title="@string/style" />
 
         <!--suppress AndroidElementNotAllowed -->
         <us.koller.cameraroll.preferences.ColumnCountPreference
-            style="@style/CameraRoll.Theme.DialogPreference"
             android:defaultValue="4"
             android:key="@string/pref_key_column_count"
             android:title="@string/column_count" />

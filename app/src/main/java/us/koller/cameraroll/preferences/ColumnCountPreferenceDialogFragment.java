@@ -22,7 +22,7 @@ public class ColumnCountPreferenceDialogFragment
         extends DialogFragment implements DialogInterface.OnClickListener {
 
     private int columnCount = Settings.DEFAULT_COLUMN_COUNT;
-    private int whichButtonClicked;
+    private int buttonClicked;
     private Preference preference;
 
     public static ColumnCountPreferenceDialogFragment newInstance(Preference preference) {
@@ -83,13 +83,13 @@ public class ColumnCountPreferenceDialogFragment
 
     @Override
     public void onClick(DialogInterface dialogInterface, int i) {
-        whichButtonClicked = i;
+        buttonClicked = i;
     }
 
     @Override
-    public void onDismiss(DialogInterface dialog) {
+    public void onDismiss(@NonNull DialogInterface dialog) {
         super.onDismiss(dialog);
-        if (whichButtonClicked == DialogInterface.BUTTON_POSITIVE
+        if (buttonClicked == DialogInterface.BUTTON_POSITIVE
                 && preference instanceof ColumnCountPreference) {
             ColumnCountPreference columnCountPreference =
                     ((ColumnCountPreference) preference);
