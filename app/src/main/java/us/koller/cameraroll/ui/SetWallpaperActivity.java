@@ -22,8 +22,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import com.davemorrissey.labs.subscaleview.DecoderFactory;
-import com.davemorrissey.labs.subscaleview.ImageRegionDecoder;
 import com.davemorrissey.labs.subscaleview.ImageViewState;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
@@ -74,18 +72,11 @@ public class SetWallpaperActivity extends AppCompatActivity {
             imageViewState = (ImageViewState) savedInstanceState.getSerializable(IMAGE_VIEW_STATE);
         }
 
-        imageView.setMinimumTileDpi(196);
-
-        // use custom decoders
-        imageView.setRegionDecoderFactory(new DecoderFactory<ImageRegionDecoder>() {
-            @Override
-            public ImageRegionDecoder make() {
-                return new CustomRegionDecoder();
-            }
-        });
-
+        imageView.setRegionDecoderFactory(CustomRegionDecoder::new);
         imageView.loadImage(imageUri.toString());
+        imageView.setRetainXSwipe(false);
         imageView.setMinimumScaleType(SubsamplingScaleImageView.SCALE_TYPE_CENTER_CROP);
+        imageView.setInitialScaleType(SubsamplingScaleImageView.SCALE_TYPE_CENTER_CROP);
 
         if (imageViewState == null) {
             imageView.setOnImageEventListener(
@@ -205,6 +196,7 @@ public class SetWallpaperActivity extends AppCompatActivity {
         }
     }
 
+    //todo use setBitmap
     private void setWallpaper(int which) {
         try {
             WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
@@ -238,7 +230,7 @@ public class SetWallpaperActivity extends AppCompatActivity {
 
     private Rect getCroppedRect() {
         SubsamplingScaleImageView imageView = findViewById(R.id.imageView);
-        PointF center = imageView.getCenter();
+        PointF center = imageView.getSVCenter();
         if (center != null) {
             int left = (int) (center.x - imageView.getWidth() / 2);
             return new Rect(left, 0, imageView.getSWidth(), imageView.getSHeight());
