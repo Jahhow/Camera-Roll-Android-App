@@ -105,9 +105,6 @@
     <string name="aspect_ratio_free">Вольна</string>
     <string name="aspect_ratio_original">Арыгінал</string>
     <string name="aspect_ratio_square">Квадрат</string>
-    <string name="aspect_ratio_3_2" translatable="false">3:2</string>
-    <string name="aspect_ratio_4_3" translatable="false">4:3</string>
-    <string name="aspect_ratio_16_9" translatable="false">16:9</string>   
     <!--ExifEditorActivity-->
     <string name="exif_editor">Exif рэдактар</string>
     <string name="edit_exif">рэдагаваць Exif</string>

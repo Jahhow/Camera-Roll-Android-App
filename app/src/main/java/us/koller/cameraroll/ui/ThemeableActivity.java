@@ -185,7 +185,7 @@ public abstract class ThemeableActivity extends BaseActivity {
         Bitmap overviewIcon = getIcon();
 
         setTaskDescription(new ActivityManager.TaskDescription(
-                getString(R.string.task_description_label),
+                getString(R.string.app_name),
                 overviewIcon, color));
         overviewIcon.recycle();
     }

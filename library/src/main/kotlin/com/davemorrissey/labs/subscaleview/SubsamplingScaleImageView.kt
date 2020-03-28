@@ -30,7 +30,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
 
         const val FILE_SCHEME = "file://"
         const val ASSET_PREFIX = "$FILE_SCHEME/android_asset/"
-        const val debug = false
+        const val debug = true
 
         const val SCALE_TYPE_UNSPECIFIED = 0
         const val SCALE_TYPE_CENTER_CROP = 2

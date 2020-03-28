@@ -129,7 +129,7 @@ public class MainActivity extends ThemeableActivity {
             }
         } else {
             if (actionBar != null) {
-                actionBar.setTitle(getString(R.string.toolbar_title));
+                actionBar.setTitle(getString(R.string.app_name));
             }
         }
 

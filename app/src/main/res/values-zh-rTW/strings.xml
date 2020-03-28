@@ -71,7 +71,7 @@
     <string name="successfully_created_new_folder">已新增</string>
     <string name="successfully_renamed_file">已重新命名</string>
     <!--FileExplorerActivity-->
-    <string name="no_files">: )</string>
+    <string name="no_files">沒有檔案</string>
     <string name="storage_roots">儲存裝置</string>
     <string name="storage">內部儲存空間</string>
     <string name="scan">重新掃描檔案</string>
@@ -84,11 +84,11 @@
     <!--SettingsActivity-->
     <string name="appearance">外觀</string>
     <string name="theme">色系</string>
-    <string name="style">相簿呈現方式</string>
-    <string name="column_count">多少項目為一列</string>
+    <string name="style">主畫面風格</string>
+    <string name="column_count">列數</string>
     <string name="other">其他</string>
     <string name="media_retriever">掃描儲存空間以取得資料</string>
-    <string name="media_retriever_summary">不使用 MediaStore API\n若您沒有看到您的一些檔案，啟用這個選項可能有幫助。</string>
+    <string name="media_retriever_summary">若您沒有看到您的一些檔案，啟用這個選項可能有幫助。</string>
     <string name="use_8_bit_color">使用 8 位元色彩</string>
     <string name="use_8_bit_color_summary">啟用以顯示更豐富的色彩</string>
     <string name="show_animations">顯示動畫</string>
@@ -126,7 +126,7 @@
     <string name="added_path_to_virtual_album">已將目錄 %1$s 加入虛擬相簿</string>
     <string name="virtual_album_deleted">已取消虛擬相簿 %1$s</string>
     <string name="path_removed">已排除此目錄</string>
-    <string name="no_paths">: )</string>
+    <string name="no_paths">沒有已包含的路徑</string>
     <string name="no_virtual_albums">沒有內容</string>
     <!--info Dialog Strings-->
     <string name="new_tag">新增標籤</string>
@@ -144,4 +144,17 @@
     <string name="info_frame_rate">框架速度:</string>
     <string name="copied_to_clipboard">已複製</string>
     <string name="unknown">未知</string>
+    <string name="app_name">相簿</string>
+    <string name="up_to_date">已是最新</string>
+    <string name="DARK_THEME_NAME">深色</string>
+    <string name="LIGHT_THEME_NAME">淺色</string>
+    <string name="BLACK_THEME_NAME">純黑</string>
+    <string name="STYLE_CARDS_NAME">圓角方形</string>
+    <string name="STYLE_NESTED_RECYCLER_VIEW_NAME">巢狀</string>
+    <string name="STYLE_SQUARES_NAME">方塊</string>
+    <string name="STYLE_LIST_NAME">清單</string>
+    <string name="moveToTarget">移動至目標</string>
+    <string name="anti_alias">反鋸齒</string>
+    <string name="show_cropping_edge">顯示裁減矩形</string>
+    <string name="STYLE_PARALLAX_NAME">飄移</string>
 </resources>

@@ -160,4 +160,86 @@
     <string name="info_frame_rate">Frame rate: </string>
     <string name="copied_to_clipboard">Copied to Clipboard</string>
     <string name="unknown">Unknown</string>
+    <!--About Text-->
+    <string name="about_text">
+        <![CDATA[
+            © 2017 Lukas Koller, Munich, Germany<br/>
+            © 2020 涂 家 浩 Jahhow, Taiwan<br/>
+            <br/>
+            <b><a href=\"https://github.com/Jahhow/Camera-Roll-Android-App\">Source Code</a></b> |
+            <b><a href=\"https://github.com/Jahhow/Camera-Roll-Android-App/blob/master/PRIVACY.md\">Privacy Policy</a></b><br/>
+            <br/>
+            <br/>
+            <b>Licenses:</b><br/>
+            <br/>
+            Libraries:<br/>
+            <br>
+                <b><a href=\"https://github.com/bumptech/glide\">Glide</a></b><br/>
+                An image loading and caching library for Android focused on smooth scrolling.<br/>
+                <a href=\"https://github.com/bumptech/glide/blob/master/LICENSE\">LICENSE</a>
+            <br>
+            <br/>
+            <br>
+                <b><a href=\"https://github.com/davemorrissey/subsampling-scale-image-view\">Subsampling Scale Image View</a></b><br/>
+                Highly configurable, easily extendable view with pan and zoom gestures for displaying huge images without loss of detail. Perfect for photo galleries, maps, building plans etc.<br/>
+                <a href=\"https://github.com/davemorrissey/subsampling-scale-image-view/blob/master/LICENSE\">LICENSE</a>
+            <br>
+            <br/>
+            <br>
+                <b><a href=\"https://github.com/chrisbanes/PhotoView\">PhotoView</a></b><br/>
+                Implementation of ImageView for Android that supports zooming, by various touch gestures.<br/>
+                <a href=\"https://github.com/chrisbanes/PhotoView/blob/master/LICENSE\">LICENSE</a>
+            <br>
+            <br/>
+            <br>
+                <b><a href=\"https://github.com/MFlisar/DragSelectRecyclerView\">DragSelectRecyclerView</a></b><br/>
+                TouchListener that can be attached to any RecyclerView and handles multi selection for you.<br/>
+                <a href=\"https://github.com/MFlisar/DragSelectRecyclerView/blob/master/LICENSE\">LICENSE</a>
+            <br>
+            <br/>
+            <br>
+                <b><a href=\"https://github.com/google/ExoPlayer\">ExoPlayer</a></b><br/>
+                An extensible media player for Android.<br/>
+                <a href=\"https://github.com/google/ExoPlayer/blob/release-v2/LICENSE\">LICENSE</a>
+            <br>
+            <br/>
+            <br>
+                <b><a href=\"https://github.com/romandanylyk/PageIndicatorView\">PageIndicatorView</a></b><br/>
+                An page indicator for Android ViewPager<br/>
+            <br>
+            <br/>
+            <br>
+                <b><a href=\"https://github.com/plusCubed/recycler-fast-scroll\">Recycler Fast Scroll</a></b><br/>
+                Widget for RecyclerView fast scrolling<br/>
+                <a href=\"https://github.com/plusCubed/recycler-fast-scroll/blob/master/LICENSE\">LICENSE</a>
+            <br>
+            <br/>
+            <br/>
+            Icons:<br/>
+            <br>
+                <b><a href=\"https://material.io/icons/\">Material Design Icons</a></b>, by Google<br/>
+            <br>
+            <br/>
+            Fonts:<br/>
+            <br>
+                <b><a href=\"https://fonts.google.com/specimen/Roboto+Mono?selection.family=Roboto+Mono\">Roboto Mono Font</a></b>, by Christian Robertson
+            <br>
+            <br/>
+            <br/>
+            Translators:<br/>
+            <br>
+                French: <a href=\"https://github.com/Primokorn\">Primokorn</a>, <a href=\"https://github.com/kkfong\">kkfong</a><br>
+                Italian: Silvano Numelli<br>
+                Polish: Marcin Głowacki<br>
+                Russian: <a href=\"https://github.com/SnowVolf\">Atrem Zhiganov</a><br>
+                Spanish: Christobal Rojas, Luis Gmz<br>
+                Bulgarian: psydex<br>
+                Croatian: <a href=\"https://github.com/krux3r\">Ivan Krušlin</a><br>
+                Portuguese: <a href=\"https://github.com/marciozomb13\">Marcio Zomb13</a><br>
+                Chinese: Yixuan Wang, <a href=\"https://github.com/Jahhow\">涂 家 浩 Jahhow</a><br>
+                Ukrainian: <a href=\"https://vlad2.carrd.co/\">Владислав Книжник</a><br>
+                Hungarian: nvi9<br>
+            <br>
+        ]]>
+    </string>
 </resources>
