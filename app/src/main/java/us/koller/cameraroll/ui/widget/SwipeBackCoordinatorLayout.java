@@ -15,7 +15,7 @@ import androidx.core.view.ViewCompat;
 //Solution heavily inspired by:
 //https://github.com/WangDaYeeeeee/Mysplash/blob/master/app/src/main/java/com/wangdaye/mysplash/common/ui/widget/SwipeBackCoordinatorLayout.java
 public class SwipeBackCoordinatorLayout extends CoordinatorLayout {
-    static final String TAG = SwipeBackCoordinatorLayout.class.getSimpleName();
+    protected static final String TAG = SwipeBackCoordinatorLayout.class.getSimpleName();
     // widget
     public OnSwipeListener listener;
 

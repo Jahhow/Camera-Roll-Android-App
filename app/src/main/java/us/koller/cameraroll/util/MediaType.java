@@ -24,8 +24,6 @@ public class MediaType {
     private static String[] exifWritingExtensions = {"jpg", "jpe", "jpeg"};
     private static String[] exifWritingMimeTypes = {"image/jpeg", "image/jpg"};
 
-    private static String[] wallpaperMimeTypes = {"image/jpeg", "image/png"};
-
     public static boolean isMedia(String path) {
         return checkImageExtension(path) ||
                 checkRAWExtension(path) ||
@@ -123,14 +121,6 @@ public class MediaType {
             if (path.toLowerCase().endsWith(extensions[i])) {
                 return true;
             }
-        }
-        return false;
-    }
-
-    public static boolean suitableAsWallpaper(Context context, Uri uri) {
-        if (uri != null) {
-            String mimeType = getMimeType(context, uri);
-            return mimeType != null && checkExtension(mimeType, wallpaperMimeTypes);
         }
         return false;
     }

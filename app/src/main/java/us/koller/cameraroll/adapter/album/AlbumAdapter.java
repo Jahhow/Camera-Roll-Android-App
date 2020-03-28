@@ -22,7 +22,6 @@ import us.koller.cameraroll.adapter.album.viewHolder.GifViewHolder;
 import us.koller.cameraroll.adapter.album.viewHolder.PhotoViewHolder;
 import us.koller.cameraroll.adapter.album.viewHolder.RAWImageHolder;
 import us.koller.cameraroll.adapter.album.viewHolder.VideoViewHolder;
-import us.koller.cameraroll.data.Settings;
 import us.koller.cameraroll.data.models.Album;
 import us.koller.cameraroll.data.models.AlbumItem;
 import us.koller.cameraroll.data.models.Gif;
@@ -32,7 +31,7 @@ import us.koller.cameraroll.data.models.Video;
 import us.koller.cameraroll.ui.ItemActivity;
 
 public class AlbumAdapter extends AbstractRecyclerViewAdapter<Album> {
-    final static String TAG = AlbumAdapter.class.getSimpleName();
+    protected static final String TAG = AlbumAdapter.class.getSimpleName();
 
     @SuppressWarnings("FieldCanBeLocal")
     private final int VIEW_TYPE_PHOTO = 1;
@@ -98,8 +97,6 @@ public class AlbumAdapter extends AbstractRecyclerViewAdapter<Album> {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.albumitem_cover, parent, false);
-        if (Settings.getInstance(parent.getContext()).showAnimations())
-            v.setAlpha(0);
         switch (viewType) {
             case VIEW_TYPE_RAW:
                 return new RAWImageHolder(v);

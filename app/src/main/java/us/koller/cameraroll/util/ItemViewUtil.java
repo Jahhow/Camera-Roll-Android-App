@@ -24,7 +24,7 @@ import us.koller.cameraroll.adapter.item.viewHolder.GifViewHolder;
 import us.koller.cameraroll.data.models.AlbumItem;
 
 public class ItemViewUtil {
-    static final String TAG = ItemViewUtil.class.getSimpleName();
+    protected static final String TAG = ItemViewUtil.class.getSimpleName();
 
     public static View inflatePhotoView(ViewGroup container) {
         return LayoutInflater.from(container.getContext())

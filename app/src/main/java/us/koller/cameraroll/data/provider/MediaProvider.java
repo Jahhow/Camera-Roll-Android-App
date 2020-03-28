@@ -20,7 +20,7 @@ import us.koller.cameraroll.data.provider.retriever.StorageRetriever;
 import us.koller.cameraroll.util.SortUtil;
 
 public class MediaProvider extends Provider {
-    static final String TAG = MediaProvider.class.getSimpleName();
+    protected static final String TAG = MediaProvider.class.getSimpleName();
 
     private static ArrayList<Album> albums;
 

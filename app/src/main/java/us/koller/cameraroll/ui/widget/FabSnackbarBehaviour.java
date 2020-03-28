@@ -13,7 +13,7 @@ import us.koller.cameraroll.util.Util;
 
 @SuppressWarnings("unused")
 public class FabSnackbarBehaviour extends CoordinatorLayout.Behavior<FloatingActionButton> {
-    static final String TAG = FabSnackbarBehaviour.class.getSimpleName();
+    protected static final String TAG = FabSnackbarBehaviour.class.getSimpleName();
 
     public FabSnackbarBehaviour(Context context, AttributeSet attrs) {
         super(context, attrs);

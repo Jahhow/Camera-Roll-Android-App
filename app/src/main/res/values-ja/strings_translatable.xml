@@ -18,7 +18,6 @@
     <string name="undo">元に戻す</string>
     <string name="done">完了</string>
     <string name="retry">リトライ</string>
-    <string name="excluded">除外しました</string>
     <string name="error">エラー</string>
     <string name="selected_count">%1$d 選択しました</string>
     <string name="file_op_channel_name">ファイル操作</string>
@@ -60,7 +59,6 @@
     <string name="move">移動</string>
     <string name="move_item_to">%1$d アイテムを以下に移動:</string>
     <string name="move_items_to">%1$d アイテムを以下に移動:</string>
-    <string name="move_error">外部ストレージへ/からの移動は動作しません。 ファイルをコピーしてから削除してください</string>
     <string name="copy">コピー</string>
     <string name="copy_item_to">%1$d アイテムを以下にコピー:</string>
     <string name="copy_items_to">Copy アイテムを以下にコピー:</string>
@@ -74,7 +72,6 @@
     <string name="no_files">ファイルはありません</string>
     <string name="storage">ストレージ</string>
     <string name="scan">スキャン</string>
-    <string name="scanning">スキャン中…</string>
     <string name="copy_file">%1$d ファイルをコピー</string>
     <string name="copy_files">%1$d ファイルをコピー</string>
     <string name="move_file">%1$d ファイルを移動</string>

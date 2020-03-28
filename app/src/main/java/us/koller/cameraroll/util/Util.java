@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.Toolbar;
@@ -181,13 +182,10 @@ public class Util {
         }
     }
 
+    @NonNull
     public static Drawable getAlbumItemSelectorOverlay(Context context) {
         Drawable selectorOverlay = AppCompatResources.getDrawable(context,
                 R.drawable.album_item_selected_indicator);
-
-        if (selectorOverlay == null) {
-            return null;
-        }
         return tintDrawableWithAccentColor(context, selectorOverlay);
     }
 

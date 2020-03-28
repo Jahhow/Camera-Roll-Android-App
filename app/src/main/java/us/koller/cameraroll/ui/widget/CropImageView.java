@@ -36,7 +36,7 @@ import us.koller.cameraroll.util.Util;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class CropImageView extends SubsamplingScaleImageView implements View.OnTouchListener {
-    static final String TAG = CropImageView.class.getSimpleName();
+    protected static final String TAG = CropImageView.class.getSimpleName();
 
     private boolean showCroppingEdge = false;
 

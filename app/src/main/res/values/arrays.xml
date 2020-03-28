@@ -5,10 +5,6 @@
     <string name="LIGHT_THEME_VALUE" translatable="false">LIGHT</string>
     <string name="BLACK_THEME_VALUE" translatable="false">BLACK</string>
 
-    <string name="DARK_THEME_NAME" translatable="false">Dark</string>
-    <string name="LIGHT_THEME_NAME" translatable="false">Light</string>
-    <string name="BLACK_THEME_NAME" translatable="false">Black</string>
-
     <string-array name="theme_values">
         <item>@string/DARK_THEME_VALUE</item>
         <item>@string/LIGHT_THEME_VALUE</item>
@@ -23,8 +19,8 @@
     <!--Style preference-->
     <integer name="STYLE_PARALLAX_VALUE">0</integer>
     <integer name="STYLE_CARDS_VALUE">2</integer>
-    <integer name="STYLE_CARDS_2_VALUE">6</integer>
     <integer name="STYLE_NESTED_RECYCLER_VIEW_VALUE">4</integer>
+    <integer name="STYLE_SQUARES_VALUE">6</integer>
     <integer name="STYLE_LIST_VALUE">8</integer>
 
     <!--Keys to store individual columnCounts-->
@@ -37,15 +33,15 @@
     <integer-array name="style_values">
         <item>@integer/STYLE_PARALLAX_VALUE</item>
         <item>@integer/STYLE_CARDS_VALUE</item>
-        <item>@integer/STYLE_CARDS_2_VALUE</item>
         <item>@integer/STYLE_NESTED_RECYCLER_VIEW_VALUE</item>
+        <item>@integer/STYLE_SQUARES_VALUE</item>
         <item>@integer/STYLE_LIST_VALUE</item>
     </integer-array>
     <string-array name="style_names">
         <item>@string/STYLE_PARALLAX_NAME</item>
         <item>@string/STYLE_CARDS_NAME</item>
-        <item>@string/STYLE_CARDS_2_NAME</item>
         <item>@string/STYLE_NESTED_RECYCLER_VIEW_NAME</item>
+        <item>@string/STYLE_SQUARES_NAME</item>
         <item>@string/STYLE_LIST_NAME</item>
     </string-array>
 </resources>

@@ -71,7 +71,7 @@ import us.koller.cameraroll.util.animators.ColorFade;
 
 public class AlbumActivity extends ThemeableActivity
         implements SwipeBackCoordinatorLayout.OnSwipeListener, SelectorModeManager.Callback {
-    static final String TAG = AlbumActivity.class.getSimpleName();
+    protected static final String TAG = AlbumActivity.class.getSimpleName();
 
     public static final int FILE_OP_DIALOG_REQUEST = 1;
 

@@ -19,7 +19,6 @@
     <string name="undo">Annuler</string>
     <string name="done">Fait</string>
     <string name="retry">Réessayer</string>
-    <string name="excluded">Exclu</string>
     <string name="error">Erreur</string>
     <string name="selected_count">%1$d selected</string>
     <string name="file_op_channel_name">File Operations</string>
@@ -61,7 +60,6 @@
     <string name="move">Déplacer</string>
     <string name="move_item_to">Move %1$d Item to:</string>
     <string name="move_items_to">Move %1$d Items to:</string>
-    <string name="move_error">Moving files to/from removable Storage doesn\'t work. Please just copy and delete the file</string>
     <string name="copy">Copier</string>
     <string name="copy_item_to">Copy %1$d Item to:</string>
     <string name="copy_items_to">Copy %1$d Items to:</string>

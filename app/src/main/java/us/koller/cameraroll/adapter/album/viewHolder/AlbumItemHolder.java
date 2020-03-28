@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
@@ -19,13 +20,13 @@ import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import us.koller.cameraroll.R;
 import us.koller.cameraroll.data.models.AlbumItem;
 import us.koller.cameraroll.util.Util;
-import us.koller.cameraroll.util.animators.ColorFade;
 
 public abstract class AlbumItemHolder extends RecyclerView.ViewHolder {
 
     public AlbumItem albumItem;
     private boolean selected = false;
     private Drawable selectorOverlay;
+    static int crossFadeDuration = 150;
 
     AlbumItemHolder(View itemView) {
         super(itemView);
@@ -73,33 +74,26 @@ public abstract class AlbumItemHolder extends RecyclerView.ViewHolder {
     }
 
     public void loadImage(final ImageView imageView, final AlbumItem albumItem) {
-        ColorFade.animateToAlpha(0f, itemView);
         Glide.with(imageView.getContext())
                 .asBitmap()
                 .load(albumItem.getPath())
+                .transition(BitmapTransitionOptions.withCrossFade(crossFadeDuration))
                 .listener(new RequestListener<Bitmap>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model,
                                                 Target<Bitmap> target, boolean isFirstResource) {
                         albumItem.error = true;
-                        fadeIn();
                         return false;
                     }
 
                     @Override
                     public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target,
                                                    DataSource dataSource, boolean isFirstResource) {
-                        fadeIn();
                         return false;
                     }
                 })
                 .apply(albumItem.getGlideRequestOptions(imageView.getContext()))
                 .into(imageView);
-    }
-
-    void fadeIn() {
-        //albumItem.hasFadedIn = true;
-        ColorFade.animateToAlpha(1, itemView);
     }
 
     public void setSelected(boolean selected) {
@@ -121,17 +115,14 @@ public abstract class AlbumItemHolder extends RecyclerView.ViewHolder {
 
         if (selectorOverlay == null) {
             selectorOverlay = Util.getAlbumItemSelectorOverlay(imageView.getContext());
+            selectorOverlay.setBounds(0, 0,
+                    imageView.getWidth(),
+                    imageView.getHeight());
         }
         if (selected) {
-            imageView.post(() -> {
-                imageView.getOverlay().remove(selectorOverlay);
-                selectorOverlay.setBounds(0, 0,
-                        imageView.getWidth(),
-                        imageView.getHeight());
-                imageView.getOverlay().add(selectorOverlay);
-            });
+            imageView.getOverlay().add(selectorOverlay);
         } else {
-            imageView.post(() -> imageView.getOverlay().remove(selectorOverlay));
+            imageView.getOverlay().remove(selectorOverlay);
         }
     }
 }

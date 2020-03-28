@@ -18,7 +18,6 @@
     <string name="undo">Vrati</string>
     <string name="done">Gotovo</string>
     <string name="retry">Pokušaj ponovno</string>
-    <string name="excluded">Izuzeto</string>
     <string name="error">Pogreška</string>
     <string name="selected_count">%1$d odabrano</string>
     <string name="file_op_channel_name">Radnje s datotekama</string>
@@ -60,7 +59,6 @@
     <string name="move">Premjesti</string>
     <string name="move_item_to">Premjesti %1$d stavku u:</string>
     <string name="move_items_to">Premjesti %1$d stavki u:</string>
-    <string name="move_error">Premještanje datoteka u/iz prijenosne pohrane ne radi. Molimo samo kopirajte i izbrišite datoteku</string>
     <string name="copy">Kopiraj</string>
     <string name="copy_item_to">Kopiraj %1$d stavku u:</string>
     <string name="copy_items_to">Kopiraj %1$d stavku u:</string>
@@ -74,7 +72,6 @@
     <string name="no_files">NEMA DATOTEKA</string>
     <string name="storage">Pohrana</string>
     <string name="scan">Skeniraj</string>
-    <string name="scanning">Skeniranje…</string>
     <string name="copy_file">Kopiraj %1$d datoteku</string>
     <string name="copy_files">Kopiraj %1$d datoteka</string>
     <string name="move_file">Premjesti %1$d datoteku</string>

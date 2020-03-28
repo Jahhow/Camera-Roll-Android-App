@@ -16,7 +16,7 @@ import com.davemorrissey.labs.subscaleview.ImageDecoder;
 import java.util.concurrent.ExecutionException;
 
 public class GlideImageDecoder implements ImageDecoder {
-    static final String TAG = GlideImageDecoder.class.getSimpleName();
+    protected static final String TAG = GlideImageDecoder.class.getSimpleName();
 
     @Override
     public Bitmap decode(@NonNull Context context, @NonNull Uri uri, int orientationAngle) {

@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import us.koller.cameraroll.R;
 
 public class ParallaxImageView extends androidx.appcompat.widget.AppCompatImageView {
-    static final String TAG = ParallaxImageView.class.getSimpleName();
+    protected static final String TAG = ParallaxImageView.class.getSimpleName();
 
     public static final String RECYCLER_VIEW_TAG = "RECYCLER_VIEW_TAG";
 
@@ -19,7 +19,9 @@ public class ParallaxImageView extends androidx.appcompat.widget.AppCompatImageV
     View itemView;
     RecyclerView recyclerView;
     int itemView_height;
-    private int recyclerView_height;
+    int recyclerView_height;
+    int halfRemainHeight;
+    float a;
 
     public ParallaxImageView(Context context) {
         super(context);
@@ -35,7 +37,13 @@ public class ParallaxImageView extends androidx.appcompat.widget.AppCompatImageV
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec + MAX_PARALLAX_OFFSET);
+        super.onMeasure(
+                widthMeasureSpec,
+                MeasureSpec.makeMeasureSpec(
+                        MeasureSpec.getSize(heightMeasureSpec) + MAX_PARALLAX_OFFSET,
+                        MeasureSpec.getMode(heightMeasureSpec)
+                )
+        );
     }
 
     @Override
@@ -64,6 +72,9 @@ public class ParallaxImageView extends androidx.appcompat.widget.AppCompatImageV
         if (recyclerView != null) {
             recyclerView_height = recyclerView.getHeight();
             itemView_height = itemView.getHeight();
+            int remainHeight = recyclerView_height - itemView_height;
+            a = -MAX_PARALLAX_OFFSET / (float) remainHeight;
+            halfRemainHeight = remainHeight >> 1;
             setParallaxTranslation();
         }
     }
@@ -74,10 +85,9 @@ public class ParallaxImageView extends androidx.appcompat.widget.AppCompatImageV
         if (invisible)
             return;
 
-        int remainHeight = recyclerView_height - itemView_height;
-        float distanceWithVerticalCenter = itemViewTop - remainHeight * .5f;
-        float translationY = -MAX_PARALLAX_OFFSET * distanceWithVerticalCenter / remainHeight;
-        setTranslationY(translationY - MAX_PARALLAX_OFFSET * .5f);
+        float distanceWithVerticalCenter = itemViewTop - halfRemainHeight;
+        float translationY = a * distanceWithVerticalCenter;
+        setTranslationY(translationY - (MAX_PARALLAX_OFFSET >> 1));
     }
 
     RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {

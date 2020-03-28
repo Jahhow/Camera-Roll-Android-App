@@ -68,7 +68,7 @@ import us.koller.cameraroll.util.Util;
 import us.koller.cameraroll.util.animators.ColorFade;
 
 public class ItemActivity extends ThemeableActivity {
-    static final String TAG = ItemActivity.class.getSimpleName();
+    protected static final String TAG = ItemActivity.class.getSimpleName();
 
     public static final int VIEW_IMAGE = 3;
     public static final int FILE_OP_DIALOG_REQUEST = 1;

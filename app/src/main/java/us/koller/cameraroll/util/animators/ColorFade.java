@@ -17,7 +17,7 @@ import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import us.koller.cameraroll.data.Settings;
 
 public class ColorFade {
-    final static String TAG = ColorFade.class.getSimpleName();
+    protected final static String TAG = ColorFade.class.getSimpleName();
 
     private static AnimatorSet toolbarTitleAnimSet;
 

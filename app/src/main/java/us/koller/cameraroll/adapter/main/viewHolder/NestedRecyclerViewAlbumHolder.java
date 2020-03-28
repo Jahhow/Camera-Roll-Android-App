@@ -16,7 +16,6 @@ import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -54,8 +53,6 @@ public class NestedRecyclerViewAlbumHolder extends AlbumHolder
 
     public RecyclerView nestedRecyclerView;
 
-    public int sharedElementReturnPosition = -1;
-
     private EqualSpacesItemDecoration itemDecoration;
 
     private SelectorModeManager manager;
@@ -69,7 +66,7 @@ public class NestedRecyclerViewAlbumHolder extends AlbumHolder
         }
     };
 
-    abstract class SelectorCallback implements SelectorModeManager.Callback {
+    abstract static class SelectorCallback implements SelectorModeManager.Callback {
     }
 
     private SelectorCallback callback
@@ -223,7 +220,6 @@ public class NestedRecyclerViewAlbumHolder extends AlbumHolder
 
     @Override
     public void setAlbum(Album album) {
-        Album oldAlbum = getAlbum();
         super.setAlbum(album);
         /*if (album.equals(oldAlbum)) {
             onItemChanged();
@@ -265,35 +261,6 @@ public class NestedRecyclerViewAlbumHolder extends AlbumHolder
         }
     }
 
-    public interface StartSharedElementTransitionCallback {
-        void startPostponedEnterTransition();
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public void onSharedElement(final int sharedElementReturnPosition,
-                                final StartSharedElementTransitionCallback callback) {
-        this.sharedElementReturnPosition = sharedElementReturnPosition;
-
-        //to prevent: requestLayout() improperly called [...] during layout: running second layout pass
-        nestedRecyclerView.getViewTreeObserver()
-                .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                    @Override
-                    public void onGlobalLayout() {
-                        nestedRecyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                        nestedRecyclerView.scrollToPosition(sharedElementReturnPosition);
-                    }
-                });
-
-        nestedRecyclerView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-            @Override
-            public void onLayoutChange(View v, int l, int t, int r, int b,
-                                       int oL, int oT, int oR, int oB) {
-                nestedRecyclerView.removeOnLayoutChangeListener(this);
-                callback.startPostponedEnterTransition();
-            }
-        });
-    }
-
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         final String[] paths = ((NestedAdapter) nestedRecyclerView.getAdapter())
@@ -313,8 +280,8 @@ public class NestedRecyclerViewAlbumHolder extends AlbumHolder
             case R.id.share:
                 //share multiple items
                 ArrayList<Uri> uris = new ArrayList<>();
-                for (int i = 0; i < paths.length; i++) {
-                    uris.add(StorageUtil.getContentUri(getContext(), paths[i]));
+                for (String path : paths) {
+                    uris.add(StorageUtil.getContentUri(getContext(), path));
                 }
 
                 intent = new Intent();
@@ -374,14 +341,6 @@ public class NestedRecyclerViewAlbumHolder extends AlbumHolder
         if (nestedRecyclerView.getAdapter() instanceof NestedAdapter) {
             ((NestedAdapter) nestedRecyclerView.getAdapter())
                     .cancelSelectorMode((Activity) getContext());
-        }
-    }
-
-    @Override
-    public void onItemChanged() {
-        RecyclerView.Adapter adapter = nestedRecyclerView.getAdapter();
-        if (adapter != null) {
-            adapter.notifyItemRangeChanged(0, adapter.getItemCount());
         }
     }
 

@@ -19,7 +19,6 @@
     <string name="undo">Върни</string>
     <string name="done">Готово</string>
     <string name="retry">Повторен опит</string>
-    <string name="excluded">Изключени папки</string>
     <string name="error">Грешка</string>
     <string name="selected_count">%1$d избран</string>
     <string name="file_op_channel_name">Операции с файла</string>
@@ -61,7 +60,6 @@
     <string name="move">Премести</string>
     <string name="move_item_to">Премести %1$d файл в:</string>
     <string name="move_items_to">Премести %1$d файлове в:</string>
-    <string name="move_error">Преместване на файлове от/в преносимо хранилище не работи. Моля, копирайте файла и изтрийте оригинала.</string>
     <string name="copy">Копирай</string>
     <string name="copy_item_to">Копирай %1$d файл в:</string>
     <string name="copy_items_to">Копирай %1$d файл в:</string>

@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
@@ -26,11 +28,10 @@ import us.koller.cameraroll.data.models.Album;
 import us.koller.cameraroll.data.models.AlbumItem;
 import us.koller.cameraroll.data.models.VirtualAlbum;
 import us.koller.cameraroll.data.provider.MediaProvider;
-import us.koller.cameraroll.util.animators.ColorFade;
 
 public abstract class AlbumHolder extends RecyclerView.ViewHolder {
-    static final String TAG = AlbumHolder.class.getSimpleName();
-
+    protected static final String TAG = AlbumHolder.class.getSimpleName();
+    protected static int imageCrossFadeDuration = 200;
     private Album album;
 
     AlbumHolder(View itemView) {
@@ -100,37 +101,33 @@ public abstract class AlbumHolder extends RecyclerView.ViewHolder {
         if (album.getAlbumItems().size() == 0) {
             Glide.with(getContext())
                     .load(R.drawable.error_placeholder)
+                    .transition(DrawableTransitionOptions.withCrossFade(imageCrossFadeDuration))
                     .apply(new RequestOptions().skipMemoryCache(true))
                     .into(image);
             return;
         }
 
-        ColorFade.animateToAlpha(0, itemView);
         final AlbumItem coverImage = album.getAlbumItems().get(0);
         Glide.with(getContext())
                 .asBitmap()
+                .transition(BitmapTransitionOptions.withCrossFade(imageCrossFadeDuration))
                 .load(coverImage.getPath())
                 .listener(new RequestListener<Bitmap>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model,
                                                 Target<Bitmap> target, boolean isFirstResource) {
                         coverImage.error = true;
-                        ColorFade.animateToAlpha(1, itemView);
                         return false;
                     }
 
                     @Override
                     public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target,
                                                    DataSource dataSource, boolean isFirstResource) {
-                        ColorFade.animateToAlpha(1, itemView);
                         return false;
                     }
                 })
                 .apply(coverImage.getGlideRequestOptions(getContext()).dontTransform())
                 .into(image);
-    }
-
-    public void onItemChanged() {
     }
 
     public Context getContext() {

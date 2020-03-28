@@ -13,7 +13,7 @@ import us.koller.cameraroll.R;
 public class Squares extends Style {
 
     public static int getValue(Context context) {
-        return context.getResources().getInteger(R.integer.STYLE_CARDS_2_VALUE);
+        return context.getResources().getInteger(R.integer.STYLE_SQUARES_VALUE);
     }
 
     @Override
@@ -48,10 +48,10 @@ public class Squares extends Style {
         Context context = container.getContext();
 
         TextView name = view.findViewById(R.id.name);
-        name.setText(context.getString(R.string.STYLE_CARDS_2_NAME));
+        name.setText(context.getString(R.string.STYLE_SQUARES_NAME));
 
         ImageView imageView = view.findViewById(R.id.image);
-        imageView.setImageResource(R.drawable.style_cards_2);
+        imageView.setImageResource(R.drawable.style_squares);
         imageView.setColorFilter(getAccentColor(context));
 
         setColumnCountButtonsClickListener(view);

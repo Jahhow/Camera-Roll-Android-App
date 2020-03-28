@@ -26,10 +26,9 @@ import us.koller.cameraroll.ui.MainActivity;
 import us.koller.cameraroll.ui.ThemeableActivity;
 
 public class MainAdapter extends AbstractRecyclerViewAdapter<ArrayList<Album>> {
-    static final String TAG = MainAdapter.class.getSimpleName();
-
+    protected static final String TAG = MainAdapter.class.getSimpleName();
     private Style style;
-    RecyclerView.RecycledViewPool nestedRecyclerViewRecycledViewPool = null;
+    private RecyclerView.RecycledViewPool nestedRecyclerViewRecycledViewPool = null;
 
     public MainAdapter(Context context, boolean pick_photos) {
         super(pick_photos);

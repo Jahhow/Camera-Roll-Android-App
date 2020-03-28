@@ -15,7 +15,7 @@ import us.koller.cameraroll.imageDecoder.CustomRegionDecoder;
 import us.koller.cameraroll.imageDecoder.GlideImageDecoder;
 
 public class PhotoViewHolder extends ViewHolder {
-    static final String TAG = PhotoViewHolder.class.getSimpleName();
+    protected static final String TAG = PhotoViewHolder.class.getSimpleName();
 
     public PhotoViewHolder(AlbumItem albumItem, int position) {
         super(albumItem, position);
