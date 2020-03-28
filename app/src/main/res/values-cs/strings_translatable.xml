@@ -108,13 +108,6 @@
     <string name="aspect_ratio_free">Volný</string>
     <string name="aspect_ratio_original">Původní</string>
     <string name="aspect_ratio_square">Čtverec</string>
-    <!--SetWallpaperActivity-->
-    <string name="wallpaper">Tapeta</string>
-    <string name="set_wallpaper">Nastavit tapetu</string>
-    <string name="wallpaper_file_format_not_supported">Soubor tohoto formátu nemůže být použit jako tapeta</string>
-    <string name="home_screen">Domovská stránka</string>
-    <string name="lock_screen">Zámek obrazovky</string>
-    <string name="both">Oba</string>
     <!--ExifEditorActivity-->
     <string name="exif_editor">Exif editor</string>
     <string name="edit_exif">upravit Exif</string>

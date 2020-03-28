@@ -105,13 +105,6 @@
     <string name="export">Exporteren</string>
     <string name="editing_file_format_not_supported">Dit bestandsformaat wordt niet ondersteund.</string>
     <string name="success">Voltooid!</string>
-    <!--SetWallpaperActivity-->
-    <string name="wallpaper">Achtergrond</string>
-    <string name="set_wallpaper">Instellen als achtergrond</string>
-    <string name="wallpaper_file_format_not_supported">Dit bestandsformaat wordt niet ondersteund.</string>
-    <string name="home_screen">Beginscherm</string>
-    <string name="lock_screen">Vergrendelscherm</string>
-    <string name="both">Beiden</string>
     <!--ExifEditorActivity-->
     <string name="exif_editor">Exif-bewerker</string>
     <string name="edit_exif">Exif bewerken</string>

@@ -106,13 +106,6 @@
     <string name="export">导出</string>
     <string name="editing_file_format_not_supported">不支持编辑该格式的文件</string>
     <string name="success">成功！</string>
-    <!--SetWallpaperActivity-->
-    <string name="wallpaper">壁纸</string>
-    <string name="set_wallpaper">设置为壁纸</string>
-    <string name="wallpaper_file_format_not_supported">不支持将该格式的文件设为壁纸</string>
-    <string name="home_screen">主屏幕</string>
-    <string name="lock_screen">锁定屏幕</string>
-    <string name="both">主屏幕和锁定屏幕</string>
     <!--ExifEditorActivity-->
     <string name="exif_editor">照片信息编辑器</string>
     <string name="edit_exif">编辑照片信息</string>

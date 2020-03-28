@@ -81,20 +81,6 @@
             android:theme="@style/CameraRoll.Theme.EditImage" />
 
         <activity
-            android:name=".ui.SetWallpaperActivity"
-            android:label="@string/wallpaper"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:theme="@style/CameraRoll.Theme.SetWallpaper">
-
-            <intent-filter>
-                <action android:name="android.intent.action.ATTACH_DATA" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="image/*" />
-            </intent-filter>
-        </activity>
-
-        <activity
             android:name=".ui.ExcludePathsActivity"
             android:label="@string/excluded_paths"
             android:launchMode="singleTop"

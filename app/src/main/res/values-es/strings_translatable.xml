@@ -108,13 +108,6 @@
     <string name="aspect_ratio_free">Libre</string>
     <string name="aspect_ratio_original">Original</string>
     <string name="aspect_ratio_square">Cuadrado</string>
-    <!--SetWallpaperActivity-->
-    <string name="wallpaper">Fondo de pantalla</string>
-    <string name="set_wallpaper">Establecer fondo de pantalla</string>
-    <string name="wallpaper_file_format_not_supported">Este formato de archivo no es compatible con fondo de pantalla</string>
-    <string name="home_screen">Pantalla de inicio</string>
-    <string name="lock_screen">Pantalla de bloqueo</string>
-    <string name="both">Ambos</string>
     <!--ExifEditorActivity-->
     <string name="exif_editor">Editor Exif</string>
     <string name="edit_exif">Editar Exif</string>

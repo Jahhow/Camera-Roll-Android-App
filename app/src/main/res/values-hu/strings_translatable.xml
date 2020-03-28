@@ -110,13 +110,6 @@
     <string name="aspect_ratio_free">Kézi</string>
     <string name="aspect_ratio_original">Eredeti</string>
     <string name="aspect_ratio_square">Négyzetes</string>
-    <!--SetWallpaperActivity-->
-    <string name="wallpaper">Háttérkép</string>
-    <string name="set_wallpaper">Háttérkép beállítása</string>
-    <string name="wallpaper_file_format_not_supported">Az ilyen formátumú fájlokat nem lehet háttérképként beállítani</string>
-    <string name="home_screen">Kezdőlapra</string>
-    <string name="lock_screen">Zárképernyőre</string>
-    <string name="both">Mindkettőre</string>
     <!--ExifEditorActivity-->
     <string name="exif_editor">Exif szerkesztő</string>
     <string name="edit_exif">Exif szerkesztése</string>

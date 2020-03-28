@@ -96,10 +96,6 @@
     <string name="restore">Restaurar</string>
     <string name="editing_file_format_not_supported">Este formato de arquivo não é suportado para edição</string>
     <string name="success">Sucesso!</string>
-    <!--SetWallpaperActivity-->
-    <string name="wallpaper">Papel de Parede</string>
-    <string name="set_wallpaper">Definir Papel de Parede</string>
-    <string name="wallpaper_file_format_not_supported">Este formato de arquivo não pode ser usado como papel de parede</string>
     <!--ExifEditorActivity-->
     <string name="exif_editor">Editor Exif</string>
     <string name="edit_exif">editar Exif</string>

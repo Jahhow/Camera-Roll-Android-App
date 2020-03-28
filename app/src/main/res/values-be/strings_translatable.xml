@@ -111,13 +111,6 @@
     <string name="aspect_ratio_3_2" translatable="false">3:2</string>
     <string name="aspect_ratio_4_3" translatable="false">4:3</string>
     <string name="aspect_ratio_16_9" translatable="false">16:9</string>   
-    <!--SetWallpaperActivity-->
-    <string name="wallpaper">Шпалеры</string>
-    <string name="set_wallpaper">Задаць шпалеры</string>
-    <string name="wallpaper_file_format_not_supported">Гэты файл нельга задаць як шпалеры</string>
-    <string name="home_screen">Дамашні экран</string>
-    <string name="lock_screen">Экран блакіроўкі</string>
-    <string name="both">Абодва</string>
     <!--ExifEditorActivity-->
     <string name="exif_editor">Exif рэдактар</string>
     <string name="edit_exif">рэдагаваць Exif</string>

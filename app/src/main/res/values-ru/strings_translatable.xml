@@ -102,10 +102,6 @@
     <string name="restore">Восстановить</string>
     <string name="editing_file_format_not_supported">Редактирование данного формата файлов не поддерживается</string>
     <string name="success">Успешно!</string>
-    <!--SetWallpaperActivity-->
-    <string name="wallpaper">Обои</string>
-    <string name="set_wallpaper">Установить обои</string>
-    <string name="wallpaper_file_format_not_supported">Этот формат файла нельзя установить как обои</string>
     <!--ExifEditorActivity-->
     <string name="exif_editor">Редактор Exif</string>
     <string name="edit_exif">изменить Exif</string>
