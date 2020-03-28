@@ -33,7 +33,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ShareCompat;
-import androidx.core.app.SharedElementCallback;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.print.PrintHelper;
@@ -43,8 +42,6 @@ import androidx.viewpager.widget.ViewPager;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import us.koller.cameraroll.R;
 import us.koller.cameraroll.adapter.item.InfoRecyclerViewAdapter;
@@ -97,28 +94,6 @@ public class ItemActivity extends ThemeableActivity {
     private AlbumItem albumItem;
 
     public boolean view_only;
-
-    private boolean isReturning;
-
-    private final SharedElementCallback sharedElementCallback = new SharedElementCallback() {
-        @Override
-        @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-        public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
-            if (isReturning) {
-                ViewGroup v = viewPager.findViewWithTag(albumItem.getPath());
-                View sharedElement = v.findViewById(R.id.image);
-                if (sharedElement == null) {
-                    names.clear();
-                    sharedElements.clear();
-                } else {
-                    names.clear();
-                    names.add(sharedElement.getTransitionName());
-                    sharedElements.clear();
-                    sharedElements.put(sharedElement.getTransitionName(), sharedElement);
-                }
-            }
-        }
-    };
 
     public interface ViewPagerOnInstantiateItemCallback {
         boolean onInstantiateItem(ViewHolder viewHolder);
@@ -829,13 +804,13 @@ public class ItemActivity extends ThemeableActivity {
     }
 
     public void setResultAndFinish() {
-        isReturning = true;
         Intent data = new Intent();
         data.setAction(SHARED_ELEMENT_RETURN_TRANSITION);
         data.putExtra(AlbumActivity.ALBUM_PATH, album.getPath());
         data.putExtra(AlbumActivity.EXTRA_CURRENT_ALBUM_POSITION, viewPager.getCurrentItem());
         setResult(RESULT_OK, data);
         finish();
+        //overridePendingTransition(0,0);
     }
 
     @Override

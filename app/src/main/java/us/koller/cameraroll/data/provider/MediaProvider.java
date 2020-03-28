@@ -245,12 +245,7 @@ public class MediaProvider extends Provider {
                 for (int i = 0; i < albums.size(); i++) {
                     if (albums.get(i).getPath().equals(path)) {
                         final Album album = albums.get(i);
-                        context.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                callback.onAlbumLoaded(album);
-                            }
-                        });
+                        context.runOnUiThread(() -> callback.onAlbumLoaded(album));
                         return;
                     }
                 }

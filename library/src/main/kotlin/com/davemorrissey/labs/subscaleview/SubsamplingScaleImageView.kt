@@ -15,6 +15,7 @@ import android.view.MotionEvent
 import android.view.animation.Interpolator
 import android.widget.ImageView
 import androidx.annotation.AnyThread
+import androidx.annotation.CallSuper
 import androidx.annotation.FloatRange
 import androidx.exifinterface.media.ExifInterface
 import java.io.File
@@ -75,6 +76,10 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
     var minimumScaleType = SCALE_TYPE_UNSPECIFIED
     var retainXSwipe = true
     var retainYSwipe = false
+    var startRect: Rect? = null
+        set(r) {
+            field = r
+        }
 
     private var vCenterX = 0f
     private var vCenterY = 0f
@@ -173,20 +178,11 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         return viewToSourceCoord(vCenterX, vCenterY)
     }
 
-    /*fun setPreviewImage(bitmap: Bitmap, orientationDegrees: Int) {
-        debug("setPreviewImage")
-        if (sWidth == 0) {
-            this.orientationDegrees = orientationDegrees
-            sWidth = bitmap.width
-            sHeight = bitmap.height
-        }
-        if (!isImageLoaded) {
-            this.bitmap = bitmap
-            invalidate()
-        } else {
-            debug("Preview Image Loaded after normal image")
-        }
-    }*/
+    fun getSCenter(): PointF? {
+        return if (sWidth != 0)
+            PointF(sWidth / 2f, sHeight / 2f)
+        else null
+    }
 
     fun loadImage(path: String) {
         reset(true)
@@ -270,7 +266,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                         x = (vCenterX - x) / scale
                         y = (vCenterY - y) / scale
                     }
-                    AnimationBuilder(targetSFocus, getClosestRightAngleDegrees(rotationDegrees)).apply {
+                    Anim(targetSFocus, getClosestRightAngleDegrees(rotationDegrees)).apply {
                         interruptible = true
                         interpolator = easeEndInterpolator
                         duration = FLING_DURATION
@@ -358,6 +354,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
 
     private fun onTouchEventInternal(event: MotionEvent): Boolean {
         val touchCount = event.pointerCount
+        @Suppress("DEPRECATION")
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 parent?.requestDisallowInterceptTouchEvent(true)
@@ -643,7 +640,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                 } else {
                     if (isToInitScale) doubleTapZoomScale else initScale
                 }
-        AnimationBuilder(sCenter!!, targetScale, getClosestRightAngleDegrees(rotationDegrees)).start()
+        Anim(sCenter!!, targetScale, getClosestRightAngleDegrees(rotationDegrees)).start()
         invalidate()
     }
 
@@ -743,7 +740,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
             if (bitmap != null && bitmap!!.width != sWidth)
                 canvas.drawText("Preview", px(5).toFloat(), px(75).toFloat(), debugTextPaint!!)
             if (anim != null) {
-                val vFocus = sourceToViewCoord(anim!!.sFocus!!)
+                val vFocus = sourceToViewCoord(anim!!.sFocus)
 
                 debugLinePaint!!.color = Color.CYAN
                 canvas.drawCircle(anim!!.vFocusEnd!!.x, anim!!.vFocusEnd!!.y, px(24).toFloat(), debugLinePaint!!)
@@ -780,9 +777,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
 
         isReady = width > 0 && height > 0 && sWidth > 0 && sHeight > 0 && (bitmap != null || getIsBaseLayerReady())
         if (isReady) {
-            preDraw()
             onReady()
-            onImageEventListener?.onReadyToDraw()
         }
         return isReady
     }
@@ -821,9 +816,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
             return true
         isImageLoaded = getIsBaseLayerReady()
         if (isImageLoaded) {
-            preDraw()
             onImageLoaded()
-            onImageEventListener?.onImageLoaded()
         }
         return isImageLoaded
     }
@@ -1089,10 +1082,10 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
 
         if (anim != null) {
             if (anim!!.duration != FLING_DURATION)
-                AnimationBuilder(anim!!).start()
+                Anim(anim!!).start()
         } else {
             val center = viewToSourceCoord(vCenterX, vCenterY)
-            AnimationBuilder(center, rightAngle).start()
+            Anim(center, rightAngle).start()
         }
     }
 
@@ -1118,12 +1111,12 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
     fun getInnerWidth() = width - paddingLeft - paddingRight
     fun getInnerHeight() = height - paddingTop - paddingBottom
 
-    private fun getCenterCropScale(): Float {
+    fun getCenterCropScale(innerWidth: Int = getInnerWidth(), innerHeight: Int = getInnerHeight()): Float {
         val rightAngle = getClosestRightAngleDegreesNormalized()
         return if (rightAngle == 0 || rightAngle == 180) {
-            Math.max(width / sWidth.toFloat(), height / sHeight.toFloat())
+            Math.max(innerWidth / sWidth.toFloat(), innerHeight / sHeight.toFloat())
         } else {
-            Math.max(width / sHeight.toFloat(), height / sWidth.toFloat())
+            Math.max(innerWidth / sHeight.toFloat(), innerHeight / sWidth.toFloat())
         }
     }
 
@@ -1556,8 +1549,25 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         }
     }
 
-    protected open fun onReady() {}
-    protected open fun onImageLoaded() {}
+    @CallSuper
+    protected open fun onReady() {
+        preDraw()
+        val startRect = this.startRect
+        if (startRect != null) {
+            scale = getCenterCropScale(startRect.width(), startRect.height())
+            Anim(getSCenter()!!, getInitialScale()).apply {
+                vFocusStart = PointF(startRect.exactCenterX(), startRect.exactCenterY())
+                vFocusEnd = PointF(vCenterX, vCenterY)
+            }.start(true, false)
+        }
+        onImageEventListener?.onReadyToDraw()
+    }
+
+    @CallSuper
+    protected open fun onImageLoaded() {
+        preDraw()
+        onImageEventListener?.onImageLoaded()
+    }
 
     fun setDoubleTapZoomDpi(dpi: Int) {
         val metrics = resources.displayMetrics
@@ -1565,101 +1575,85 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         doubleTapZoomScale = averageDpi / dpi
     }
 
-    inner class AnimationBuilder {
-        private val targetScale: Float
-        private var sFocus: PointF
-        private var targetRotationDegrees = rotationDegrees
+    inner class Anim {
+        var scaleStart = scale
+        var scaleEnd = 0f
+
+        var rotationDegreesStart = rotationDegrees
+        var rotationDegreesEnd = rotationDegrees
+
+        var sFocus: PointF
+        var vFocusStart: PointF? = null
+        var vFocusEnd: PointF? = null
+
         var duration: Long = (ANIMATION_DURATION * Settings.Global.getFloat(context.contentResolver,
                 Settings.Global.ANIMATOR_DURATION_SCALE, 1.0f)).toLong()
-        var interpolator: Interpolator = SubsamplingScaleImageView.interpolator
+        var startTime = System.currentTimeMillis()
+
         var interruptible = false
+        var interpolator: Interpolator = SubsamplingScaleImageView.interpolator
+
+        var finishEdges: Byte = ANIM_FINISH_EDGE_NONE
 
         constructor(sFocus: PointF, scale: Float) {
-            targetScale = scale
+            scaleEnd = scale
             this.sFocus = sFocus
         }
 
         constructor(sFocus: PointF, degrees: Int) {
-            targetScale = limitedScale(scale)
+            scaleEnd = limitedScale(scale)
             this.sFocus = sFocus
-            targetRotationDegrees = degrees.toFloat()
+            rotationDegreesEnd = degrees.toFloat()
         }
 
         constructor(sFocus: PointF, scale: Float, degrees: Int) {
-            targetScale = scale
+            scaleEnd = scale
             this.sFocus = sFocus
-            targetRotationDegrees = degrees.toFloat()
+            rotationDegreesEnd = degrees.toFloat()
         }
 
         constructor(sFocus: PointF, scale: Float, degrees: Float) {
-            targetScale = scale
+            scaleEnd = scale
             this.sFocus = sFocus
-            targetRotationDegrees = degrees
+            rotationDegreesEnd = degrees
         }
 
         constructor(anim: Anim) {
-            targetRotationDegrees = anim.rotationDegreesEnd
+            rotationDegreesEnd = anim.rotationDegreesEnd
             interruptible = anim.interruptible
             interpolator = anim.interpolator
             duration = anim.duration
-            targetScale = anim.scaleEnd
+            scaleEnd = anim.scaleEnd
             sFocus = getSVCenter()!!
         }
 
         @JvmOverloads
-        fun start(skipCenterLimiting: Boolean = false) {
+        fun start(skipCenterLimiting: Boolean = false, refreshRequiredTargetTiles: Boolean = true) {
             val sFocusRequested = PointF(sFocus.x, sFocus.y)
             if (!skipCenterLimiting) {
-                limitSVCenter(targetScale, sFocus)
+                limitSVCenter(scaleEnd, sFocus)
             }
-            if (scale == targetScale && rotationDegrees == targetRotationDegrees && getSVCenter() == sFocus)
+            if (scale == scaleEnd && rotationDegrees == rotationDegreesEnd && getSVCenter() == sFocus)
                 return
 
-            anim = Anim().apply {
-                scaleStart = scale
-                scaleEnd = targetScale
-                rotationDegreesStart = rotationDegrees
-                rotationDegreesEnd = targetRotationDegrees
-                sFocus = this@AnimationBuilder.sFocus
-                vFocusStart = sourceToViewCoord(this@AnimationBuilder.sFocus)
+            if (vFocusStart == null)
+                vFocusStart = sourceToViewCoord(sFocus)
+            if (vFocusEnd == null)
                 vFocusEnd = PointF(vCenterX, vCenterY)
-                duration = this@AnimationBuilder.duration
-                interruptible = this@AnimationBuilder.interruptible
-                interpolator = this@AnimationBuilder.interpolator
-                initFinishEdges(sFocusRequested)
+            initFinishEdges(sFocusRequested)
+
+            if (refreshRequiredTargetTiles) {
+                val tx = vTranslate.x
+                val ty = vTranslate.y
+                update(1f)
+                refreshRequiredTiles(true)
+                scale = scaleStart
+                setRotationDegrees(rotationDegreesStart)
+                vTranslate.set(tx, ty)
             }
-
-            val tx = vTranslate.x
-            val ty = vTranslate.y
-            anim!!.update(1f)
-            refreshRequiredTiles(true)
-
-            scale = anim!!.scaleStart
-            setRotationDegrees(anim!!.rotationDegreesStart)
-            vTranslate.set(tx, ty)
-
+            anim = this
             invalidate()
         }
-    }
-
-    inner class Anim {
-        var scaleStart = 0f
-        var scaleEnd = 0f
-
-        var rotationDegreesStart = 0f
-        var rotationDegreesEnd = 0f
-
-        var sFocus: PointF? = null
-        var vFocusStart: PointF? = null
-        var vFocusEnd: PointF? = null
-
-        var duration: Long = 0
-        var startTime = System.currentTimeMillis()
-
-        var interruptible = false
-        lateinit var interpolator: Interpolator
-
-        var finishEdges: Byte = ANIM_FINISH_EDGE_NONE
 
         fun initFinishEdges(sFocusRequested: PointF) {
             if (scaleEnd <= getFitCenterScale()) {
@@ -1689,10 +1683,10 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                 }
 
                 var finishEdges3 = 0
-                if (sFocusRequested.x < sFocus!!.x) finishEdges3 = ANIM_FINISH_EDGE_LEFT.toInt()
-                else if (sFocusRequested.x > sFocus!!.x) finishEdges3 = ANIM_FINISH_EDGE_RIGHT.toInt()
-                if (sFocusRequested.y < sFocus!!.y) finishEdges3 = finishEdges3 or ANIM_FINISH_EDGE_TOP.toInt()
-                else if (sFocusRequested.y > sFocus!!.y) finishEdges3 = finishEdges3 or ANIM_FINISH_EDGE_BOTTOM.toInt()
+                if (sFocusRequested.x < sFocus.x) finishEdges3 = ANIM_FINISH_EDGE_LEFT.toInt()
+                else if (sFocusRequested.x > sFocus.x) finishEdges3 = ANIM_FINISH_EDGE_RIGHT.toInt()
+                if (sFocusRequested.y < sFocus.y) finishEdges3 = finishEdges3 or ANIM_FINISH_EDGE_TOP.toInt()
+                else if (sFocusRequested.y > sFocus.y) finishEdges3 = finishEdges3 or ANIM_FINISH_EDGE_BOTTOM.toInt()
                 val rotateRight =
                         when (rightAngle) {
                             90 -> 1
@@ -1720,14 +1714,14 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         }
 
         fun update(@FloatRange(from = 0.0, to = 1.0) elapsed: Float) {
-            val interpolation = anim!!.interpolator.getInterpolation(elapsed)
-            scale = ease(interpolation, anim!!.scaleStart, anim!!.scaleEnd - anim!!.scaleStart, anim!!.scaleEnd)
-            val newVFocusX = ease(interpolation, anim!!.vFocusStart!!.x, anim!!.vFocusEnd!!.x - anim!!.vFocusStart!!.x, anim!!.vFocusEnd!!.x)
-            val newVFocusY = ease(interpolation, anim!!.vFocusStart!!.y, anim!!.vFocusEnd!!.y - anim!!.vFocusStart!!.y, anim!!.vFocusEnd!!.y)
-            val rotation = ease(interpolation, anim!!.rotationDegreesStart, anim!!.rotationDegreesEnd - anim!!.rotationDegreesStart, anim!!.rotationDegreesEnd)
+            val interpolation = interpolator.getInterpolation(elapsed)
+            scale = ease(interpolation, scaleStart, scaleEnd - scaleStart, scaleEnd)
+            val newVFocusX = ease(interpolation, vFocusStart!!.x, vFocusEnd!!.x - vFocusStart!!.x, vFocusEnd!!.x)
+            val newVFocusY = ease(interpolation, vFocusStart!!.y, vFocusEnd!!.y - vFocusStart!!.y, vFocusEnd!!.y)
+            val rotation = ease(interpolation, rotationDegreesStart, rotationDegreesEnd - rotationDegreesStart, rotationDegreesEnd)
             setRotationDegrees(rotation)
             // Find out where the focal point is at this scale/rotation then adjust its position to follow the animation path
-            val vFocus = sourceToViewCoord(anim!!.sFocus!!)
+            val vFocus = sourceToViewCoord(sFocus)
             var dX = vFocus.x - newVFocusX
             var dY = vFocus.y - newVFocusY
             if (isPanning) {

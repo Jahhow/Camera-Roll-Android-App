@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 
@@ -127,14 +126,15 @@ public class AlbumAdapter extends AbstractRecyclerViewAdapter<Album> {
                 onItemSelected(albumItemHolder);
             } else {
                 //Log.d(TAG, "onClick: " + getData().getPath());
+                /*int[] a = new int[2];
+                itemView.getLocationOnScreen(a);
+                albumItem.itemViewBound = new Rect(a[0], a[1], a[0] + itemView.getWidth(), a[1] + itemView.getHeight());*/
                 Context context = itemView.getContext();
                 Intent intent = new Intent(context, ItemActivity.class);
                 intent.putExtra(ItemActivity.ALBUM_ITEM, albumItem);
                 intent.putExtra(ItemActivity.ALBUM_PATH, getData().getPath());
                 intent.putExtra(ItemActivity.ITEM_POSITION, getData().getAlbumItems().indexOf(albumItem));
-
-                ActivityCompat.startActivityForResult((Activity) context, intent,
-                        ItemActivity.VIEW_IMAGE, null);
+                ((Activity) context).startActivityForResult(intent, ItemActivity.VIEW_IMAGE);
             }
         });
 

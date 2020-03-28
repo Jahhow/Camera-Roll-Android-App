@@ -238,7 +238,7 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
         if (getAnim() != null) oldRotationDegrees = getAnim().getRotationDegreesEnd();
         else oldRotationDegrees = getRotationDegrees();
         float rotationDegrees = oldRotationDegrees - 90;
-        new AnimationBuilder(getCenterOfCropRect(), getFitCenterScale(cropRect.width(), cropRect.height(), getClosestRightAngleDegreesNormalized(rotationDegrees)), rotationDegrees).start(true);
+        new Anim(getCenterOfCropRect(), getFitCenterScale(cropRect.width(), cropRect.height(), getClosestRightAngleDegreesNormalized(rotationDegrees)), rotationDegrees).start(true);
     }
 
     public void setShowCroppingEdge(boolean show) {
@@ -368,7 +368,7 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
         float scale = getFitCenterScale(cropRect.width(), cropRect.height());
         PointF center = getCenterOfCropRect();
         if (animate) {
-            new AnimationBuilder(center, scale).start(true);
+            new Anim(center, scale).start(true);
         } else {
             setScaleAndCenter(scale, center);
         }

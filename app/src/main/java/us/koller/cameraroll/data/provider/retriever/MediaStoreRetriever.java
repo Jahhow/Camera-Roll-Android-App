@@ -69,65 +69,62 @@ public class MediaStoreRetriever extends Retriever {
             albums.addAll(hiddenAlbums);
         }
 
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                if (cursor.moveToFirst()) {
-                    String path;
-                    long dateTaken, id;
-                    int pathColumn = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA);
-                    int idColumn = cursor.getColumnIndex(BaseColumns._ID);
+        AsyncTask.execute(() -> {
+            if (cursor.moveToFirst()) {
+                String path;
+                long dateTaken, id;
+                int pathColumn = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA);
+                int idColumn = cursor.getColumnIndex(BaseColumns._ID);
 
-                    do {
-                        path = cursor.getString(pathColumn);
-                        AlbumItem albumItem = AlbumItem.getInstance(context, path);
-                        if (albumItem != null) {
-                            //set dateTaken
-                            int dateTakenColumn = cursor.getColumnIndex(
-                                    !(albumItem instanceof Video) ?
-                                            MediaStore.Images.ImageColumns.DATE_TAKEN :
-                                            MediaStore.Video.VideoColumns.DATE_TAKEN);
-                            dateTaken = cursor.getLong(dateTakenColumn);
-                            albumItem.setDate(dateTaken);
+                do {
+                    path = cursor.getString(pathColumn);
+                    AlbumItem albumItem = AlbumItem.getInstance(context, path);
+                    if (albumItem != null) {
+                        //set dateTaken
+                        int dateTakenColumn = cursor.getColumnIndex(
+                                !(albumItem instanceof Video) ?
+                                        MediaStore.Images.ImageColumns.DATE_TAKEN :
+                                        MediaStore.Video.VideoColumns.DATE_TAKEN);
+                        dateTaken = cursor.getLong(dateTakenColumn);
+                        albumItem.setDate(dateTaken);
 
-                            id = cursor.getLong(idColumn);
-                            Uri uri = ContentUris.withAppendedId(
-                                    MediaStore.Files.getContentUri("external"), id);
-                            albumItem.setUri(uri);
+                        id = cursor.getLong(idColumn);
+                        Uri uri = ContentUris.withAppendedId(
+                                MediaStore.Files.getContentUri("external"), id);
+                        albumItem.setUri(uri);
 
-                            //search bucket
-                            Album album = null;
-                            String albumPath = FileOperation.Util.getParentPath(path);
-                            for (int i = 0; i < albums.size(); i++) {
-                                Album curAlbum = albums.get(i);
-                                if (curAlbum.getPath().equals(albumPath)) {
-                                    album = curAlbum;
-                                    break;
-                                }
+                        //search bucket
+                        Album album = null;
+                        String albumPath = FileOperation.Util.getParentPath(path);
+                        for (int i = 0; i < albums.size(); i++) {
+                            Album curAlbum = albums.get(i);
+                            if (curAlbum.getPath().equals(albumPath)) {
+                                album = curAlbum;
+                                break;
                             }
-
-                            if (album == null) {
-                                //no bucket found
-                                album = new Album().setPath(albumPath);
-                                albums.add(album);
-                            }
-                            album.getAlbumItems().add(albumItem);
                         }
 
-                    } while (cursor.moveToNext());
+                        if (album == null) {
+                            //no bucket found
+                            album = new Album().setPath(albumPath);
+                            albums.add(album);
+                        }
+                        album.getAlbumItems().add(albumItem);
+                    }
 
-                }
-                cursor.close();
+                } while (cursor.moveToNext());
 
-                //done loading media with content resolver
-                MediaProvider.OnMediaLoadedCallback callback = getCallback();
-                if (callback != null) {
-                    callback.onMediaLoaded(albums);
-                }
-
-                /*Log.d("MediaStoreRetriever", "onMediaLoaded(): "
-                        + String.valueOf(System.currentTimeMillis() - startTime) + " ms");*/
             }
+            cursor.close();
+
+            //done loading media with content resolver
+            MediaProvider.OnMediaLoadedCallback callback = getCallback();
+            if (callback != null) {
+                callback.onMediaLoaded(albums);
+            }
+
+            /*Log.d("MediaStoreRetriever", "onMediaLoaded(): "
+                    + String.valueOf(System.currentTimeMillis() - startTime) + " ms");*/
         });
     }
 

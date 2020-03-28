@@ -25,32 +25,19 @@ public class PhotoViewHolder extends ViewHolder {
     public View inflateView(ViewGroup container) {
         View view = inflatePhotoView(container);
         SubsamplingScaleImageView scaleImageView = view.findViewById(R.id.subsampling);
-        //ItemViewUtil.bindTransitionView(transitionView, albumItem);
-        //ItemViewUtil.setPreviewImage(scaledImageView, albumItem);
         loadImage(scaleImageView);
         return view;
     }
 
     private void loadImage(SubsamplingScaleImageView scaleImageView) {
-        if (albumItem.error) {
+        if (albumItem.error)
             return;
-        }
-
-        // use custom decoders
         scaleImageView.setDecoderFactory(getImageDecoderFactory());
         scaleImageView.setRegionDecoderFactory(getImageRegionDecoderFactory());
         scaleImageView.setPreviewDecoderFactory(getPreviewImageDecoderFactory());
-
         scaleImageView.setOnClickListener(PhotoViewHolder.this::imageOnClick);
-
-        /*ImageViewState imageViewState = null;
-        if (photo.getImageViewSavedState() != null) {
-            imageViewState = (ImageViewState) photo.getImageViewSavedState();
-            photo.putImageViewSavedState(null);
-        }*/
-
+        scaleImageView.setStartRect(albumItem.itemViewBound);
         scaleImageView.loadImage(albumItem.getPath());
-        //ItemViewUtil.setPreviewImage(scaleImageView, albumItem);
         scaleImageView.setOnImageEventListener(new SubsamplingScaleImageView.DefaultOnImageEventListener() {
             @Override
             public void onImageLoaded() {
@@ -66,7 +53,6 @@ public class PhotoViewHolder extends ViewHolder {
 
     @Override
     public void onShowViewHolder() {
-        //todo load image
     }
 
     @Override

@@ -27,14 +27,11 @@
         <item name="android:windowActivityTransitions">true</item>
     </style>
 
-    <!--PhotoView Theme-->
+    <!--ItemActivity Theme-->
     <style name="CameraRoll.Theme.PhotoView" parent="CameraRoll.Theme">
-        <item name="android:windowBackground">@color/black</item>
-
-        <item name="android:windowSharedElementEnterTransition">@transition/album_item_transition
-        </item>
-        <item name="android:windowSharedElementExitTransition">@transition/album_item_transition
-        </item>
+        <!--<item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowAnimationStyle">@null</item>-->
 
         <item name="android:windowTranslucentNavigation">false</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>

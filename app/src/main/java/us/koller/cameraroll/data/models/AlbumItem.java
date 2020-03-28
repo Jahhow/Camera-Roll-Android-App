@@ -1,6 +1,7 @@
 package us.koller.cameraroll.data.models;
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Parcel;
@@ -40,6 +41,7 @@ public abstract class AlbumItem
     private int[] imageDimens;
     private List<String> tags;
 
+    public Rect itemViewBound;
     public boolean error = false;
     public boolean isSharedElement = false;//todo
 
@@ -203,10 +205,11 @@ public abstract class AlbumItem
     }
 
     AlbumItem(Parcel parcel) {
-        this.name = parcel.readString();
-        this.path = parcel.readString();
-        this.error = Boolean.parseBoolean(parcel.readString());
-        this.uri = Uri.parse(parcel.readString());
+        name = parcel.readString();
+        path = parcel.readString();
+        error = Boolean.parseBoolean(parcel.readString());
+        uri = Uri.parse(parcel.readString());
+        itemViewBound = parcel.readParcelable(Rect.class.getClassLoader());
     }
 
     @NonNull
@@ -237,6 +240,7 @@ public abstract class AlbumItem
         parcel.writeString(path);
         parcel.writeString(String.valueOf(error));
         parcel.writeString(String.valueOf(uri));
+        parcel.writeParcelable(itemViewBound, 0);
     }
 
     @SuppressWarnings("WeakerAccess")
