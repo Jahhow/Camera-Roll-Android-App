@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import us.koller.cameraroll.R;
 import us.koller.cameraroll.adapter.SelectorModeManager;
 import us.koller.cameraroll.adapter.album.AlbumAdapter;
+import us.koller.cameraroll.adapter.album.viewHolder.AlbumItemHolder;
 import us.koller.cameraroll.data.Settings;
 import us.koller.cameraroll.data.fileOperations.FileOperation;
 import us.koller.cameraroll.data.fileOperations.Move;
@@ -504,7 +505,10 @@ public class AlbumActivity extends ThemeableActivity
                     paths[i] = album.getAlbumItems().get(i).getPath();
                 }
                 manager.selectAll(paths);
-                recyclerViewAdapter.notifyItemRangeChanged(0, paths.length);
+                for (int i = 0; i < recyclerView.getChildCount(); ++i) {
+                    AlbumItemHolder albumItemHolder = (AlbumItemHolder) recyclerView.getChildViewHolder(recyclerView.getChildAt(i));
+                    albumItemHolder.setSelected(true);
+                }
                 break;
             case R.id.share:
                 //share multiple items
