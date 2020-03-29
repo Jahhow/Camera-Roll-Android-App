@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import us.koller.cameraroll.R;
 import us.koller.cameraroll.adapter.SelectorModeManager;
 import us.koller.cameraroll.adapter.album.AlbumAdapter;
+import us.koller.cameraroll.adapter.album.viewHolder.AlbumItemHolder;
 import us.koller.cameraroll.data.Settings;
 import us.koller.cameraroll.data.fileOperations.FileOperation;
 import us.koller.cameraroll.data.models.Album;
@@ -45,7 +47,7 @@ import us.koller.cameraroll.util.animators.ColorFade;
 
 public class NestedRecyclerViewAlbumHolder extends AlbumHolder
         implements Toolbar.OnMenuItemClickListener {
-
+    protected static final String TAG = NestedRecyclerViewAlbumHolder.class.getSimpleName();
     @SuppressWarnings("FieldCanBeLocal")
     private static int SINGLE_LINE_MAX_ITEM_COUNT = 4;
 
@@ -61,115 +63,13 @@ public class NestedRecyclerViewAlbumHolder extends AlbumHolder
     private SelectorModeManager.OnBackPressedCallback onBackPressedCallback
             = new SelectorModeManager.OnBackPressedCallback() {
         @Override
-        public void cancelSelectorMode() {
+        public void onBackPressed() {
             NestedRecyclerViewAlbumHolder.this.cancelSelectorMode();
         }
     };
 
-    abstract static class SelectorCallback implements SelectorModeManager.Callback {
+    abstract static class NestedSelectorCallback implements SelectorModeManager.Callback {
     }
-
-    private SelectorCallback callback
-            = new SelectorCallback() {
-        @Override
-        public void onSelectorModeEnter() {
-            final View rootView = ((Activity) nestedRecyclerView.getContext())
-                    .findViewById(R.id.root_view);
-
-            final Toolbar toolbar = rootView.findViewById(R.id.toolbar);
-
-            if (theme.darkStatusBarIconsInSelectorMode()) {
-                Util.setDarkStatusBarIcons(rootView);
-            } else {
-                Util.setLightStatusBarIcons(rootView);
-            }
-
-            View.OnClickListener onClickListener
-                    = new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    cancelSelectorMode();
-                }
-            };
-
-            //create selector-toolbar
-            final Toolbar selectorToolbar = SelectorModeUtil.getSelectorModeToolbar(
-                    getContext(), onClickListener,
-                    NestedRecyclerViewAlbumHolder.this);
-
-            selectorToolbar.setPadding(toolbar.getPaddingLeft(),
-                    toolbar.getPaddingTop(),
-                    toolbar.getPaddingRight(),
-                    toolbar.getPaddingBottom());
-
-            //add selector-toolbar
-            ((ViewGroup) toolbar.getParent()).addView(selectorToolbar,
-                    toolbar.getLayoutParams());
-
-            selectorToolbar.requestLayout();
-
-            //animate selector-toolbar
-            selectorToolbar.getViewTreeObserver().addOnGlobalLayoutListener(
-                    new ViewTreeObserver.OnGlobalLayoutListener() {
-                        @Override
-                        public void onGlobalLayout() {
-                            selectorToolbar.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-
-                            selectorToolbar.setTranslationY(-selectorToolbar.getHeight());
-                            selectorToolbar.animate().translationY(0);
-                        }
-                    });
-        }
-
-        @Override
-        public void onSelectorModeExit() {
-            final View rootView = ((Activity) nestedRecyclerView.getContext())
-                    .findViewById(R.id.root_view);
-
-            //find selector-toolbar
-            final Toolbar selectorToolbar = rootView
-                    .findViewWithTag(SelectorModeUtil.SELECTOR_TOOLBAR_TAG);
-
-            //animate selector-toolbar
-            selectorToolbar.animate()
-                    .translationY(-selectorToolbar.getHeight())
-                    .setListener(new AnimatorListenerAdapter() {
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            super.onAnimationEnd(animation);
-
-                            if (theme.darkStatusBarIcons()) {
-                                Util.setDarkStatusBarIcons(rootView);
-                            } else {
-                                Util.setLightStatusBarIcons(rootView);
-                            }
-
-                            //remove selector-toolbar
-                            ((ViewGroup) rootView).removeView(selectorToolbar);
-                        }
-                    });
-        }
-
-        @Override
-        public void onItemSelected(int selectedItemCount) {
-            final View rootView = ((Activity) nestedRecyclerView.getContext())
-                    .findViewById(R.id.root_view);
-
-            final Toolbar toolbar = rootView
-                    .findViewWithTag(SelectorModeUtil.SELECTOR_TOOLBAR_TAG);
-
-            final String title = getContext().getString(R.string.selected_count, selectedItemCount);
-
-            ColorFade.fadeToolbarTitleColor(toolbar,
-                    theme.getAccentTextColor(getContext()),
-                    new ColorFade.ToolbarTitleFadeCallback() {
-                        @Override
-                        public void setTitle(Toolbar toolbar) {
-                            toolbar.setTitle(title);
-                        }
-                    });
-        }
-    };
 
     public NestedRecyclerViewAlbumHolder(View itemView) {
         super(itemView);
@@ -185,37 +85,128 @@ public class NestedRecyclerViewAlbumHolder extends AlbumHolder
         }
     }
 
-    public NestedRecyclerViewAlbumHolder setSelectorModeManager(SelectorModeManager manager) {
+    public void setSelectorModeManager(SelectorModeManager manager) {
         this.manager = manager;
         if (!manager.onBackPressedCallbackAlreadySet()) {
             manager.setOnBackPressedCallback(onBackPressedCallback);
         }
 
-        //checking if SelectorCallback is already attached, if not attach it
         boolean callbackAttached = false;
         ArrayList<SelectorModeManager.Callback> callbacks = manager.getCallbacks();
         if (callbacks != null) {
             for (int i = 0; i < callbacks.size(); i++) {
-                if (callbacks.get(i) instanceof SelectorCallback) {
+                if (callbacks.get(i) instanceof NestedSelectorCallback) {
                     callbackAttached = true;
                     break;
                 }
             }
         }
         if (!callbackAttached) {
-            manager.addCallback(callback);
+            manager.addCallback(new NestedSelectorCallback() {
+                @Override
+                public void onSelectorModeEnter() {
+                    //Log.i(TAG, "onSelectorModeEnter");
+                    final View rootView = ((Activity) nestedRecyclerView.getContext())
+                            .findViewById(R.id.root_view);
+
+                    final Toolbar toolbar = rootView.findViewById(R.id.toolbar);
+
+                    if (theme.darkStatusBarIconsInSelectorMode()) {
+                        Util.setDarkStatusBarIcons(rootView);
+                    } else {
+                        Util.setLightStatusBarIcons(rootView);
+                    }
+
+                    //create selector-toolbar
+                    final Toolbar selectorToolbar = SelectorModeUtil.getSelectorModeToolbar(
+                            getContext(), view -> cancelSelectorMode(),
+                            NestedRecyclerViewAlbumHolder.this);
+
+                    selectorToolbar.setPadding(toolbar.getPaddingLeft(),
+                            toolbar.getPaddingTop(),
+                            toolbar.getPaddingRight(),
+                            toolbar.getPaddingBottom());
+
+                    //add selector-toolbar
+                    ((ViewGroup) toolbar.getParent()).addView(selectorToolbar,
+                            toolbar.getLayoutParams());
+
+                    selectorToolbar.requestLayout();
+
+                    //animate selector-toolbar
+                    selectorToolbar.getViewTreeObserver().addOnGlobalLayoutListener(
+                            new ViewTreeObserver.OnGlobalLayoutListener() {
+                                @Override
+                                public void onGlobalLayout() {
+                                    selectorToolbar.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+
+                                    selectorToolbar.setTranslationY(-selectorToolbar.getHeight());
+                                    selectorToolbar.animate().translationY(0);
+                                }
+                            });
+                }
+
+                @Override
+                public void onSelectorModeExit() {
+                    //Log.i(TAG, "onSelectorModeExit");
+                    final View rootView = ((Activity) nestedRecyclerView.getContext())
+                            .findViewById(R.id.root_view);
+
+                    //find selector-toolbar
+                    final Toolbar selectorToolbar = rootView
+                            .findViewWithTag(SelectorModeUtil.SELECTOR_TOOLBAR_TAG);
+
+                    //animate selector-toolbar
+                    selectorToolbar.animate()
+                            .translationY(-selectorToolbar.getHeight())
+                            .setListener(new AnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    super.onAnimationEnd(animation);
+
+                                    if (theme.darkStatusBarIcons()) {
+                                        Util.setDarkStatusBarIcons(rootView);
+                                    } else {
+                                        Util.setLightStatusBarIcons(rootView);
+                                    }
+
+                                    //remove selector-toolbar
+                                    ((ViewGroup) rootView).removeView(selectorToolbar);
+                                }
+                            });
+                }
+
+                @Override
+                public void onItemSelected(int selectedItemCount) {
+                    final View rootView = ((Activity) nestedRecyclerView.getContext())
+                            .findViewById(R.id.root_view);
+
+                    final Toolbar toolbar = rootView
+                            .findViewWithTag(SelectorModeUtil.SELECTOR_TOOLBAR_TAG);
+
+                    final String title = getContext().getString(R.string.selected_count, selectedItemCount);
+
+                    ColorFade.fadeToolbarTitleColor(toolbar,
+                            theme.getAccentTextColor(getContext()),
+                            new ColorFade.ToolbarTitleFadeCallback() {
+                                @Override
+                                public void setTitle(Toolbar toolbar) {
+                                    toolbar.setTitle(title);
+                                }
+                            });
+                }
+            });
         }
 
         manager.addCallback(new SelectorModeManager.SimpleCallback() {
             @Override
             public void onSelectorModeExit() {
-                RecyclerView.Adapter adapter = nestedRecyclerView.getAdapter();
-                if (adapter != null) {
-                    adapter.notifyItemRangeChanged(0, adapter.getItemCount());
+                for (int i = 0; i < nestedRecyclerView.getChildCount(); ++i) {
+                    AlbumItemHolder albumItemHolder = (AlbumItemHolder) nestedRecyclerView.getChildViewHolder(nestedRecyclerView.getChildAt(i));
+                    albumItemHolder.setSelected(false);
                 }
             }
         });
-        return this;
     }
 
     @Override
@@ -254,19 +245,15 @@ public class NestedRecyclerViewAlbumHolder extends AlbumHolder
             NestedAdapter adapter = (NestedAdapter) nestedRecyclerView.getAdapter();
             adapter.setData(album);
         } else {
-            NestedAdapter adapter = new NestedAdapter(callback,
-                    nestedRecyclerView, album, false);
-            adapter.setSelectorModeManager(manager);
-            nestedRecyclerView.setAdapter(adapter);
+            nestedRecyclerView.setAdapter(new NestedAdapter(null,
+                    nestedRecyclerView, album, false, manager));
         }
     }
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         final String[] paths = ((NestedAdapter) nestedRecyclerView.getAdapter())
-                .cancelSelectorMode((Activity) getContext());
-
-        cancelSelectorMode();
+                .exitSelectorMode(true);
 
         Activity a;
         if (getContext() instanceof Activity) {
@@ -336,11 +323,12 @@ public class NestedRecyclerViewAlbumHolder extends AlbumHolder
         return false;
     }
 
+    //todo
     private void cancelSelectorMode() {
         //cancel SelectorMode
         if (nestedRecyclerView.getAdapter() instanceof NestedAdapter) {
-            ((NestedAdapter) nestedRecyclerView.getAdapter())
-                    .cancelSelectorMode((Activity) getContext());
+            //Log.i(TAG, "cancelSelectorMode");
+            ((NestedAdapter) nestedRecyclerView.getAdapter()).exitSelectorMode(false);
         }
     }
 
@@ -355,9 +343,13 @@ public class NestedRecyclerViewAlbumHolder extends AlbumHolder
 
     private static class NestedAdapter extends AlbumAdapter {
 
-        NestedAdapter(SelectorModeManager.Callback callback, final RecyclerView recyclerView,
-                      Album album, boolean pick_photos) {
-            super(callback, recyclerView, album, pick_photos);
+        public NestedAdapter(SelectorModeManager.Callback callback, RecyclerView recyclerView, Album album, boolean pick_photos, SelectorModeManager selectorModeManager) {
+            super(callback, recyclerView, album, pick_photos, selectorModeManager);
+        }
+
+        @Override
+        public String[] exitSelectorMode(boolean getSelectedPath) {
+            return super.exitSelectorMode(getSelectedPath, false);
         }
 
         @Override
@@ -371,7 +363,7 @@ public class NestedRecyclerViewAlbumHolder extends AlbumHolder
         private static final String SELECTOR_TOOLBAR_TAG = "SELECTOR_TOOLBAR_TAG";
 
         static Toolbar getSelectorModeToolbar(Context context,
-                                              View.OnClickListener onClickListener,
+                                              View.OnClickListener navigationOnClickListener,
                                               Toolbar.OnMenuItemClickListener onItemClickListener) {
             final Toolbar toolbar = new Toolbar(context);
             toolbar.setTag(SELECTOR_TOOLBAR_TAG);
@@ -401,7 +393,7 @@ public class NestedRecyclerViewAlbumHolder extends AlbumHolder
                 toolbar.setNavigationIcon(navIcon);
             }
 
-            toolbar.setNavigationOnClickListener(onClickListener);
+            toolbar.setNavigationOnClickListener(navigationOnClickListener);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 toolbar.setElevation(context.getResources()

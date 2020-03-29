@@ -53,10 +53,10 @@
     <string name="share_item">分享%1$s</string>
     <string name="share_error">沒有程式可分享您的%1$s</string>
     <string name="edit">編輯</string>
-    <string name="edit_item">編輯%1$s</string>
+    <string name="edit_item">編輯 %1$s</string>
     <string name="edit_error">沒有程式可編輯您的%1$s</string>
     <string name="delete">刪除</string>
-    <string name="delete_item">刪除%1$s</string>
+    <string name="delete_item">刪除 %1$s</string>
     <string name="delete_files">刪除 %1$d 個項目</string>
     <string name="move">移動</string>
     <string name="move_item_to">移動 %1$d 個項目至：</string>

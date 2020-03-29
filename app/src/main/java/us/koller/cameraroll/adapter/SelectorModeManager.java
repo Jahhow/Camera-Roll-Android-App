@@ -1,14 +1,13 @@
 package us.koller.cameraroll.adapter;
 
-import android.app.Activity;
 import android.os.Bundle;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 import us.koller.cameraroll.data.models.AlbumItem;
-import us.koller.cameraroll.data.Settings;
-import us.koller.cameraroll.util.SortUtil;
 
 //simple wrapper class to handle the Selector Mode and selected items
 public class SelectorModeManager {
@@ -17,7 +16,7 @@ public class SelectorModeManager {
     private static final String SELECTED_ITEMS_PATHS = "SELECTED_ITEMS_PATHS";
 
     private boolean selectorModeActive = false;
-    private ArrayList<String> selected_items_paths;
+    private List<String> selected_items_paths;
 
     private ArrayList<Callback> callbacks;
 
@@ -26,7 +25,7 @@ public class SelectorModeManager {
 
     //SelectorMode Callbacks
     public interface OnBackPressedCallback {
-        void cancelSelectorMode();
+        void onBackPressed();
     }
 
     public interface Callback {
@@ -83,15 +82,17 @@ public class SelectorModeManager {
             setSelectorMode(Boolean.parseBoolean(savedState.getString(SELECTOR_MODE_ACTIVE)));
         }
 
+        selected_items_paths = new LinkedList<>();
         if (isSelectorModeActive() && savedState.containsKey(SELECTED_ITEMS_PATHS)) {
-            selected_items_paths = savedState.getStringArrayList(SELECTED_ITEMS_PATHS);
-        } else {
-            selected_items_paths = new ArrayList<>();
+            String[] stringArray = savedState.getStringArray(SELECTED_ITEMS_PATHS);
+            if (stringArray != null) {
+                selected_items_paths.addAll(Arrays.asList(stringArray));
+            }
         }
     }
 
     public SelectorModeManager() {
-        selected_items_paths = new ArrayList<>();
+        selected_items_paths = new LinkedList<>();
     }
 
     public boolean isItemSelected(String path) {
@@ -99,11 +100,13 @@ public class SelectorModeManager {
     }
 
     public void setSelectorMode(boolean selectorMode) {
-        this.selectorModeActive = selectorMode;
-        if (selectorMode) {
-            onSelectorModeEnter();
-        } else {
-            onSelectorModeExit();
+        if (this.selectorModeActive != selectorMode) {
+            this.selectorModeActive = selectorMode;
+            if (selectorMode) {
+                onSelectorModeEnter();
+            } else {
+                onSelectorModeExit();
+            }
         }
     }
 
@@ -111,17 +114,17 @@ public class SelectorModeManager {
         return selectorModeActive;
     }
 
-    public boolean onItemSelect(String path) {
-        boolean selected = addOrRemovePathFromList(selected_items_paths, path);
+    public boolean onToggleItemSelection(String path) {
+        boolean selected = toggleSelectedPath(selected_items_paths, path);
         onItemSelected(getSelectedItemCount());
         return selected;
     }
 
     public void selectAll(String[] paths) {
         ArrayList<String> itemsToSelect = new ArrayList<>();
-        for (int i = 0; i < paths.length; i++) {
-            if (!selected_items_paths.contains(paths[i])) {
-                itemsToSelect.add(paths[i]);
+        for (String path : paths) {
+            if (!selected_items_paths.contains(path)) {
+                itemsToSelect.add(path);
             }
         }
         selected_items_paths.addAll(itemsToSelect);
@@ -136,24 +139,23 @@ public class SelectorModeManager {
         return selected_items_paths.size();
     }
 
-    public String[] createStringArray(Activity context) {
-        ArrayList<String> selected_items_paths = sortStringArray(context, this.selected_items_paths);
-        return createStringArray(selected_items_paths);
+    public String[] createStringArray() {
+        return selected_items_paths.toArray(new String[0]);
     }
 
     public void clearList() {
-        this.selected_items_paths = new ArrayList<>();
+        this.selected_items_paths = new LinkedList<>();
     }
 
-    public void saveInstanceState(Bundle outState) {
+    void saveInstanceState(Bundle outState) {
         boolean active = isSelectorModeActive();
         outState.putString(SELECTOR_MODE_ACTIVE, String.valueOf(active));
         if (active) {
-            outState.putStringArrayList(SELECTED_ITEMS_PATHS, selected_items_paths);
+            outState.putStringArray(SELECTED_ITEMS_PATHS, createStringArray());
         }
     }
 
-    public SelectorModeManager addCallback(Callback callback) {
+    public void addCallback(Callback callback) {
         if (callbacks == null) {
             callbacks = new ArrayList<>();
         }
@@ -163,15 +165,10 @@ public class SelectorModeManager {
             callback.onSelectorModeEnter();
             callback.onItemSelected(getSelectedItemCount());
         }
-        return this;
     }
 
     public ArrayList<Callback> getCallbacks() {
         return callbacks;
-    }
-
-    public boolean callbacksAttached() {
-        return callbacks != null && callbacks.size() > 0;
     }
 
     public void setOnBackPressedCallback(OnBackPressedCallback onBackPressedCallback) {
@@ -184,7 +181,7 @@ public class SelectorModeManager {
 
     public boolean onBackPressed() {
         if (onBackPressedCallback != null && isSelectorModeActive()) {
-            onBackPressedCallback.cancelSelectorMode();
+            onBackPressedCallback.onBackPressed();
             return true;
         } else {
             return false;
@@ -193,17 +190,8 @@ public class SelectorModeManager {
 
 
     //Util methods
-    private static boolean addOrRemovePathFromList(ArrayList<String> arr, String item) {
-        //find out if item is in arr
-        boolean itemIsInList = false;
-        for (int i = 0; i < arr.size(); i++) {
-            if (arr.get(i).equals(item)) {
-                itemIsInList = true;
-                break;
-            }
-        }
-
-        if (itemIsInList) {
+    private static boolean toggleSelectedPath(List<String> arr, String item) {
+        if (arr.contains(item)) {
             //remove item
             arr.remove(item);
             return false;
@@ -215,8 +203,7 @@ public class SelectorModeManager {
     }
 
     public static AlbumItem[] createAlbumItemArray(String[] arr) {
-        ArrayList<String> arrayList = new ArrayList<>();
-        arrayList.addAll(Arrays.asList(arr));
+        ArrayList<String> arrayList = new ArrayList<>(Arrays.asList(arr));
         return createAlbumItemArray(arrayList);
     }
 
@@ -226,30 +213,5 @@ public class SelectorModeManager {
             albumItems[i] = AlbumItem.getInstance(arr.get(i));
         }
         return albumItems;
-    }
-
-    private static String[] createStringArray(ArrayList<String> arr) {
-        String[] paths = new String[arr.size()];
-        for (int i = 0; i < arr.size(); i++) {
-            paths[i] = arr.get(i);
-        }
-        return paths;
-    }
-
-    private static ArrayList<String> sortStringArray(Activity context, ArrayList<String> paths) {
-        /*ArrayList<AlbumItem> albumItems = new ArrayList<>();
-        for (int i = 0; i < paths.size(); i++) {
-            albumItems.add(AlbumItem.getInstance(paths.get(i)));
-        }
-        int sortBy = Settings.getInstance(context).sortAlbumBy();
-        SortUtil.sort(albumItems, sortBy);
-
-        ArrayList<String> sortedPaths = new ArrayList<>();
-        for (int i = 0; i < albumItems.size(); i++) {
-            sortedPaths.add(albumItems.get(i).getPath());
-        }
-
-        return sortedPaths;*/
-        return paths;
     }
 }

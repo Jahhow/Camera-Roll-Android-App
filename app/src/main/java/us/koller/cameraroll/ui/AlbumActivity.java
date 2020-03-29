@@ -188,7 +188,7 @@ public class AlbumActivity extends ThemeableActivity
             @Override
             public void onClick(View view) {
                 if (recyclerViewAdapter != null && recyclerViewAdapter.isSelectorModeActive()) {
-                    recyclerViewAdapter.cancelSelectorMode(null);
+                    recyclerViewAdapter.exitSelectorMode(false);
                 } else {
                     onBackPressed();
                 }
@@ -362,7 +362,6 @@ public class AlbumActivity extends ThemeableActivity
                         AlbumActivity.this.onAlbumLoaded(savedInstanceState);
                     }
                 });
-
     }
 
     private void onAlbumLoaded(Bundle savedInstanceState) {
@@ -513,7 +512,7 @@ public class AlbumActivity extends ThemeableActivity
                 break;
             case R.id.copy:
             case R.id.move:
-                selected_items_paths = recyclerViewAdapter.cancelSelectorMode(this);
+                selected_items_paths = recyclerViewAdapter.exitSelectorMode(true);
                 intent = new Intent(this, FileOperationDialogActivity.class);
                 intent.setAction(item.getItemId() == R.id.copy ?
                         FileOperationDialogActivity.ACTION_COPY :
@@ -722,7 +721,7 @@ public class AlbumActivity extends ThemeableActivity
 
     public void setPhotosResult() {
         final AlbumItem[] selected_items = SelectorModeManager
-                .createAlbumItemArray(recyclerViewAdapter.cancelSelectorMode(this));
+                .createAlbumItemArray(recyclerViewAdapter.exitSelectorMode(true));
 
         Intent intent = new Intent("us.koller.RESULT_ACTION");
         if (allowMultiple) {
@@ -755,9 +754,11 @@ public class AlbumActivity extends ThemeableActivity
             //fade overflow menu icon
             ColorFade.fadeDrawableColor(toolbar.getOverflowIcon(), textColorSecondary, accentTextColor);
 
-            Drawable selectAll = menu.findItem(R.id.select_all).getIcon();
-            selectAll.setAlpha(0);
-            ColorFade.fadeDrawableAlpha(selectAll, 255);
+            if (menu != null) {
+                Drawable selectAll = menu.findItem(R.id.select_all).getIcon();
+                selectAll.setAlpha(0);
+                ColorFade.fadeDrawableAlpha(selectAll, 255);
+            }
 
             ColorDrawable statusBarOverlay = getStatusBarOverlay();
             if (statusBarOverlay != null) {
@@ -873,7 +874,7 @@ public class AlbumActivity extends ThemeableActivity
 
     @Override
     public void onItemSelected(int selectedItemCount) {
-        if (selectedItemCount != 0) {
+        if (selectedItemCount > 0) {
             Toolbar toolbar = findViewById(R.id.toolbar);
             final String title = getString(R.string.selected_count, selectedItemCount);
             ColorFade.fadeToolbarTitleColor(toolbar, accentTextColor,
@@ -883,9 +884,6 @@ public class AlbumActivity extends ThemeableActivity
                             toolbar.setTitle(title);
                         }
                     });
-        }
-
-        if (selectedItemCount > 0) {
             if (pick_photos) {
                 if (allowMultiple) {
                     animateFab(true);
@@ -904,7 +902,7 @@ public class AlbumActivity extends ThemeableActivity
     public void deleteSelectedItems() {
         //deleteAlbumItemsSnackbar();
         final String[] selected_items = recyclerViewAdapter
-                .cancelSelectorMode(AlbumActivity.this);
+                .exitSelectorMode(true);
         new AlertDialog.Builder(AlbumActivity.this)
                 .setTitle(getString(R.string.delete_files, selected_items.length) + "?")
                 .setNegativeButton(getString(R.string.no), null)
@@ -927,7 +925,7 @@ public class AlbumActivity extends ThemeableActivity
 
     public void shareSelectedItems() {
         //share multiple items
-        String[] selected_items_paths = recyclerViewAdapter.cancelSelectorMode(this);
+        String[] selected_items_paths = recyclerViewAdapter.exitSelectorMode(true);
         ArrayList<Uri> uris = new ArrayList<>();
         for (int i = 0; i < selected_items_paths.length; i++) {
             uris.add(StorageUtil.getContentUri(this, selected_items_paths[i]));
@@ -1043,7 +1041,7 @@ public class AlbumActivity extends ThemeableActivity
     @Override
     public void onSwipeFinish(int dir) {
         if (recyclerViewAdapter.isSelectorModeActive()) {
-            recyclerViewAdapter.cancelSelectorMode(null);
+            recyclerViewAdapter.exitSelectorMode(false);
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setReturnTransition(new TransitionSet()

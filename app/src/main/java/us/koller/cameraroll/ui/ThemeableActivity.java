@@ -18,7 +18,6 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
 
@@ -202,8 +201,7 @@ public abstract class ThemeableActivity extends BaseActivity {
     }
 
     public int getTaskDescriptionColor() {
-        int colorRes = theme.isBaseLight() ? R.color.colorPrimary_light : R.color.colorPrimary;
-        return ContextCompat.getColor(this, colorRes);
+        return theme.getBackgroundColor(this);
     }
 
     public int getStatusBarColor() {

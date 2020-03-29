@@ -713,9 +713,9 @@ public class MainActivity extends ThemeableActivity {
 
     @Override
     public void onBackPressed() {
-        if (!recyclerViewAdapter.onBackPressed()) {
-            super.onBackPressed();
-        }
+        if (recyclerViewAdapter.onBackPressed())
+            return;
+        super.onBackPressed();
     }
 
     @Override

@@ -3,6 +3,7 @@ package us.koller.cameraroll.adapter.album.viewHolder;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
@@ -22,6 +23,7 @@ import us.koller.cameraroll.data.models.AlbumItem;
 import us.koller.cameraroll.util.Util;
 
 public abstract class AlbumItemHolder extends RecyclerView.ViewHolder {
+    protected static final String TAG = AlbumItemHolder.class.getSimpleName();
 
     public AlbumItem albumItem;
     private boolean selected = false;
@@ -53,18 +55,16 @@ public abstract class AlbumItemHolder extends RecyclerView.ViewHolder {
             final ImageView imageView = itemView.findViewById(R.id.image);
             final Drawable indicatorOverlay
                     = ContextCompat.getDrawable(itemView.getContext(), indicatorRes);
-            imageView.post(new Runnable() {
-                @Override
-                public void run() {
-                    final int overlayPadding = (int) (imageView.getWidth() * 0.05f);
-                    final int overlayDimens = (int) (imageView.getWidth() * 0.3f);
-                    indicatorOverlay.setBounds(
-                            imageView.getWidth() - overlayDimens - overlayPadding,
-                            imageView.getHeight() - overlayDimens,
-                            imageView.getWidth() - overlayPadding,
-                            imageView.getHeight());
-                    imageView.getOverlay().add(indicatorOverlay);
-                }
+            imageView.post(() -> {
+                final int overlayPadding = (int) (imageView.getWidth() * 0.05f);
+                final int overlayDimens = (int) (imageView.getWidth() * 0.3f);
+                assert indicatorOverlay != null;
+                indicatorOverlay.setBounds(
+                        imageView.getWidth() - overlayDimens - overlayPadding,
+                        imageView.getHeight() - overlayDimens,
+                        imageView.getWidth() - overlayPadding,
+                        imageView.getHeight());
+                imageView.getOverlay().add(indicatorOverlay);
             });
         }
     }
@@ -97,32 +97,44 @@ public abstract class AlbumItemHolder extends RecyclerView.ViewHolder {
     }
 
     public void setSelected(boolean selected) {
-        boolean animate = this.selected != selected;
-        this.selected = selected;
-        if (animate) {
-            animateSelected();
+        setSelected(selected, true);
+    }
+
+    public void setSelected(boolean selected, boolean animate) {
+        if (this.selected != selected) {
+            this.selected = selected;
+            updateSelected(animate);
         }
     }
 
-    private void animateSelected() {
+    private void updateSelected(boolean animate) {
         final View imageView = itemView.findViewById(R.id.image);
 
-        float scale = selected ? 0.8f : 1.0f;
-        imageView.animate().setInterpolator(SubsamplingScaleImageView.Companion.getInterpolator())
-                .scaleX(scale)
-                .scaleY(scale)
-                .start();
-
-        if (selectorOverlay == null) {
-            selectorOverlay = Util.getAlbumItemSelectorOverlay(imageView.getContext());
-            selectorOverlay.setBounds(0, 0,
-                    imageView.getWidth(),
-                    imageView.getHeight());
-        }
-        if (selected) {
-            imageView.getOverlay().add(selectorOverlay);
+        float scale = selected ? 0.8f : 1f;
+        /**
+         * Don't touch 'itemView' directly.
+         * {@link androidx.recyclerview.widget.DefaultItemAnimator} might cancel animations added on itemView */
+        View child = ((ViewGroup) itemView).getChildAt(0);
+        if (animate) {
+            child.animate().setInterpolator(SubsamplingScaleImageView.Companion.getInterpolator())
+                    .scaleX(scale).scaleY(scale).start();
         } else {
-            imageView.getOverlay().remove(selectorOverlay);
+            child.clearAnimation();
+            child.setScaleX(scale);
+            child.setScaleY(scale);
+        }
+
+
+        imageView.getOverlay().clear();
+        if (selected) {
+            imageView.post(() -> {
+                if (selectorOverlay == null) {
+                    selectorOverlay = Util.getAlbumItemSelectorOverlay(imageView.getContext());
+                    int size = imageView.getWidth();
+                    selectorOverlay.setBounds(0, 0, size, size);
+                }
+                imageView.getOverlay().add(selectorOverlay);
+            });
         }
     }
 }

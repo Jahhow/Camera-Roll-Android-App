@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import com.michaelflisar.dragselectrecyclerview.DragSelectTouchListener;
 
@@ -37,28 +36,39 @@ public class AlbumAdapter extends AbstractRecyclerViewAdapter<Album> {
     private final int VIEW_TYPE_GIF = 2;
     private final int VIEW_TYPE_VIDEO = 3;
     private final int VIEW_TYPE_RAW = 4;
+    private final RecyclerView recyclerView;
+    //static int i = 0;
 
     private DragSelectTouchListener dragSelectTouchListener;
 
     public AlbumAdapter(SelectorModeManager.Callback callback, final RecyclerView recyclerView,
                         final Album album, boolean pick_photos) {
+        this(callback, recyclerView, album, pick_photos, new SelectorModeManager());
+    }
+
+    public AlbumAdapter(SelectorModeManager.Callback callback, final RecyclerView recyclerView,
+                        final Album album, boolean pick_photos, SelectorModeManager selectorModeManager) {
         super(pick_photos);
+        this.recyclerView = recyclerView;
 
         setData(album);
-        setSelectorModeManager(new SelectorModeManager());
+        setSelectorModeManager(selectorModeManager);
+        if (pick_photos) {
+            getSelectorManager().setSelectorMode(true);
+        }
         if (callback != null) {
             getSelectorManager().addCallback(callback);
         }
 
-        if (pick_photos) {
-            getSelectorManager().setSelectorMode(true);
-            if (callback != null) {
-                callback.onSelectorModeEnter();
+        //((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
+        /*recyclerView.setItemAnimator(new DefaultItemAnimator() {
+            @Override
+            public boolean animateChange(RecyclerView.ViewHolder oldHolder, RecyclerView.ViewHolder newHolder, int fromX, int fromY, int toX, int toY) {
+                if (oldHolder != newHolder)
+                    Log.w(TAG, "animateChange");
+                return super.animateChange(oldHolder, newHolder, fromX, fromY, toX, toY);
             }
-        }
-
-        /**needed for exit selector mode by {@link AlbumAdapter#cancelSelectorMode(Activity)} */
-        ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
+        });*/
 
         if (callback != null && dragSelectEnabled()) {
             dragSelectTouchListener = new DragSelectTouchListener()
@@ -66,7 +76,7 @@ public class AlbumAdapter extends AbstractRecyclerViewAdapter<Album> {
                         @Override
                         public void onSelectChange(int start, int end, boolean isSelected) {
                             for (int i = start; i <= end; i++) {
-                                getSelectorManager().onItemSelect(getData()
+                                getSelectorManager().onToggleItemSelection(getData()
                                         .getAlbumItems().get(i).getPath());
                                 //update ViewHolder
                                 notifyItemChanged(i);
@@ -114,38 +124,36 @@ public class AlbumAdapter extends AbstractRecyclerViewAdapter<Album> {
         View itemView = albumItemHolder.itemView;
         AlbumItem albumItem = getData().getAlbumItems().get(position);
 
+        //Log.i(TAG, "onBindViewHolder " + position);
+        boolean selected = getSelectorManager().isItemSelected(albumItem.getPath());
+        albumItemHolder.setSelected(selected, false);
+
         if (!albumItem.equals(albumItemHolder.getAlbumItem())) {
             albumItemHolder.setAlbumItem(albumItem);
             itemView.setTag(albumItem.getPath());
-        }
-
-        boolean selected = getSelectorManager().isItemSelected(albumItem.getPath());
-        albumItemHolder.setSelected(selected);
-        itemView.setOnClickListener(view -> {
-            if (getSelectorMode()) {
-                onItemSelected(albumItemHolder);
-            } else {
-                //Log.d(TAG, "onClick: " + getData().getPath());
+            itemView.setOnClickListener(view -> {
+                if (getSelectorMode()) {
+                    onToggleItemSelection(albumItemHolder);
+                } else {
+                    //Log.d(TAG, "onClick: " + getData().getPath());
                 /*int[] a = new int[2];
                 itemView.getLocationOnScreen(a);
                 albumItem.itemViewBound = new Rect(a[0], a[1], a[0] + itemView.getWidth(), a[1] + itemView.getHeight());*/
-                Context context = itemView.getContext();
-                Intent intent = new Intent(context, ItemActivity.class);
-                intent.putExtra(ItemActivity.ALBUM_ITEM, albumItem);
-                intent.putExtra(ItemActivity.ALBUM_PATH, getData().getPath());
-                intent.putExtra(ItemActivity.ITEM_POSITION, getData().getAlbumItems().indexOf(albumItem));
-                ((Activity) context).startActivityForResult(intent, ItemActivity.VIEW_IMAGE);
-            }
-        });
-
-        if (getSelectorManager().callbacksAttached()) {
+                    Context context = itemView.getContext();
+                    Intent intent = new Intent(context, ItemActivity.class);
+                    intent.putExtra(ItemActivity.ALBUM_ITEM, albumItem);
+                    intent.putExtra(ItemActivity.ALBUM_PATH, getData().getPath());
+                    intent.putExtra(ItemActivity.ITEM_POSITION, getData().getAlbumItems().indexOf(albumItem));
+                    ((Activity) context).startActivityForResult(intent, ItemActivity.VIEW_IMAGE);
+                }
+            });
             itemView.setOnLongClickListener(view -> {
                 if (!getSelectorMode()) {
-                    setSelectorMode(true);
+                    notifySelectorModeChange(true);
                     clearSelectedItemsList();
                 }
 
-                onItemSelected(albumItemHolder);
+                onToggleItemSelection(albumItemHolder);
 
                 if (dragSelectEnabled()) {
                     //notify DragSelectTouchListener
@@ -177,45 +185,46 @@ public class AlbumAdapter extends AbstractRecyclerViewAdapter<Album> {
         getSelectorManager().onItemSelected(getSelectorManager().getSelectedItemCount());
     }
 
-    private void checkForNoSelectedItems() {
-        if (getSelectedItemCount() == 0 && !pickPhotos()) {
-            cancelSelectorMode(null);
-        }
-    }
-
     private int getSelectedItemCount() {
         return getSelectorManager().getSelectedItemCount();
     }
 
-    private void onItemSelected(AlbumItemHolder holder) {
-        boolean selected = getSelectorManager().onItemSelect(holder.albumItem.getPath());
+    private void onToggleItemSelection(AlbumItemHolder holder) {
+        boolean selected = getSelectorManager().onToggleItemSelection(holder.albumItem.getPath());
         holder.setSelected(selected);
-        checkForNoSelectedItems();
+        if (getSelectedItemCount() == 0 && !pickPhotos()) {
+            exitSelectorMode(false);
+        }
     }
 
-    public String[] cancelSelectorMode(Activity context) {
-        setSelectorMode(false);
-        //update ui
-        for (int i = 0; i < getData().getAlbumItems().size(); i++) {
-            if (getSelectorManager().isItemSelected(getData().getAlbumItems().get(i).getPath())) {
-                notifyItemChanged(i);
+    public String[] exitSelectorMode(boolean getSelectedPath) {
+        return exitSelectorMode(getSelectedPath, true);
+    }
+
+    public String[] exitSelectorMode(boolean getSelectedPath, boolean clearUI) {
+        notifySelectorModeChange(false);
+
+        if (clearUI) {
+            for (int i = 0; i < recyclerView.getChildCount(); ++i) {
+                AlbumItemHolder albumItemHolder = (AlbumItemHolder) recyclerView.getChildViewHolder(recyclerView.getChildAt(i));
+                albumItemHolder.setSelected(false);
             }
         }
-        //generate paths array
+
         String[] paths;
-        if (context != null) {
-            paths = getSelectorManager().createStringArray(context);
+        if (getSelectedPath) {
+            paths = getSelectorManager().createStringArray();
         } else {
             paths = null;
         }
-        //clear manager list
+
         clearSelectedItemsList();
         return paths;
     }
 
     public boolean onBackPressed() {
         if (getSelectorMode() && !pickPhotos()) {
-            cancelSelectorMode(null);
+            exitSelectorMode(false);
             return true;
         }
         return false;
@@ -225,7 +234,7 @@ public class AlbumAdapter extends AbstractRecyclerViewAdapter<Album> {
         return getSelectorManager().isSelectorModeActive();
     }
 
-    private void setSelectorMode(boolean activate) {
+    protected void notifySelectorModeChange(boolean activate) {
         getSelectorManager().setSelectorMode(activate);
     }
 
@@ -233,7 +242,7 @@ public class AlbumAdapter extends AbstractRecyclerViewAdapter<Album> {
         return true;
     }
 
-    private void clearSelectedItemsList() {
+    protected void clearSelectedItemsList() {
         getSelectorManager().clearList();
     }
 

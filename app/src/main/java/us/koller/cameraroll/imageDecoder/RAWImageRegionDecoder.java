@@ -36,7 +36,7 @@ public class RAWImageRegionDecoder implements ImageRegionDecoder {
     @Override
     @NonNull
     public Bitmap decodeRegion(@NonNull Rect rect, int sampleSize) throws IOException {
-        Log.i(TAG, "decodeRegion");
+        //Log.i(TAG, "decodeRegion");
         if (bitmap == null) {
             bitmap = BitmapFactory.decodeStream(context.getContentResolver().openInputStream(uri));
         }

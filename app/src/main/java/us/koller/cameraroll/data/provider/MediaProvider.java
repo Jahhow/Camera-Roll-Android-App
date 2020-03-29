@@ -181,25 +181,20 @@ public class MediaProvider extends Provider {
         getAlbum(context, path, callback, false);
     }
 
-    public static void getAlbum(final Activity context, final String path,
+    public static void getAlbum(final Activity activity, final String path,
                                 final OnAlbumLoadedCallback callback, boolean reload) {
         if (path == null) {
-            context.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    callback.onAlbumLoaded(null);
-                }
-            });
+            activity.runOnUiThread(() -> callback.onAlbumLoaded(null));
             return;
         }
 
         if (reload || albums == null) {
-            Settings s = Settings.getInstance(context);
+            Settings s = Settings.getInstance(activity);
             boolean hiddenFolders = s.getHiddenFolders();
-            new MediaProvider(context).loadAlbums(context, hiddenFolders, new OnMediaLoadedCallback() {
+            new MediaProvider(activity).loadAlbums(activity, hiddenFolders, new OnMediaLoadedCallback() {
                 @Override
                 public void onMediaLoaded(ArrayList<Album> albums) {
-                    getAlbum(context, path, callback);
+                    getAlbum(activity, path, callback);
                 }
 
                 @Override
@@ -214,17 +209,12 @@ public class MediaProvider extends Provider {
             });
         } else {
             if (path.startsWith(VirtualAlbum.VIRTUAL_ALBUMS_DIR)) {
-                ArrayList<VirtualAlbum> virtualDirectories = getVirtualAlbums(context);
+                ArrayList<VirtualAlbum> virtualDirectories = getVirtualAlbums(activity);
                 for (int i = 0; i < virtualDirectories.size(); i++) {
                     if (virtualDirectories.get(i).getPath().equals(path)) {
                         final VirtualAlbum album = virtualDirectories.get(i);
-                        album.create(context, albums);
-                        context.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                callback.onAlbumLoaded(album);
-                            }
-                        });
+                        album.create(activity, albums);
+                        activity.runOnUiThread(() -> callback.onAlbumLoaded(album));
                         return;
                     }
                 }
@@ -233,19 +223,14 @@ public class MediaProvider extends Provider {
                 for (int i = 0; i < albums.size(); i++) {
                     album.getAlbumItems().addAll(albums.get(i).getAlbumItems());
                 }
-                int sortBy = Settings.getInstance(context).sortAlbumsBy();
+                int sortBy = Settings.getInstance(activity).sortAlbumsBy();
                 SortUtil.sort(album.getAlbumItems(), sortBy);
-                context.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        callback.onAlbumLoaded(album);
-                    }
-                });
+                activity.runOnUiThread(() -> callback.onAlbumLoaded(album));
             } else {
                 for (int i = 0; i < albums.size(); i++) {
                     if (albums.get(i).getPath().equals(path)) {
                         final Album album = albums.get(i);
-                        context.runOnUiThread(() -> callback.onAlbumLoaded(album));
+                        activity.runOnUiThread(() -> callback.onAlbumLoaded(album));
                         return;
                     }
                 }
