@@ -828,7 +828,7 @@ public class AlbumActivity extends ThemeableActivity
         ColorFade.fadeToolbarTitleColor(toolbar, textColorPrimary,
                 new ColorFade.ToolbarTitleFadeCallback() {
                     @Override
-                    public void setTitle(Toolbar toolbar) {
+                    public void onSetTitle(Toolbar toolbar) {
                         toolbar.setTitle(album.getName());
                     }
                 });
@@ -874,16 +874,16 @@ public class AlbumActivity extends ThemeableActivity
 
     @Override
     public void onItemSelected(int selectedItemCount) {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        ColorFade.fadeToolbarTitleColor(toolbar, accentTextColor,
+                new ColorFade.ToolbarTitleFadeCallback() {
+                    @Override
+                    public void onSetTitle(Toolbar toolbar) {
+                        toolbar.setTitle(getString(R.string.selected_count, selectedItemCount));
+                    }
+                });
+
         if (selectedItemCount > 0) {
-            Toolbar toolbar = findViewById(R.id.toolbar);
-            final String title = getString(R.string.selected_count, selectedItemCount);
-            ColorFade.fadeToolbarTitleColor(toolbar, accentTextColor,
-                    new ColorFade.ToolbarTitleFadeCallback() {
-                        @Override
-                        public void setTitle(Toolbar toolbar) {
-                            toolbar.setTitle(title);
-                        }
-                    });
             if (pick_photos) {
                 if (allowMultiple) {
                     animateFab(true);
@@ -924,6 +924,10 @@ public class AlbumActivity extends ThemeableActivity
     }
 
     public void shareSelectedItems() {
+        if (recyclerViewAdapter.getSelectorManager().getSelectedItemCount() <= 0) {
+            recyclerViewAdapter.exitSelectorMode(false);
+            return;
+        }
         //share multiple items
         String[] selected_items_paths = recyclerViewAdapter.exitSelectorMode(true);
         ArrayList<Uri> uris = new ArrayList<>();

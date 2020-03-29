@@ -76,10 +76,16 @@ public class AlbumAdapter extends AbstractRecyclerViewAdapter<Album> {
                         @Override
                         public void onSelectChange(int start, int end, boolean isSelected) {
                             for (int i = start; i <= end; i++) {
-                                getSelectorManager().onToggleItemSelection(getData()
-                                        .getAlbumItems().get(i).getPath());
+                                AlbumItem albumItem = getData().getAlbumItems().get(i);
+                                boolean selected = getSelectorManager().onToggleItemSelection(albumItem.getPath());
                                 //update ViewHolder
-                                notifyItemChanged(i);
+                                for (int j = 0; j < recyclerView.getChildCount(); ++j) {
+                                    AlbumItemHolder albumItemHolder = (AlbumItemHolder) recyclerView.getChildViewHolder(recyclerView.getChildAt(j));
+                                    if (albumItemHolder.getAlbumItem() == albumItem) {
+                                        albumItemHolder.setSelected(selected);
+                                        break;
+                                    }
+                                }
                             }
                         }
                     });
@@ -157,11 +163,8 @@ public class AlbumAdapter extends AbstractRecyclerViewAdapter<Album> {
 
                 if (dragSelectEnabled()) {
                     //notify DragSelectTouchListener
-                    boolean selected1 = getSelectorManager().isItemSelected(albumItem.getPath());
-                    if (selected1) {
-                        int position1 = getData().getAlbumItems().indexOf(albumItem);
-                        dragSelectTouchListener.startDragSelection(position1);
-                    }
+                    int position1 = getData().getAlbumItems().indexOf(albumItem);
+                    dragSelectTouchListener.startDragSelection(position1);
                 }
                 return true;
             });

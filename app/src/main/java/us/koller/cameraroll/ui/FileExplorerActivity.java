@@ -812,7 +812,7 @@ public class FileExplorerActivity extends ThemeableActivity
             ColorFade.fadeToolbarTitleColor(toolbar, accentTextColor,
                     new ColorFade.ToolbarTitleFadeCallback() {
                         @Override
-                        public void setTitle(Toolbar toolbar) {
+                        public void onSetTitle(Toolbar toolbar) {
                             toolbar.setTitle(title);
                         }
                     });
@@ -828,7 +828,7 @@ public class FileExplorerActivity extends ThemeableActivity
             ColorFade.fadeToolbarTitleColor(toolbar, accentTextColor,
                     new ColorFade.ToolbarTitleFadeCallback() {
                         @Override
-                        public void setTitle(Toolbar toolbar) {
+                        public void onSetTitle(Toolbar toolbar) {
                             String title = "";
                             int action = FileOperation.Util.getActionInt(
                                     FileExplorerActivity.this, fileOpIntent.getAction());
@@ -903,7 +903,7 @@ public class FileExplorerActivity extends ThemeableActivity
             ColorFade.fadeToolbarTitleColor(toolbar, textColorPrimary,
                     new ColorFade.ToolbarTitleFadeCallback() {
                         @Override
-                        public void setTitle(Toolbar toolbar) {
+                        public void onSetTitle(Toolbar toolbar) {
                             if (STORAGE_ROOTS.equals(currentDir.getPath())) {
                                 toolbar.setTitle(R.string.storage_roots);
                             } else {
@@ -939,7 +939,7 @@ public class FileExplorerActivity extends ThemeableActivity
         ColorFade.fadeToolbarTitleColor(toolbar, textColorPrimary,
                 new ColorFade.ToolbarTitleFadeCallback() {
                     @Override
-                    public void setTitle(Toolbar toolbar) {
+                    public void onSetTitle(Toolbar toolbar) {
                         toolbar.setTitle(currentDir.getPath());
                     }
                 });

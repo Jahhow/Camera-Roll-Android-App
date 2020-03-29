@@ -22,7 +22,7 @@ public class ColorFade {
     private static AnimatorSet toolbarTitleAnimSet;
 
     public interface ToolbarTitleFadeCallback {
-        void setTitle(Toolbar toolbar);
+        void onSetTitle(Toolbar toolbar);
     }
 
     public static void fadeBackgroundColor(final View v, final int startColor, final int endColor) {
@@ -104,13 +104,13 @@ public class ColorFade {
                 public void onAnimationEnd(Animator animation) {
                     super.onAnimationEnd(animation);
                     if (callback != null) {
-                        callback.setTitle(toolbar);
+                        callback.onSetTitle(toolbar);
                     }
                 }
             });
         } else {
             toolbar.setTitleTextColor(transparent);
-            callback.setTitle(toolbar);
+            callback.onSetTitle(toolbar);
         }
 
         ValueAnimator fadeIn = getDefaultValueAnimator();

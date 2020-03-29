@@ -190,7 +190,7 @@ public class NestedRecyclerViewAlbumHolder extends AlbumHolder
                             theme.getAccentTextColor(getContext()),
                             new ColorFade.ToolbarTitleFadeCallback() {
                                 @Override
-                                public void setTitle(Toolbar toolbar) {
+                                public void onSetTitle(Toolbar toolbar) {
                                     toolbar.setTitle(title);
                                 }
                             });

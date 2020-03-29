@@ -246,7 +246,7 @@ public class ItemActivity extends ThemeableActivity {
                 ColorFade.fadeToolbarTitleColor(toolbar, color,
                         new ColorFade.ToolbarTitleFadeCallback() {
                             @Override
-                            public void setTitle(Toolbar toolbar) {
+                            public void onSetTitle(Toolbar toolbar) {
                                 toolbar.setTitle(albumItem.getName() != null ? albumItem.getName() : "");
                             }
                         });
