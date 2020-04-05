@@ -5,11 +5,14 @@
 ![PREVIEW](https://github.com/kollerlukas/Camera-Roll-Android-App/blob/master/camera_roll_banner.png)
 
 # Camera Roll
-Simple Gallery App for Android, with lovely Material Design.<br>
+Simple Gallery App for Android, with lovely Material Design.
+
+### Original Links
+Changes made by this fork are not yet uploaded to the links below.<br>
+Let me know if you would like to try out the version this GitHub fork is currently building.
 
 <a href="https://play.google.com/store/apps/details?id=us.koller.cameraroll" target="_blank">
     <img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" alt="Get it on Google Play" width="240px"/></a>
 
 [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
     alt="Get it on F-Droid" width="240px">](https://f-droid.org/app/us.koller.cameraroll)
-
