@@ -28,7 +28,9 @@ import com.davemorrissey.labs.subscaleview.ImageViewState;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
 import us.koller.cameraroll.R;
+import us.koller.cameraroll.imageDecoder.CustomImageDecoder;
 import us.koller.cameraroll.imageDecoder.CustomRegionDecoder;
+import us.koller.cameraroll.imageDecoder.GlideImageDecoder;
 import us.koller.cameraroll.imageDecoder.RAWImageRegionDecoder;
 import us.koller.cameraroll.interpolator.MyInterpolator;
 import us.koller.cameraroll.util.MediaType;
@@ -144,15 +146,7 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
     }
 
     private void init() {
-        //setZoomEnabled(false);
-        //setPanEnabled(false);
-        //setPanLimit(PAN_LIMIT_CENTER);
-        //setOrientationDegrees(0);
-        //setMinScale(0.01f);
-        //setMinimumScaleType(SCALE_TYPE_CUSTOM);
-        //setRotationEnabled(false);
         setRetainXSwipe(false);
-
         setOnTouchListener(this);
 
         strokeWidth = Util.dpToPx(getContext(), STROKE_WIDTH_DP);
@@ -202,9 +196,12 @@ public class CropImageView extends SubsamplingScaleImageView implements View.OnT
         String mimeType = MediaType.getMimeType(getContext(), imageUri);
         if (MediaType.checkRAWMimeType(mimeType)) {
             setRegionDecoderFactory(RAWImageRegionDecoder::new);
+            setDecoderFactory(null);
         } else {
             setRegionDecoderFactory(CustomRegionDecoder::new);
+            setDecoderFactory(CustomImageDecoder::new);
         }
+        setPreviewDecoderFactory(GlideImageDecoder::new);
 
         if (state != null) {
             cropRect = state.getCropRect();

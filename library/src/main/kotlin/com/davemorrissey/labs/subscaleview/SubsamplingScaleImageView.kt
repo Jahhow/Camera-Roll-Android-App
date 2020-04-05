@@ -1356,6 +1356,8 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                         view.onImageEventListener?.onImageLoadError(exception)
                     else {
                         view.bitmap = bitmap
+                        view.checkReadyToDraw()
+                        view.checkBaseLayerReady()
                         view.invalidate()
                     }
                 }
