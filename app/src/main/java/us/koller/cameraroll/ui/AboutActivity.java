@@ -1,5 +1,6 @@
 package us.koller.cameraroll.ui;
 
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
 import android.os.Build;
@@ -59,16 +60,14 @@ public class AboutActivity extends ThemeableActivity
 
         TextView version = findViewById(R.id.version);
         try {
-            String versionName = getPackageManager()
-                    .getPackageInfo(getPackageName(), 0).versionName;
-            final int versionCode = getPackageManager()
-                    .getPackageInfo(getPackageName(), 0).versionCode;
-            version.setText(Html.fromHtml(versionName));
+            PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            final int versionCode = packageInfo.versionCode;
+            version.setText(getString(R.string.version, packageInfo.versionName));
             version.setTextColor(theme.getAccentTextColor(this));
             version.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
-                    Toast.makeText(view.getContext(), "versionCode: " + versionCode, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(view.getContext(), "Version Code " + versionCode, Toast.LENGTH_SHORT).show();
                     return false;
                 }
             });

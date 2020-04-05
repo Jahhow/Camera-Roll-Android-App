@@ -160,7 +160,8 @@
     <string name="info_frame_rate">Frame rate: </string>
     <string name="copied_to_clipboard">Copied to Clipboard</string>
     <string name="unknown">Unknown</string>
-    <!--About Text-->
+    <!--AboutActivity-->
+    <string name="version">Version %s</string>
     <string name="about_text">
         <![CDATA[
             © 2017 Lukas Koller, Munich, Germany<br/>
