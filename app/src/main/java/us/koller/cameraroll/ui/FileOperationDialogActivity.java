@@ -40,9 +40,11 @@ import us.koller.cameraroll.data.models.File_POJO;
 import us.koller.cameraroll.data.provider.MediaProvider;
 import us.koller.cameraroll.ui.widget.GridMarginDecoration;
 import us.koller.cameraroll.util.MediaType;
+import us.koller.cameraroll.util.ScrollIndicatorAdaptor;
 import us.koller.cameraroll.util.Util;
 
 public class FileOperationDialogActivity extends ThemeableActivity {
+    protected static final String TAG = FileOperationDialogActivity.class.getSimpleName();
 
     public static String ACTION_COPY = "ACTION_COPY";
     public static String ACTION_MOVE = "ACTION_MOVE";
@@ -96,14 +98,8 @@ public class FileOperationDialogActivity extends ThemeableActivity {
         showFolderSelectorDialog(files);
     }
 
-    private interface NewFolderCallback {
-        void newFolderCreated(String path);
-
-        void failed();
-    }
-
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         if (creatingNewFolder) {
@@ -133,33 +129,18 @@ public class FileOperationDialogActivity extends ThemeableActivity {
 
     public void showFolderSelectorDialog(final File_POJO[] files) {
         View v = LayoutInflater.from(this)
-                .inflate(R.layout.file_operation_dialog,
-                        (ViewGroup) findViewById(R.id.root_view),
-                        false);
+                .inflate(R.layout.file_operation_dialog, findViewById(R.id.root_view), false);
+
+        final RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter();
 
         RecyclerView recyclerView = v.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         recyclerView.addItemDecoration(new GridMarginDecoration((int) getResources().getDimension(R.dimen.album_grid_spacing)));
-
-        final RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter();
         recyclerView.setAdapter(recyclerViewAdapter);
 
         final View scrollIndicatorTop = v.findViewById(R.id.scroll_indicator_top);
         final View scrollIndicatorBottom = v.findViewById(R.id.scroll_indicator_bottom);
-
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                scrollIndicatorTop.setVisibility(
-                        recyclerView.canScrollVertically(-1) ?
-                                View.VISIBLE : View.INVISIBLE);
-
-                scrollIndicatorBottom.setVisibility(
-                        recyclerView.canScrollVertically(1) ?
-                                View.VISIBLE : View.INVISIBLE);
-            }
-        });
+        new ScrollIndicatorAdaptor(recyclerView, scrollIndicatorTop, scrollIndicatorBottom);
 
         int stringRes;
         boolean oneItem = files.length == 1;
@@ -216,23 +197,8 @@ public class FileOperationDialogActivity extends ThemeableActivity {
     }
 
     public void createNewFolder(final File_POJO[] files) {
-        createNewFolderDialog(new NewFolderCallback() {
-            @Override
-            public void newFolderCreated(String path) {
-                executeAction(files, path);
-            }
-
-            @Override
-            public void failed() {
-                setResult(RESULT_CANCELED, null);
-                finish();
-            }
-        });
-    }
-
-    public void createNewFolderDialog(final NewFolderCallback callback) {
-        View dialogLayout = LayoutInflater.from(this).inflate(R.layout.input_dialog_layout,
-                (ViewGroup) findViewById(R.id.root_view), false);
+        View dialogLayout = LayoutInflater.from(this)
+                .inflate(R.layout.input_dialog_layout, findViewById(R.id.root_view), false);
 
         final EditText editText = dialogLayout.findViewById(R.id.edit_text);
 
@@ -255,12 +221,9 @@ public class FileOperationDialogActivity extends ThemeableActivity {
                                 unregisterLocalBroadcastReceiver(this);
                                 switch (intent.getAction()) {
                                     case FileOperation.RESULT_DONE:
-                                        creatingNewFolder = false;
-                                        callback.newFolderCreated(newFolder.getPath());
-                                        break;
                                     case FileOperation.FAILED:
                                         creatingNewFolder = false;
-                                        callback.failed();
+                                        executeAction(files, newFolder.getPath());
                                         break;
                                     default:
                                         break;
@@ -295,6 +258,7 @@ public class FileOperationDialogActivity extends ThemeableActivity {
     }
 
     public void executeAction(File_POJO[] files, String target) {
+        //Log.i(TAG, "executeAction " + action);
         int action = this.action.equals(ACTION_COPY) ? FileOperation.COPY : FileOperation.MOVE;
         final Intent workIntent = FileOperation.getDefaultIntent(this, action, files);
         workIntent.putExtra(FileOperation.TARGET, new File_POJO(target, false));
@@ -304,12 +268,8 @@ public class FileOperationDialogActivity extends ThemeableActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case MainActivity.REMOVABLE_STORAGE_PERMISSION_REQUEST_CODE:
-                onDialogDismiss();
-                break;
-            default:
-                break;
+        if (requestCode == MainActivity.REMOVABLE_STORAGE_PERMISSION_REQUEST_CODE) {
+            onDialogDismiss();
         }
     }
 
@@ -336,7 +296,7 @@ public class FileOperationDialogActivity extends ThemeableActivity {
 
         static class ViewHolder extends RecyclerView.ViewHolder {
 
-            public ViewHolder(View itemView) {
+            ViewHolder(View itemView) {
                 super(itemView);
             }
 
@@ -355,30 +315,19 @@ public class FileOperationDialogActivity extends ThemeableActivity {
                             colorDrawable2 = new ColorDrawable(tintColor);
                     colorDrawable1.setAlpha(138);
                     colorDrawable2.setAlpha(138);
-                    card.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            card.getOverlay().clear();
-                            if (selectorOverlay != null) {
-                                int width = card.getWidth(), height = card.getHeight();
-                                int start = (width - height) / 2;
-                                //noinspection SuspiciousNameCombination
-                                selectorOverlay.setBounds(start, 0, start + height, height);
-                                colorDrawable1.setBounds(0, 0, start, height);
-                                colorDrawable2.setBounds(start + height, 0, width, height);
-                                card.getOverlay().add(selectorOverlay);
-                                card.getOverlay().add(colorDrawable1);
-                                card.getOverlay().add(colorDrawable2);
-                            }
-                        }
+                    card.post(() -> {
+                        card.getOverlay().clear();
+                        int width = card.getWidth(), height = card.getHeight();
+                        int start = (width - height) / 2;
+                        selectorOverlay.setBounds(start, 0, start + height, height);
+                        colorDrawable1.setBounds(0, 0, start, height);
+                        colorDrawable2.setBounds(start + height, 0, width, height);
+                        card.getOverlay().add(selectorOverlay);
+                        card.getOverlay().add(colorDrawable1);
+                        card.getOverlay().add(colorDrawable2);
                     });
                 } else {
-                    card.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            card.getOverlay().clear();
-                        }
-                    });
+                    card.post(() -> card.getOverlay().clear());
                 }
             }
         }

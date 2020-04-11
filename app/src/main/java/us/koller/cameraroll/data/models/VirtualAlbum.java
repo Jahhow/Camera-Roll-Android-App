@@ -29,6 +29,7 @@ import us.koller.cameraroll.R;
 import us.koller.cameraroll.data.Settings;
 import us.koller.cameraroll.data.provider.Provider;
 import us.koller.cameraroll.themes.Theme;
+import us.koller.cameraroll.util.ScrollIndicatorAdaptor;
 import us.koller.cameraroll.util.SortUtil;
 
 public class VirtualAlbum extends Album {
@@ -265,20 +266,7 @@ public class VirtualAlbum extends Album {
 
             final View scrollIndicatorTop = dialogLayout.findViewById(R.id.scroll_indicator_top);
             final View scrollIndicatorBottom = dialogLayout.findViewById(R.id.scroll_indicator_bottom);
-            recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                @Override
-                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                    super.onScrolled(recyclerView, dx, dy);
-                    scrollIndicatorTop.setVisibility(
-                            recyclerView.canScrollVertically(-1) ?
-                                    View.VISIBLE : View.INVISIBLE);
-
-                    scrollIndicatorBottom.setVisibility(
-                            recyclerView.canScrollVertically(1) ?
-                                    View.VISIBLE : View.INVISIBLE);
-                }
-            });
-
+            new ScrollIndicatorAdaptor(recyclerView, scrollIndicatorTop, scrollIndicatorBottom);
             return dialog;
         }
 

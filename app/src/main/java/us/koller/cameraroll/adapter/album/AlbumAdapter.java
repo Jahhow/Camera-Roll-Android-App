@@ -65,7 +65,7 @@ public class AlbumAdapter extends AbstractRecyclerViewAdapter<Album> {
             @Override
             public boolean animateChange(RecyclerView.ViewHolder oldHolder, RecyclerView.ViewHolder newHolder, int fromX, int fromY, int toX, int toY) {
                 if (oldHolder != newHolder)
-                    Log.w(TAG, "animateChange");
+                    //Log.w(TAG, "animateChange");
                 return super.animateChange(oldHolder, newHolder, fromX, fromY, toX, toY);
             }
         });*/

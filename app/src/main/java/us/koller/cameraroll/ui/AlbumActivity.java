@@ -915,7 +915,7 @@ public class AlbumActivity extends ThemeableActivity
                     public void onClick(DialogInterface dialogInterface, int i) {
                         deleteAlbumItemsSnackbar(selected_items);
                     }
-                }).create().show();
+                }).show();
     }
 
     public void fabClicked() {
@@ -1179,24 +1179,26 @@ public class AlbumActivity extends ThemeableActivity
     }
 
     private void removeAlbumItem(String path) {
-        //Log.d("AlbumActivity", "removeAlbumItem() called with: path = [" + path + "]");
-        int index = -1;
-        ArrayList<AlbumItem> items = album.getAlbumItems();
-        for (int i = 0; i < items.size(); i++) {
-            AlbumItem albumItem = items.get(i);
-            if (albumItem.getPath().equals(path)) {
-                index = i;
-                break;
+        //Log.d(TAG, "removeAlbumItem(" + path + ")");
+        ArrayList<AlbumItem> albumItems = album.getAlbumItems();
+        int size = albumItems.size();
+        for (int i = 0; i < size; ++i) {
+            String curPath = albumItems.get(i).getPath();
+            if (curPath.equals(path)) {
+                albumItems.remove(i);
+                if (size == 1)
+                    supportFinishAfterTransition();
+                else
+                    recyclerViewAdapter.notifyItemRemoved(i);
+                return;
             }
         }
-        if (items.size() == 0) {
-            supportFinishAfterTransition();
-            return;
-        }
 
-        if (index > -1) {
-            items.remove(index);
-            recyclerViewAdapter.notifyItemRemoved(index);
-        }
+        //todo: property 'album' is shared with ItemActivity. This can cause problems.
+        //Log.w(TAG, "todo: property 'album' is shared with ItemActivity. This can cause problems.");
+        if (size == 0)
+            supportFinishAfterTransition();
+        else
+            recyclerViewAdapter.notifyDataSetChanged();
     }
 }

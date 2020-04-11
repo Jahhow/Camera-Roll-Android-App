@@ -169,8 +169,12 @@ public abstract class FileOperation extends IntentService implements Parcelable 
     }
 
     public void sendDoneBroadcast() {
+        sendDoneBroadcast(true);
+    }
+
+    public void sendDoneBroadcast(boolean showToastDone) {
         ContentObserver.selfChange = false;
-        showToast(getString(R.string.done));
+        if (showToastDone) showToast(getString(R.string.done));
         Intent intent = getDoneIntent();
         sendLocalBroadcast(intent);
     }
@@ -222,12 +226,7 @@ public abstract class FileOperation extends IntentService implements Parcelable 
     }
 
     public void showToast(final String message) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getBaseContext(), message, Toast.LENGTH_SHORT).show();
-            }
-        });
+        runOnUiThread(() -> Toast.makeText(getBaseContext(), message, Toast.LENGTH_SHORT).show());
     }
 
     public void runOnUiThread(Runnable r) {
@@ -417,7 +416,7 @@ public abstract class FileOperation extends IntentService implements Parcelable 
 
         @SuppressLint("ShowToast")
         private static void scanPaths(final Context context, final String[] paths, final MediaScannerCallback callback, final boolean withNotification) {
-           //Log.i("FileOperation", "scanPaths(), paths: " + Arrays.toString(paths));
+            //Log.i("FileOperation", "scanPaths(), paths: " + Arrays.toString(paths));
             if (paths == null) {
                 if (callback != null) {
                     callback.onAllPathsScanned();

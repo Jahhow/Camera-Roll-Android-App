@@ -61,6 +61,7 @@ import us.koller.cameraroll.data.provider.MediaProvider;
 import us.koller.cameraroll.interpolator.MyInterpolator;
 import us.koller.cameraroll.util.MediaType;
 import us.koller.cameraroll.util.ParallaxTransformer;
+import us.koller.cameraroll.util.ScrollIndicatorAdaptor;
 import us.koller.cameraroll.util.Util;
 import us.koller.cameraroll.util.animators.ColorFade;
 
@@ -83,6 +84,7 @@ public class ItemActivity extends ThemeableActivity {
 
     private Toolbar toolbar;
     private View bottomBar;
+    @Nullable
     private ViewPager viewPager;
 
     private AlertDialog infoDialog;
@@ -232,7 +234,7 @@ public class ItemActivity extends ThemeableActivity {
         viewPager = findViewById(R.id.view_pager);
         viewPager.setAdapter(new ItemAdapter(album));
         int currentItem = album.getAlbumItems().indexOf(albumItem);
-        viewPager.setCurrentItem(currentItem >= 0 ? currentItem : 0, false);
+        viewPager.setCurrentItem(currentItem < 0 ? 0 : currentItem, false);
         if (showAnimations()) {
             viewPager.setPageTransformer(false, new ParallaxTransformer());
         }
@@ -644,34 +646,18 @@ public class ItemActivity extends ThemeableActivity {
                 new InfoRecyclerViewAdapter.OnDataRetrievedCallback() {
                     @Override
                     public void onDataRetrieved() {
-                        ItemActivity.this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                RecyclerView recyclerView = rootView.findViewById(R.id.recyclerView);
-                                LinearLayoutManager layoutManager = new LinearLayoutManager(ItemActivity.this);
-                                recyclerView.setLayoutManager(layoutManager);
-                                recyclerView.setAdapter(adapter);
+                        ItemActivity.this.runOnUiThread(() -> {
+                            RecyclerView recyclerView = rootView.findViewById(R.id.recyclerView);
+                            LinearLayoutManager layoutManager = new LinearLayoutManager(ItemActivity.this);
+                            recyclerView.setLayoutManager(layoutManager);
+                            recyclerView.setAdapter(adapter);
 
-                                final View scrollIndicatorTop = rootView.findViewById(R.id.scroll_indicator_top);
-                                final View scrollIndicatorBottom = rootView.findViewById(R.id.scroll_indicator_bottom);
+                            final View scrollIndicatorTop = rootView.findViewById(R.id.scroll_indicator_top);
+                            final View scrollIndicatorBottom = rootView.findViewById(R.id.scroll_indicator_bottom);
+                            new ScrollIndicatorAdaptor(recyclerView, scrollIndicatorTop, scrollIndicatorBottom);
 
-                                recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                                    @Override
-                                    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                                        super.onScrolled(recyclerView, dx, dy);
-                                        scrollIndicatorTop.setVisibility(
-                                                recyclerView.canScrollVertically(-1) ?
-                                                        View.VISIBLE : View.INVISIBLE);
-
-                                        scrollIndicatorBottom.setVisibility(
-                                                recyclerView.canScrollVertically(1) ?
-                                                        View.VISIBLE : View.INVISIBLE);
-                                    }
-                                });
-
-                                loadingBar.setVisibility(View.GONE);
-                                dialogLayout.setVisibility(View.VISIBLE);
-                            }
+                            loadingBar.setVisibility(View.GONE);
+                            dialogLayout.setVisibility(View.VISIBLE);
                         });
                     }
 
@@ -807,7 +793,9 @@ public class ItemActivity extends ThemeableActivity {
         Intent data = new Intent();
         data.setAction(SHARED_ELEMENT_RETURN_TRANSITION);
         data.putExtra(AlbumActivity.ALBUM_PATH, album.getPath());
-        data.putExtra(AlbumActivity.EXTRA_CURRENT_ALBUM_POSITION, viewPager.getCurrentItem());
+        if (viewPager != null) {
+            data.putExtra(AlbumActivity.EXTRA_CURRENT_ALBUM_POSITION, viewPager.getCurrentItem());
+        }
         setResult(RESULT_OK, data);
         finish();
         //overridePendingTransition(0,0);

@@ -5,9 +5,8 @@
     android:orientation="vertical"
     android:paddingTop="20dp">
 
-    <TextView
+    <View
         android:id="@+id/scroll_indicator_top"
-        style="?android:attr/listSeparatorTextViewStyle"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/black_translucent3" />
@@ -20,9 +19,8 @@
         android:paddingEnd="@dimen/album_grid_spacing"
         android:paddingStart="@dimen/album_grid_spacing" />
 
-    <TextView
+    <View
         android:id="@+id/scroll_indicator_bottom"
-        style="?android:attr/listSeparatorTextViewStyle"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/black_translucent3" />
