@@ -171,6 +171,13 @@ public class AlbumAdapter extends AbstractRecyclerViewAdapter<Album> {
         }
     }
 
+    @Override
+    public void onViewAttachedToWindow(@NonNull RecyclerView.ViewHolder holder) {
+        AlbumItemHolder albumItemHolder = (AlbumItemHolder) holder;
+        if (!getSelectorMode())
+            albumItemHolder.setSelected(false, false);
+    }
+
     public boolean isSelectorModeActive() {
         return getSelectorMode() && !pickPhotos();
     }
