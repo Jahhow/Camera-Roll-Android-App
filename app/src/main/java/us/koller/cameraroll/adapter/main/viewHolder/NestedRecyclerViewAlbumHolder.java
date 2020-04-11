@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,7 +42,6 @@ import us.koller.cameraroll.ui.widget.EqualSpacesItemDecoration;
 import us.koller.cameraroll.util.MediaType;
 import us.koller.cameraroll.util.StorageUtil;
 import us.koller.cameraroll.util.Util;
-import us.koller.cameraroll.util.animators.ColorFade;
 
 public class NestedRecyclerViewAlbumHolder extends AlbumHolder
         implements Toolbar.OnMenuItemClickListener {
@@ -185,15 +183,7 @@ public class NestedRecyclerViewAlbumHolder extends AlbumHolder
                             .findViewWithTag(SelectorModeUtil.SELECTOR_TOOLBAR_TAG);
 
                     final String title = getContext().getString(R.string.selected_count, selectedItemCount);
-
-                    ColorFade.fadeToolbarTitleColor(toolbar,
-                            theme.getAccentTextColor(getContext()),
-                            new ColorFade.ToolbarTitleFadeCallback() {
-                                @Override
-                                public void onSetTitle(Toolbar toolbar) {
-                                    toolbar.setTitle(title);
-                                }
-                            });
+                    toolbar.setTitle(title);
                 }
             });
         }

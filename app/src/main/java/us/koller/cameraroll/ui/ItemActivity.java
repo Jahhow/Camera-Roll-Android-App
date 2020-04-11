@@ -63,7 +63,6 @@ import us.koller.cameraroll.util.MediaType;
 import us.koller.cameraroll.util.ParallaxTransformer;
 import us.koller.cameraroll.util.ScrollIndicatorAdaptor;
 import us.koller.cameraroll.util.Util;
-import us.koller.cameraroll.util.animators.ColorFade;
 
 public class ItemActivity extends ThemeableActivity {
     protected static final String TAG = ItemActivity.class.getSimpleName();
@@ -245,14 +244,7 @@ public class ItemActivity extends ThemeableActivity {
             public void onPageSelected(int position) {
                 //set new AlbumItem
                 albumItem = album.getAlbumItems().get(position);
-                ColorFade.fadeToolbarTitleColor(toolbar, color,
-                        new ColorFade.ToolbarTitleFadeCallback() {
-                            @Override
-                            public void onSetTitle(Toolbar toolbar) {
-                                toolbar.setTitle(albumItem.getName() != null ? albumItem.getName() : "");
-                            }
-                        });
-
+                toolbar.setTitle(albumItem.getName() != null ? albumItem.getName() : "");
                 ViewHolder viewHolder = ((ItemAdapter) viewPager.getAdapter())
                         .findViewHolderByTag(albumItem.getPath());
                 if (viewHolder != null) {

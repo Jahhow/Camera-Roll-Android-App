@@ -3,6 +3,7 @@ package us.koller.cameraroll.util.animators;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
+import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -15,11 +16,13 @@ import androidx.core.graphics.drawable.DrawableCompat;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
 import us.koller.cameraroll.data.Settings;
+import us.koller.cameraroll.interpolator.MyInterpolator;
 
 public class ColorFade {
     protected final static String TAG = ColorFade.class.getSimpleName();
 
     private static AnimatorSet toolbarTitleAnimSet;
+    public static ArgbEvaluator argbEvaluator = new ArgbEvaluator();
 
     public interface ToolbarTitleFadeCallback {
         void onSetTitle(Toolbar toolbar);
@@ -44,21 +47,13 @@ public class ColorFade {
 
     private static ValueAnimator getDefaultValueAnimator(int startValue, int endValue) {
         ValueAnimator animator = ValueAnimator.ofInt(startValue, endValue);
-        animator.setDuration(500);
-        animator.setInterpolator(SubsamplingScaleImageView.Companion.getInterpolator());
+        animator.setDuration(250);
+        animator.setInterpolator(MyInterpolator.accelerateDecelerateInterpolator);
         return animator;
     }
 
     private static int getAnimatedColor(int startColor, int endColor, float animatedValue) {
-        int alpha = getAnimatedValue(Color.alpha(startColor), Color.alpha(endColor), animatedValue);
-        int red = getAnimatedValue(Color.red(startColor), Color.red(endColor), animatedValue);
-        int green = getAnimatedValue(Color.green(startColor), Color.green(endColor), animatedValue);
-        int blue = getAnimatedValue(Color.blue(startColor), Color.blue(endColor), animatedValue);
-        return Color.argb(alpha, red, green, blue);
-    }
-
-    private static int getAnimatedValue(int start, int end, float animatedValue) {
-        return (int) (start + (end - start) * animatedValue);
+        return (int) argbEvaluator.evaluate(animatedValue, startColor, endColor);
     }
 
     public static void animateToAlpha(float alpha, final View view) {
@@ -92,7 +87,7 @@ public class ColorFade {
         ValueAnimator fadeOut = null;
         if (finalTextView != null) {
             fadeOut = getDefaultValueAnimator();
-            fadeOut.setDuration(250);
+            fadeOut.setDuration(70);
             fadeOut.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator valueAnimator) {
@@ -114,7 +109,7 @@ public class ColorFade {
         }
 
         ValueAnimator fadeIn = getDefaultValueAnimator();
-        fadeIn.setDuration(250);
+        fadeIn.setDuration(370);
         if (finalTextView != null) {
             fadeIn.addListener(new AnimatorListenerAdapter() {
                 @Override

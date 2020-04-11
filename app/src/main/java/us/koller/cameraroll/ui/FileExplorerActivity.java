@@ -77,17 +77,13 @@ public class FileExplorerActivity extends ThemeableActivity
     public static final String FILE_OPERATION = "FILE_OPERATION";
 
     private File_POJO roots;
-
     private File_POJO currentDir;
-
     private FilesProvider filesProvider;
-
     private RecyclerView recyclerView;
     private FileExplorerAdapter recyclerViewAdapter;
-
     private Menu menu;
-
     private Intent fileOpIntent;
+    private int selectedCount;
 
     public interface OnDirectoryChangeCallback {
         void changeDir(String path);
@@ -670,6 +666,7 @@ public class FileExplorerActivity extends ThemeableActivity
 
     @Override
     public void onSelectorModeEnter() {
+        selectedCount = 0;
         fileOpIntent = null;
 
         final Toolbar toolbar = findViewById(R.id.toolbar);
@@ -688,8 +685,6 @@ public class FileExplorerActivity extends ThemeableActivity
         }
 
         ColorFade.fadeBackgroundColor(toolbar, toolbarColor, accentColor);
-
-        ColorFade.fadeToolbarTitleColor(toolbar, accentTextColor, null);
 
         //fade overflow menu icon
         ColorFade.fadeDrawableColor(toolbar.getOverflowIcon(),
@@ -782,14 +777,19 @@ public class FileExplorerActivity extends ThemeableActivity
         if (count != 0) {
             Toolbar toolbar = findViewById(R.id.toolbar);
             final String title = getString(R.string.selected_count, count);
-            ColorFade.fadeToolbarTitleColor(toolbar, accentTextColor,
-                    new ColorFade.ToolbarTitleFadeCallback() {
-                        @Override
-                        public void onSetTitle(Toolbar toolbar) {
-                            toolbar.setTitle(title);
-                        }
-                    });
+            if (selectedCount == 0 && count > 0) {
+                ColorFade.fadeToolbarTitleColor(toolbar, accentTextColor,
+                        new ColorFade.ToolbarTitleFadeCallback() {
+                            @Override
+                            public void onSetTitle(Toolbar toolbar) {
+                                toolbar.setTitle(title);
+                            }
+                        });
+            } else {
+                toolbar.setTitle(title);
+            }
         }
+        selectedCount = count;
     }
 
     @Override
@@ -862,18 +862,11 @@ public class FileExplorerActivity extends ThemeableActivity
 
         if (recyclerViewAdapter.getMode() == FileExplorerAdapter.NORMAL_MODE) {
             final Toolbar toolbar = findViewById(R.id.toolbar);
-
-            ColorFade.fadeToolbarTitleColor(toolbar, textColorPrimary,
-                    new ColorFade.ToolbarTitleFadeCallback() {
-                        @Override
-                        public void onSetTitle(Toolbar toolbar) {
-                            if (STORAGE_ROOTS.equals(currentDir.getPath())) {
-                                toolbar.setTitle(R.string.storage_roots);
-                            } else {
-                                toolbar.setTitle(currentDir.getPath());
-                            }
-                        }
-                    });
+            if (STORAGE_ROOTS.equals(currentDir.getPath())) {
+                toolbar.setTitle(R.string.storage_roots);
+            } else {
+                toolbar.setTitle(currentDir.getPath());
+            }
         }
 
         if (recyclerViewAdapter.getMode() == FileExplorerAdapter.NORMAL_MODE) {

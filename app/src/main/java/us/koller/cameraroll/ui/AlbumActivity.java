@@ -119,16 +119,13 @@ public class AlbumActivity extends ThemeableActivity
     };*/
 
     private Album album;
-
     private RecyclerView recyclerView;
     private AlbumAdapter recyclerViewAdapter;
-
     private Snackbar snackbar;
-
     private Menu menu;
-
     private boolean pick_photos;
     private boolean allowMultiple;
+    int selectedItemCount = 0;
 
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
@@ -723,8 +720,8 @@ public class AlbumActivity extends ThemeableActivity
 
         if (!pick_photos) {
             ColorFade.fadeBackgroundColor(toolbar, toolbarColor, accentColor);
-
-            ColorFade.fadeToolbarTitleColor(toolbar, accentTextColor, null);
+            //ColorFade.fadeToolbarTitleColor(toolbar, accentTextColor, null);
+            selectedItemCount = 0;
 
             //fade overflow menu icon
             ColorFade.fadeDrawableColor(toolbar.getOverflowIcon(), textColorSecondary, accentTextColor);
@@ -850,13 +847,17 @@ public class AlbumActivity extends ThemeableActivity
     @Override
     public void onItemSelected(int selectedItemCount) {
         Toolbar toolbar = findViewById(R.id.toolbar);
-        ColorFade.fadeToolbarTitleColor(toolbar, accentTextColor,
+        final String newTitle = getString(R.string.selected_count, selectedItemCount);
+        if (selectedItemCount > 0 && this.selectedItemCount > 0)
+            toolbar.setTitle(newTitle);
+        else ColorFade.fadeToolbarTitleColor(toolbar, accentTextColor,
                 new ColorFade.ToolbarTitleFadeCallback() {
                     @Override
                     public void onSetTitle(Toolbar toolbar) {
-                        toolbar.setTitle(getString(R.string.selected_count, selectedItemCount));
+                        toolbar.setTitle(newTitle);
                     }
                 });
+        this.selectedItemCount = selectedItemCount;
 
         if (selectedItemCount > 0) {
             if (pick_photos) {
@@ -873,7 +874,7 @@ public class AlbumActivity extends ThemeableActivity
         }
     }
 
-    //todo keep the UI items selected until user click delete
+    //todo: keep the UI items selected until user click delete
     public void deleteSelectedItems() {
         //deleteAlbumItemsSnackbar();
         final String[] selected_items = recyclerViewAdapter
