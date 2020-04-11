@@ -37,7 +37,7 @@ public class PhotoViewHolder extends ViewHolder {
         scaleImageView.setPreviewDecoderFactory(getPreviewImageDecoderFactory());
         scaleImageView.setOnClickListener(PhotoViewHolder.this::imageOnClick);
         scaleImageView.setStartRect(albumItem.itemViewBound);
-        scaleImageView.loadImage(albumItem.getPath());
+        scaleImageView.loadImage(albumItem.getUri(itemView.getContext()));
         scaleImageView.setOnImageEventListener(new SubsamplingScaleImageView.DefaultOnImageEventListener() {
             @Override
             public void onImageLoaded() {

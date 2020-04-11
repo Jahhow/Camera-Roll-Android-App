@@ -184,28 +184,10 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         else null
     }
 
-    fun loadImage(path: String) {
+    fun loadImage(uri: Uri) {
         reset(true)
-
-        var newPath = path
-        if (!path.contains("://")) {
-            if (path.startsWith("/")) {
-                newPath = path.substring(1)
-            }
-            newPath = "$FILE_SCHEME/$newPath"
-        }
-        if (newPath.startsWith(FILE_SCHEME)) {
-            val uriFile = File(newPath.substring(FILE_SCHEME.length))
-            if (!uriFile.exists()) {
-                try {
-                    newPath = URLDecoder.decode(newPath, "UTF-8")
-                } catch (e: UnsupportedEncodingException) {
-                }
-            }
-        }
-        uri = Uri.parse(newPath)
-
-        execute(InitTask(this, context, regionDecoderFactory, uri!!))
+        this.uri = uri
+        execute(InitTask(this, context, regionDecoderFactory, uri))
     }
 
     private fun reset(newImage: Boolean) {
