@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -38,7 +39,7 @@ public class MediaProvider extends Provider {
     }
 
     public interface OnAlbumLoadedCallback {
-        void onAlbumLoaded(Album album);
+        void onAlbumLoaded(@Nullable Album album);
     }
 
     public MediaProvider(Context context) {

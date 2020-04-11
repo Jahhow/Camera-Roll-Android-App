@@ -11,6 +11,7 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.documentfile.provider.DocumentFile;
 
@@ -23,6 +24,7 @@ import us.koller.cameraroll.ui.BaseActivity;
 import us.koller.cameraroll.util.StorageUtil;
 
 public class Rename extends FileOperation {
+    protected static final String TAG = Rename.class.getSimpleName();
 
     public static final String NEW_FILE_PATH = "NEW_FILE_PATH";
 
@@ -59,13 +61,12 @@ public class Rename extends FileOperation {
             if (!result) {
                 sendFailedBroadcast(workIntent, file.getPath());
             } else {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getApplicationContext(), getString(R.string.successfully_renamed_file),
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
+                runOnUiThread(() ->
+                        Toast.makeText(
+                                getApplicationContext(), getString(R.string.successfully_renamed_file),
+                                Toast.LENGTH_SHORT
+                        ).show()
+                );
             }
         }
     }
@@ -139,7 +140,7 @@ public class Rename extends FileOperation {
 
         public static AlertDialog getRenameDialog(final BaseActivity activity,
                                                   final File_POJO file,
-                                                  final BroadcastReceiver broadcastReceiver) {
+                                                  @Nullable final BroadcastReceiver broadcastReceiver) {
 
             @SuppressLint("InflateParams")
             View dialogLayout = activity.getLayoutInflater()
@@ -167,7 +168,7 @@ public class Rename extends FileOperation {
 
                             final File_POJO[] files = new File_POJO[]{file};
                             Intent intent = FileOperation.getDefaultIntent(activity, FileOperation.RENAME, files)
-                                            .putExtra(FileOperation.NEW_FILE_NAME, newFileName);
+                                    .putExtra(FileOperation.NEW_FILE_NAME, newFileName);
                             activity.startService(intent);
                         }
                     })
@@ -177,5 +178,10 @@ public class Rename extends FileOperation {
             dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
             return dialog;
         }
+    }
+
+    @Override
+    public void sendDoneBroadcast() {
+        sendDoneBroadcast(false);
     }
 }

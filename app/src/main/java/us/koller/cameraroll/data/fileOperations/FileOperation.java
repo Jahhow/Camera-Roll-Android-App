@@ -47,6 +47,7 @@ import us.koller.cameraroll.util.MediaType;
 import us.koller.cameraroll.util.StorageUtil;
 
 public abstract class FileOperation extends IntentService implements Parcelable {
+    protected static final String TAG = Rename.class.getSimpleName();
 
     private static final int NOTIFICATION_ID = 6;
 
@@ -69,7 +70,7 @@ public abstract class FileOperation extends IntentService implements Parcelable 
     public static final String REMOVABLE_STORAGE_TREE_URI = "REMOVABLE_STORAGE_TREE_URI";
 
     private NotificationCompat.Builder notifBuilder;
-
+    private boolean sentFailedBroadcast;
     private ArrayList<String> pathsToScan;
 
     public FileOperation() {
@@ -80,6 +81,7 @@ public abstract class FileOperation extends IntentService implements Parcelable 
 
     @Override
     protected void onHandleIntent(Intent workIntent) {
+        sentFailedBroadcast = false;
         notifBuilder = createNotificationBuilder();
         notifBuilder.setProgress(1, 0, false);
         Notification notification = notifBuilder.build();
@@ -102,7 +104,6 @@ public abstract class FileOperation extends IntentService implements Parcelable 
                     public void onAllPathsScanned() {
                         sendDoneBroadcast();
                         stopForeground(true);
-
                     }
                 });
             } else {
@@ -176,10 +177,13 @@ public abstract class FileOperation extends IntentService implements Parcelable 
         ContentObserver.selfChange = false;
         if (showToastDone) showToast(getString(R.string.done));
         Intent intent = getDoneIntent();
+        if (sentFailedBroadcast)
+            intent.putExtra(FAILED, true);
         sendLocalBroadcast(intent);
     }
 
     public void sendFailedBroadcast(Intent workIntent, String path) {
+        sentFailedBroadcast = true;
         Intent intent = new Intent(FAILED);
         intent.putExtra(FILES, path);
         intent.putExtra(WORK_INTENT, workIntent);
@@ -483,7 +487,6 @@ public abstract class FileOperation extends IntentService implements Parcelable 
                                 manager.notify(NOTIFICATION_ID, notifBuilder.build());
                             }
                         }
-
                     }
 
                     if (manager != null) {

@@ -29,6 +29,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowInsets;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -556,37 +557,7 @@ public class AlbumActivity extends ThemeableActivity
                 Rename.Util.getRenameDialog(this, file, new BroadcastReceiver() {
                     @Override
                     public void onReceive(Context context, Intent intent) {
-                        final Activity activity = AlbumActivity.this;
 
-                        final String newFilePath = intent.getStringExtra(Rename.NEW_FILE_PATH);
-                        getIntent().putExtra(ALBUM_PATH, newFilePath);
-
-                        boolean hiddenFolders = Settings.getInstance(activity).getHiddenFolders();
-                        new MediaProvider(activity).loadAlbums(activity, hiddenFolders,
-                                new MediaProvider.OnMediaLoadedCallback() {
-                                    @Override
-                                    public void onMediaLoaded(ArrayList<Album> albums) {
-                                        //reload activity
-                                        MediaProvider.getAlbum(activity, newFilePath,
-                                                new MediaProvider.OnAlbumLoadedCallback() {
-                                                    @Override
-                                                    public void onAlbumLoaded(Album album) {
-                                                        AlbumActivity.this.album = album;
-                                                        AlbumActivity.this.onAlbumLoaded(null);
-                                                    }
-                                                });
-                                    }
-
-                                    @Override
-                                    public void timeout() {
-                                        supportFinishAfterTransition();
-                                    }
-
-                                    @Override
-                                    public void needPermission() {
-                                        supportFinishAfterTransition();
-                                    }
-                                });
                     }
                 }).show();
                 break;
@@ -1126,7 +1097,7 @@ public class AlbumActivity extends ThemeableActivity
                                 }
                                 break;
                             }
-                            case FileOperation.COPY:
+                            case FileOperation.COPY: {
                                 //todo animate
                                 String albumPath = getIntent().getStringExtra(ALBUM_PATH);
                                 MediaProvider.getAlbum(AlbumActivity.this, albumPath,
@@ -1153,14 +1124,53 @@ public class AlbumActivity extends ThemeableActivity
                                             }
                                         }, true);
                                 break;
+                            }
+                            case FileOperation.RENAME: {
+                                if (intent.getBooleanExtra(FileOperation.FAILED, false)) {
+                                    Toast.makeText(context, R.string.error, Toast.LENGTH_SHORT).show();
+                                    break;
+                                }
+                                final Activity activity = AlbumActivity.this;
+
+                                final String newFilePath = intent.getStringExtra(Rename.NEW_FILE_PATH);
+                                getIntent().putExtra(ALBUM_PATH, newFilePath);
+
+                                boolean hiddenFolders = Settings.getInstance(activity).getHiddenFolders();
+                                new MediaProvider(activity).loadAlbums(activity, hiddenFolders,
+                                        new MediaProvider.OnMediaLoadedCallback() {
+                                            @Override
+                                            public void onMediaLoaded(ArrayList<Album> albums) {
+                                                //reload activity
+                                                MediaProvider.getAlbum(activity, newFilePath,
+                                                        new MediaProvider.OnAlbumLoadedCallback() {
+                                                            @Override
+                                                            public void onAlbumLoaded(@Nullable Album album) {
+                                                                AlbumActivity.this.album = album;
+                                                                AlbumActivity.this.onAlbumLoaded(null);
+                                                            }
+                                                        });
+                                            }
+
+                                            @Override
+                                            public void timeout() {
+                                                supportFinishAfterTransition();
+                                            }
+
+                                            @Override
+                                            public void needPermission() {
+                                                supportFinishAfterTransition();
+                                            }
+                                        });
+                            }
                         }
                         break;
-                    case ALBUM_ITEM_REMOVED:
+                    case ALBUM_ITEM_REMOVED: {
                         String path = intent.getStringExtra(ItemActivity.ALBUM_ITEM_PATH);
                         removeAlbumItem(path);
                         break;
+                    }
                     case ALBUM_ITEM_RENAMED:
-                    case DATA_CHANGED:
+                    case DATA_CHANGED: {
                         String albumPath = getIntent().getStringExtra(ALBUM_PATH);
                         MediaProvider.getAlbum(AlbumActivity.this, albumPath,
                                 new MediaProvider.OnAlbumLoadedCallback() {
@@ -1171,6 +1181,7 @@ public class AlbumActivity extends ThemeableActivity
                                     }
                                 });
                         break;
+                    }
                     default:
                         break;
                 }
