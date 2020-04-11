@@ -4,15 +4,6 @@ import android.content.Context;
 import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,6 +14,15 @@ import android.view.WindowInsets;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
@@ -347,16 +347,10 @@ public class VirtualAlbumsActivity extends ThemeableActivity {
                     @Override
                     public void onClick(View view) {
                         currentAlbum = virtualAlbum;
-                        //Handler to keep ripple animation
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
                                 notifyDataSetChanged();
                                 if (listener != null) {
                                     listener.onVirtualAlbumChanged(currentAlbum);
                                 }
-                            }
-                        }, /*300*/0);
                     }
                 });
                 ((VirtualAlbumHolder) holder).deleteButton.
@@ -366,10 +360,7 @@ public class VirtualAlbumsActivity extends ThemeableActivity {
                                 final int index = virtualAlbums.indexOf(virtualAlbum);
                                 Provider.removeVirtualAlbum(view.getContext(), virtualAlbum);
                                 virtualAlbums = Provider.getVirtualAlbums(view.getContext());
-                                //Handler to keep ripple animation
-                                new Handler().postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
+
                                         //notifyDataSetChanged();
                                         notifyItemRemoved(index);
                                         if (listener != null) {
@@ -379,8 +370,6 @@ public class VirtualAlbumsActivity extends ThemeableActivity {
                                         String message = view.getContext()
                                                 .getString(R.string.virtual_album_deleted, virtualAlbum.getName());
                                         Toast.makeText(view.getContext(), message, Toast.LENGTH_SHORT).show();
-                                    }
-                                }, /*300*/0);
 
                                 if (virtualAlbum.pinned()) {
                                     //remove virtualAlbum from pinnedPaths
@@ -398,18 +387,13 @@ public class VirtualAlbumsActivity extends ThemeableActivity {
                             public void onClick(final View view) {
                                 final int index = currentAlbum.getDirectories().indexOf(path);
                                 currentAlbum.removeDirectory(path);
-                                //Handler to keep ripple animation
-                                new Handler().postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
+
                                         //notifyDataSetChanged();
                                         notifyItemRemoved(index);
                                         if (listener != null) {
                                             listener.onVirtualAlbumChanged(currentAlbum);
                                         }
                                         Toast.makeText(view.getContext(), R.string.path_removed, Toast.LENGTH_SHORT).show();
-                                    }
-                                }, /*300*/0);
                             }
                         });
             }

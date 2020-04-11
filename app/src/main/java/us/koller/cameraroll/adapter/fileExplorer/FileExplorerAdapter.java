@@ -1,11 +1,11 @@
 package us.koller.cameraroll.adapter.fileExplorer;
 
 import android.content.Intent;
-import android.os.Handler;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import us.koller.cameraroll.IntentReceiver;
 import us.koller.cameraroll.R;
@@ -100,13 +100,7 @@ public class FileExplorerAdapter extends RecyclerView.Adapter {
                         holder.itemView.getContext().startActivity(intent);
                     }
                 } else {
-                    //to keep the ripple animation
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            directoryChangeCallback.changeDir(file.getPath());
-                        }
-                    }, 300);
+                    directoryChangeCallback.changeDir(file.getPath());
                 }
             }
         });

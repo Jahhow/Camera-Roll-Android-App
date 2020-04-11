@@ -34,6 +34,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
@@ -333,61 +334,36 @@ public class FileExplorerActivity extends ThemeableActivity
 
     public void loadDirectory(final String path) {
         //Log.d("FileExplorerActivity", "loadDirectory(): " + path);
-        final Snackbar snackbar = Snackbar.make(findViewById(R.id.root_view),
-                getString(R.string.loading), Snackbar.LENGTH_INDEFINITE);
-        Util.showSnackbar(snackbar);
-
         final FilesProvider.Callback callback = new FilesProvider.Callback() {
             @Override
             public void onDirLoaded(final File_POJO dir) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        filesProvider.onDestroy();
-                        filesProvider = null;
+                runOnUiThread(() -> {
+                    filesProvider.onDestroy();
+                    filesProvider = null;
 
-                        if (dir != null) {
-                            FileExplorerActivity.this.currentDir = dir;
-                            if (recyclerViewAdapter != null) {
-                                recyclerViewAdapter.setFiles(currentDir);
-                                recyclerViewAdapter.notifyDataSetChanged();
-                                onDataChanged();
-                            }
+                    if (dir != null) {
+                        FileExplorerActivity.this.currentDir = dir;
+                        if (recyclerViewAdapter != null) {
+                            recyclerViewAdapter.setFiles(currentDir);
+                            recyclerViewAdapter.notifyDataSetChanged();
+                            onDataChanged();
                         }
-
-                        snackbar.dismiss();
                     }
                 });
             }
 
             @Override
             public void timeout() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        snackbar.dismiss();
-
-                        final Snackbar snackbar = Snackbar.make(findViewById(R.id.root_view),
-                                R.string.loading_failed, Snackbar.LENGTH_INDEFINITE);
-                        snackbar.setAction(getString(R.string.retry), new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                loadDirectory(path);
-                            }
-                        });
-                        Util.showSnackbar(snackbar);
-                    }
+                runOnUiThread(() -> {
+                    final Snackbar snackbar = Snackbar.make(findViewById(R.id.root_view),
+                            R.string.loading_failed, Snackbar.LENGTH_INDEFINITE);
+                    snackbar.setAction(getString(R.string.retry), view -> loadDirectory(path));
+                    Util.showSnackbar(snackbar);
                 });
             }
 
             @Override
             public void needPermission() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        snackbar.dismiss();
-                    }
-                });
             }
         };
 
@@ -396,7 +372,7 @@ public class FileExplorerActivity extends ThemeableActivity
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(ROOTS, roots);
         if (currentDir != null) {
@@ -725,38 +701,35 @@ public class FileExplorerActivity extends ThemeableActivity
             ColorFade.fadeDrawableColor(navIcon,
                     textColorSecondary, accentTextColor);
         }
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Drawable d;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    AnimatedVectorDrawable drawable = (AnimatedVectorDrawable)
-                            ContextCompat.getDrawable(FileExplorerActivity.this,
-                                    R.drawable.cancel_to_back_avd);
-                    //mutating avd to reset it
-                    drawable.mutate();
-                    d = drawable;
-                } else {
-                    d = ContextCompat.getDrawable(FileExplorerActivity.this,
-                            R.drawable.ic_clear_white);
-                }
-                d = DrawableCompat.wrap(d);
-                DrawableCompat.setTint(d.mutate(), accentTextColor);
-                toolbar.setNavigationIcon(d);
+        new Handler().postDelayed(() -> {
+            Drawable d;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                AnimatedVectorDrawable drawable = (AnimatedVectorDrawable)
+                        ContextCompat.getDrawable(FileExplorerActivity.this,
+                                R.drawable.cancel_to_back_avd);
+                //mutating avd to reset it
+                drawable.mutate();
+                d = drawable;
+            } else {
+                d = ContextCompat.getDrawable(FileExplorerActivity.this,
+                        R.drawable.ic_clear_white);
+            }
+            d = DrawableCompat.wrap(d);
+            DrawableCompat.setTint(d.mutate(), accentTextColor);
+            toolbar.setNavigationIcon(d);
 
-                //make menu items visible
-                for (int i = 0; i < menu.size(); i++) {
-                    MenuItem item = menu.getItem(i);
-                    switch (item.getItemId()) {
-                        case R.id.copy:
-                        case R.id.move:
-                        case R.id.delete:
-                            item.setVisible(true);
-                            break;
-                        default:
-                            item.setVisible(false);
-                            break;
-                    }
+            //make menu items visible
+            for (int i = 0; i < menu.size(); i++) {
+                MenuItem item = menu.getItem(i);
+                switch (item.getItemId()) {
+                    case R.id.copy:
+                    case R.id.move:
+                    case R.id.delete:
+                        item.setVisible(true);
+                        break;
+                    default:
+                        item.setVisible(false);
+                        break;
                 }
             }
         }, navIcon instanceof Animatable ? (int) (500 * Util.getAnimatorSpeed(this)) : 0);
@@ -855,21 +828,11 @@ public class FileExplorerActivity extends ThemeableActivity
 
         animateFab(true);
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                //hide menu items
-                for (int i = 0; i < menu.size(); i++) {
-                    MenuItem item = menu.getItem(i);
-                    switch (item.getItemId()) {
-                        case R.id.paste:
-                            item.setVisible(true);
-                            break;
-                        default:
-                            item.setVisible(false);
-                            break;
-                    }
-                }
+        new Handler().postDelayed(() -> {
+            //hide menu items
+            for (int i = 0; i < menu.size(); i++) {
+                MenuItem item = menu.getItem(i);
+                item.setVisible(item.getItemId() == R.id.paste);
             }
         }, (int) (300 * Util.getAnimatorSpeed(this)));
     }
@@ -952,37 +915,34 @@ public class FileExplorerActivity extends ThemeableActivity
             ((Animatable) navIcon).start();
             ColorFade.fadeDrawableColor(navIcon, accentTextColor, textColorSecondary);
         }
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Drawable d;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    AnimatedVectorDrawable drawable = (AnimatedVectorDrawable)
-                            ContextCompat.getDrawable(FileExplorerActivity.this,
-                                    R.drawable.back_to_cancel_avd);
-                    //mutating avd to reset it
-                    drawable.mutate();
-                    d = drawable;
-                } else {
-                    d = ContextCompat.getDrawable(FileExplorerActivity.this,
-                            R.drawable.ic_arrow_back_white);
-                }
-                d = DrawableCompat.wrap(d);
-                DrawableCompat.setTint(d.mutate(), textColorSecondary);
-                toolbar.setNavigationIcon(d);
+        new Handler().postDelayed(() -> {
+            Drawable d;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                AnimatedVectorDrawable drawable = (AnimatedVectorDrawable)
+                        ContextCompat.getDrawable(FileExplorerActivity.this,
+                                R.drawable.back_to_cancel_avd);
+                //mutating avd to reset it
+                drawable.mutate();
+                d = drawable;
+            } else {
+                d = ContextCompat.getDrawable(FileExplorerActivity.this,
+                        R.drawable.ic_arrow_back_white);
+            }
+            d = DrawableCompat.wrap(d);
+            DrawableCompat.setTint(d.mutate(), textColorSecondary);
+            toolbar.setNavigationIcon(d);
 
-                //hide menu items
-                for (int i = 0; i < menu.size(); i++) {
-                    MenuItem item = menu.getItem(i);
-                    switch (item.getItemId()) {
-                        case R.id.exclude:
-                        case R.id.scan:
-                            item.setVisible(true);
-                            break;
-                        default:
-                            item.setVisible(false);
-                            break;
-                    }
+            //hide menu items
+            for (int i = 0; i < menu.size(); i++) {
+                MenuItem item = menu.getItem(i);
+                switch (item.getItemId()) {
+                    case R.id.exclude:
+                    case R.id.scan:
+                        item.setVisible(true);
+                        break;
+                    default:
+                        item.setVisible(false);
+                        break;
                 }
             }
         }, navIcon instanceof Animatable ? (int) (500 * Util.getAnimatorSpeed(this)) : 0);
