@@ -168,6 +168,7 @@ public abstract class Provider {
 
         if (!pinnedPaths.contains(path)) {
             pinnedPaths.add(path);
+            MediaProvider.dataChanged = true;
         }
     }
 
@@ -175,8 +176,10 @@ public abstract class Provider {
         if (pinnedPaths == null) {
             pinnedPaths = loadPinnedPaths(context);
         }
-
-        pinnedPaths.remove(path);
+        if (pinnedPaths.contains(path)) {
+            MediaProvider.dataChanged = true;
+            pinnedPaths.remove(path);
+        }
     }
 
     public static ArrayList<String> loadPinnedPaths(Context context) {
