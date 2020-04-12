@@ -88,7 +88,6 @@
     <string name="media_retriever">MediaRetriever</string>
     <string name="media_retriever_summary">Ręcznie przeszukaj pamięć, zamiast polegać na MediaStore Api. Może pomóc, jeśli uważasz, że brakuje części plików.</string>
     <string name="show_animations">Pokaż animacje</string>
-    <string name="show_animations_summary">Wyłącz SharedElementTransition i PageTransformer</string>
     <string name="show_videos">Pokaż filmy</string>
     <string name="show_videos_summary">Pokazuj filmy w galerii</string>
     <!--EditImageActivity-->

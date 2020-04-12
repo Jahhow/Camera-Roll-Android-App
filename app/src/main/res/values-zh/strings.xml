@@ -89,7 +89,6 @@
     <string name="media_retriever">媒体获取器</string>
     <string name="media_retriever_summary">不使用MediaStore API而手动搜索存储空间内的媒体，或许可以解决某些照片不能显示的问题</string>
     <string name="show_animations">过渡动画</string>
-    <string name="show_animations_summary">停用元素过渡动画和翻页动画</string>
     <string name="show_videos">显示视频</string>
     <string name="show_videos_summary">在相册中显示视频</string>
     <string name="maximum_brightness">最大亮度</string>

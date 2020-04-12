@@ -88,7 +88,6 @@
     <string name="media_retriever">MediaDoorzoeker</string>
     <string name="media_retriever_summary">Handmatig zoeken naar media op de opslag in plaats van via de MediaStore API. Dit kan helpen als er afbeeldingen ontbreken.</string>
     <string name="show_animations">Animaties tonen</string>
-    <string name="show_animations_summary">SharedElementTransition en PageTransformer uitschakelen</string>
     <string name="show_videos">Video\'s tonen</string>
     <string name="show_videos_summary">Video\'s tonen in de galerij</string>
     <string name="maximum_brightness">Maximale helderheid</string>

@@ -88,7 +88,6 @@
     <string name="media_retriever">MediaRetriever</string>
     <string name="media_retriever_summary">Самастойны пошук мыдыя замест выкарыстання MediaStore API. Гэта можа дапамагчы, калі нейкія відарысы нябачныя.</string>
     <string name="show_animations">Паказваць анімацыі</string>
-    <string name="show_animations_summary">Адключае анімацыі выбару і гартання відарысаў</string>
     <string name="show_videos">Паказваць відэа</string>
     <string name="show_videos_summary">Паказваць відэа ў галерэі</string>
     <string name="maximum_brightness">Максімальная яркасць</string>

@@ -34,7 +34,6 @@
         <SwitchPreference
             android:defaultValue="true"
             android:key="@string/pref_key_animations"
-            android:summary="@string/show_animations_summary"
             android:title="@string/show_animations" />
 
         <SwitchPreference
