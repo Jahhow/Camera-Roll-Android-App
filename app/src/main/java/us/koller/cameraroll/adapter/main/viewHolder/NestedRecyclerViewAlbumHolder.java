@@ -24,6 +24,8 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
+
 import java.util.ArrayList;
 
 import us.koller.cameraroll.R;
@@ -48,7 +50,7 @@ public class NestedRecyclerViewAlbumHolder extends AlbumHolder
     protected static final String TAG = NestedRecyclerViewAlbumHolder.class.getSimpleName();
     @SuppressWarnings("FieldCanBeLocal")
     private static int SINGLE_LINE_MAX_ITEM_COUNT = 4;
-
+    private static final long toolbarTranslationDuration = 400;
     private Theme theme;
 
     public RecyclerView nestedRecyclerView;
@@ -139,7 +141,10 @@ public class NestedRecyclerViewAlbumHolder extends AlbumHolder
                                     selectorToolbar.getViewTreeObserver().removeOnGlobalLayoutListener(this);
 
                                     selectorToolbar.setTranslationY(-selectorToolbar.getHeight());
-                                    selectorToolbar.animate().translationY(0);
+                                    selectorToolbar.animate()
+                                            .setDuration(toolbarTranslationDuration)
+                                            .setInterpolator(SubsamplingScaleImageView.Companion.getInterpolator())
+                                            .translationY(0);
                                 }
                             });
                 }
@@ -156,22 +161,22 @@ public class NestedRecyclerViewAlbumHolder extends AlbumHolder
 
                     //animate selector-toolbar
                     selectorToolbar.animate()
+                            .setDuration(toolbarTranslationDuration)
+                            .setInterpolator(SubsamplingScaleImageView.Companion.getInterpolator())
                             .translationY(-selectorToolbar.getHeight())
                             .setListener(new AnimatorListenerAdapter() {
                                 @Override
                                 public void onAnimationEnd(Animator animation) {
-                                    super.onAnimationEnd(animation);
-
-                                    if (theme.darkStatusBarIcons()) {
-                                        Util.setDarkStatusBarIcons(rootView);
-                                    } else {
-                                        Util.setLightStatusBarIcons(rootView);
-                                    }
-
-                                    //remove selector-toolbar
                                     ((ViewGroup) rootView).removeView(selectorToolbar);
                                 }
                             });
+                    itemView.postDelayed(() -> {
+                        if (theme.darkStatusBarIcons()) {
+                            Util.setDarkStatusBarIcons(rootView);
+                        } else {
+                            Util.setLightStatusBarIcons(rootView);
+                        }
+                    }, (long) (toolbarTranslationDuration * .325));
                 }
 
                 @Override
@@ -333,7 +338,7 @@ public class NestedRecyclerViewAlbumHolder extends AlbumHolder
 
     private static class NestedAdapter extends AlbumAdapter {
 
-        public NestedAdapter(SelectorModeManager.Callback callback, RecyclerView recyclerView, Album album, boolean pick_photos, SelectorModeManager selectorModeManager) {
+        NestedAdapter(SelectorModeManager.Callback callback, RecyclerView recyclerView, Album album, boolean pick_photos, SelectorModeManager selectorModeManager) {
             super(callback, recyclerView, album, pick_photos, selectorModeManager);
         }
 

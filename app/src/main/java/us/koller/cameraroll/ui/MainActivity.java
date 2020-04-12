@@ -138,13 +138,11 @@ public class MainActivity extends ThemeableActivity {
         SelectorModeManager.Callback callback = new SelectorModeManager.SimpleCallback() {
             @Override
             public void onSelectorModeEnter() {
-                super.onSelectorModeEnter();
                 showAndHideFab(false);
             }
 
             @Override
             public void onSelectorModeExit() {
-                super.onSelectorModeExit();
                 showAndHideFab(true);
             }
         };

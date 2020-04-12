@@ -310,6 +310,11 @@ public class Settings {
                 .apply();
     }
 
+    /*public static float getAnimatorDurationScale(Context context) {
+        return android.provider.Settings.Global.getFloat(context.getContentResolver(),
+                android.provider.Settings.Global.ANIMATOR_DURATION_SCALE, 1.0f);
+    }*/
+
     public static class Utils {
         public static String getThemeName(Context context, String themeValue) {
             int valuesRes = R.array.theme_values;
