@@ -160,7 +160,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             BroadcastReceiver broadcastReceiver = broadcastReceivers.get(i);
             LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
         }
-        broadcastReceivers=null;
+        broadcastReceivers = null;
         super.onDestroy();
     }
 

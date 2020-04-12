@@ -49,9 +49,9 @@ public class Settings {
         return instance;
     }
 
-    public static Settings getInstance() {
+    /*public static Settings getInstance() {
         return instance;
-    }
+    }*/
 
     private Settings(Context context) {
 
@@ -274,14 +274,6 @@ public class Settings {
 
     public void setMaxBrightness(boolean maxBrightness) {
         this.maxBrightness = maxBrightness;
-    }
-
-    public void setPrevBrightness(float prevBrightness) {
-        this.prevBrightness = prevBrightness;
-    }
-
-    public float getPrevBrightness() {
-        return prevBrightness;
     }
 
     public void setRemovableStorageTreeUri(Context context, Uri removableStorageTreeUri) {
