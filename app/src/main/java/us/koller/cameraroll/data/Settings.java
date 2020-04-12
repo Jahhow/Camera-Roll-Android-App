@@ -36,9 +36,7 @@ public class Settings {
     private boolean cameraShortcut;
     private Uri removableStorageTreeUri;
     private boolean virtualDirectories;
-    private boolean showAnimations;
     private boolean maxBrightness;
-    private float prevBrightness;
 
     private static Settings instance;
 
@@ -98,10 +96,6 @@ public class Settings {
 
         virtualDirectories = sharedPreferences.getBoolean(
                 context.getString(R.string.pref_key_virtual_directories),
-                true);
-
-        showAnimations = sharedPreferences.getBoolean(
-                context.getString(R.string.pref_key_animations),
                 true);
 
         maxBrightness = sharedPreferences.getBoolean(
@@ -258,14 +252,6 @@ public class Settings {
 
     public boolean noFolderMode() {
         return false;
-    }
-
-    public boolean showAnimations() {
-        return showAnimations;
-    }
-
-    public void showAnimations(boolean showAnimations) {
-        this.showAnimations = showAnimations;
     }
 
     public boolean isMaxBrightness() {

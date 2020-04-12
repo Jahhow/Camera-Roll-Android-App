@@ -90,7 +90,6 @@
     <string name="other">Other</string>
     <string name="media_retriever">MediaRetriever</string>
     <string name="media_retriever_summary">Manually search the storage for media instead of relying on the MediaStore API. This might help if you are missing some pictures.</string>
-    <string name="show_animations">Show Animations</string>
     <string name="show_videos">Show Videos</string>
     <string name="show_videos_summary">Show videos in gallery</string>
     <string name="maximum_brightness">Maximum Brightness</string>

@@ -215,7 +215,6 @@ public class SettingsActivity extends ThemeableActivity {
             initShowVideos(settings.showVideos());
             initMediaRetrieverPref(settings.useStorageRetriever());
             initCameraShortcutPref(settings.getCameraShortcut());
-            initAnimationsPref(settings.showAnimations());
             initMaxBrightnessPref(settings.isMaxBrightness());
 
             if (savedInstanceState != null
@@ -312,14 +311,6 @@ public class SettingsActivity extends ThemeableActivity {
             cameraShortcutPref.setOnPreferenceChangeListener(this);
         }
 
-        private void initAnimationsPref(boolean showAnimations) {
-            TwoStatePreference animationsPref =
-                    (TwoStatePreference) findPreference(getString(R.string.pref_key_animations));
-
-            animationsPref.setChecked(showAnimations);
-            animationsPref.setOnPreferenceChangeListener(this);
-        }
-
         private void initMaxBrightnessPref(boolean maxBrightness) {
             TwoStatePreference animationsPref =
                     (TwoStatePreference) findPreference(getString(R.string.pref_key_max_brightness));
@@ -408,8 +399,6 @@ public class SettingsActivity extends ThemeableActivity {
                 settings.useStorageRetriever((boolean) o);
             } else if (key.equals(getString(R.string.pref_key_camera_shortcut))) {
                 settings.setCameraShortcut((boolean) o);
-            } else if (key.equals(getString(R.string.pref_key_animations))) {
-                settings.showAnimations((boolean) o);
             } else if (key.equals(getString(R.string.pref_key_show_videos))) {
                 settings.showVideos((boolean) o);
             } else if (key.equals(getString(R.string.pref_key_max_brightness))) {

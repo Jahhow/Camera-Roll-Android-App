@@ -114,7 +114,7 @@ public class FileExplorerActivity extends ThemeableActivity
         toolbar.setBackgroundColor(toolbarColor);
         toolbar.setTitleTextColor(textColorPrimary);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && showAnimations()) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             AnimatedVectorDrawable drawable = (AnimatedVectorDrawable)
                     ContextCompat.getDrawable(FileExplorerActivity.this, R.drawable.back_to_cancel_avd);
             //mutating avd to reset it
@@ -122,7 +122,6 @@ public class FileExplorerActivity extends ThemeableActivity
             toolbar.setNavigationIcon(drawable);
         } else {
             toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white);
-
         }
         Drawable navIcon = toolbar.getNavigationIcon();
         if (navIcon != null) {
@@ -175,6 +174,7 @@ public class FileExplorerActivity extends ThemeableActivity
         fab.setImageDrawable(d);
         fab.setScaleX(0.0f);
         fab.setScaleY(0.0f);
+        //animateFab(true);
 
         //setting window insets manually
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
@@ -514,9 +514,7 @@ public class FileExplorerActivity extends ThemeableActivity
     }
 
     public void fabClicked(View v) {
-        if (showAnimations()) {
-            animateFab(false);
-        }
+        animateFab(false);
 
         View dialogLayout = LayoutInflater.from(this).inflate(R.layout.input_dialog_layout,
                 findViewById(R.id.root_view), false);

@@ -89,7 +89,6 @@
     <string name="other">其他</string>
     <string name="media_retriever">掃描儲存空間以取得資料</string>
     <string name="media_retriever_summary">若您沒有看到您的一些檔案，啟用這個選項可能有幫助。</string>
-    <string name="show_animations">顯示動畫</string>
     <string name="show_videos">顯示影片</string>
     <string name="show_videos_summary">在此程式中顯示影片檔</string>
     <string name="maximum_brightness">將螢幕設定至最大亮度</string>

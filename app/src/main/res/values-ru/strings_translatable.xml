@@ -86,7 +86,6 @@
     <string name="other">Прочее</string>
     <string name="media_retriever">MediaRetriever</string>
     <string name="media_retriever_summary">Производить поиск изображений самостоятельно, вместо использования MediaStore API. Может быть полезным, если некоторые фотографии не видны в галерее.</string>
-    <string name="show_animations">Просмотр анимаций</string>
     <string name="show_videos">Просмотр видео</string>
     <string name="show_videos_summary">Показывать видео в галерее</string>
     <string name="maximum_brightness">Максимальная яркость</string>

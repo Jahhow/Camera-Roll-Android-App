@@ -16,7 +16,6 @@ import com.bumptech.glide.request.target.Target;
 
 import us.koller.cameraroll.R;
 import us.koller.cameraroll.data.models.AlbumItem;
-import us.koller.cameraroll.util.animators.ColorFade;
 
 public class GifViewHolder extends AlbumItemHolder {
 
@@ -31,8 +30,6 @@ public class GifViewHolder extends AlbumItemHolder {
 
     @Override
     public void loadImage(final ImageView imageView, final AlbumItem albumItem) {
-        ColorFade.animateToAlpha(0f, itemView);
-
         RequestOptions options = new RequestOptions()
                 .error(R.drawable.error_placeholder)
                 .signature(albumItem.getGlideSignature());

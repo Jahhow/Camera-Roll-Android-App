@@ -113,7 +113,6 @@
     <string name="virtual_albums">Віртуальні альбоми</string>
     <string name="maximum_brightness">Максимальна яскравість</string>
     <string name="maximum_brightness_summary">Установити яскравість екрана до максимуму при перегляді зображень.</string>
-    <string name="show_animations">Показувати анімацію</string>
     <string name="save_edit">Зберегти</string>
     <string name="export">Експорт</string>
 </resources>

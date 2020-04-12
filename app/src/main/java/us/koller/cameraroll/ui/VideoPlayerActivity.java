@@ -270,7 +270,7 @@ public class VideoPlayerActivity extends ThemeableActivity {
             @Override
             public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
                 //update PlayPause-Button
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && showAnimations()) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     if (player.getPlayWhenReady()) {
                         playPause.setImageResource(R.drawable.play_to_pause_avd);
                     } else {

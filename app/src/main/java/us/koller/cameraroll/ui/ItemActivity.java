@@ -234,9 +234,7 @@ public class ItemActivity extends ThemeableActivity {
         viewPager.setAdapter(new ItemAdapter(album));
         int currentItem = album.getAlbumItems().indexOf(albumItem);
         viewPager.setCurrentItem(currentItem < 0 ? 0 : currentItem, false);
-        if (showAnimations()) {
-            viewPager.setPageTransformer(false, new ParallaxTransformer());
-        }
+        viewPager.setPageTransformer(false, new ParallaxTransformer());
         viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             private final int color = ContextCompat.getColor(ItemActivity.this, R.color.white);
 

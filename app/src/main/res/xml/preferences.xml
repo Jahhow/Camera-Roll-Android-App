@@ -32,11 +32,6 @@
             android:title="@string/column_count" />
 
         <SwitchPreference
-            android:defaultValue="true"
-            android:key="@string/pref_key_animations"
-            android:title="@string/show_animations" />
-
-        <SwitchPreference
             android:defaultValue="false"
             android:key="@string/pref_key_camera_shortcut"
             android:title="@string/camera_shortcut" />

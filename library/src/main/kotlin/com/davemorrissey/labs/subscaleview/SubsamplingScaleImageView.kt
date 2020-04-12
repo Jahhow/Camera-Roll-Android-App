@@ -40,7 +40,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         val easeEndInterpolator = SigmoidInterpolator(7.0, 0.0)
 
         private const val TILE_SIZE_AUTO = Integer.MAX_VALUE
-        private const val ANIMATION_DURATION = 366L
+        var ANIMATION_DURATION = 366L
         private const val FLING_DURATION = 1000L
         private const val ROTATION_THRESHOLD_DEGREES = 10f
 

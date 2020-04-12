@@ -87,7 +87,6 @@
     <string name="other">Jiný</string>
     <string name="media_retriever">MediaRetriever</string>
     <string name="media_retriever_summary">Nespoléhat na MediaStore API, ale ručně vyhledat média v úložišti. Může to pomoct, pokud postrádáte nějaké obrázky.</string>
-    <string name="show_animations">Zobrazovat animace</string>
     <string name="show_videos">Zobrazovat videa</string>
     <string name="show_videos_summary">Zobrazovat v galerii videa</string>
     <string name="maximum_brightness">Maximální jas</string>

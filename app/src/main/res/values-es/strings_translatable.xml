@@ -87,7 +87,6 @@
     <string name="other">Otros</string>
     <string name="media_retriever">Recuperación de archivos</string>
     <string name="media_retriever_summary">Busque manualmente el almacenamiento en lugar de depender de la API de MediaStore. Esto podría ayudarle si le falta alguna imagen.</string>
-    <string name="show_animations">Mostrar animaciones</string>
     <string name="show_videos">Mostrar videos</string>
     <string name="show_videos_summary">Mostrar los videos en la galería</string>
     <string name="maximum_brightness">Brillo máximo</string>

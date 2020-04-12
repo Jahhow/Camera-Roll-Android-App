@@ -13,9 +13,6 @@ import android.widget.TextView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.drawable.DrawableCompat;
 
-import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
-
-import us.koller.cameraroll.data.Settings;
 import us.koller.cameraroll.interpolator.MyInterpolator;
 
 public class ColorFade {
@@ -54,13 +51,6 @@ public class ColorFade {
 
     private static int getAnimatedColor(int startColor, int endColor, float animatedValue) {
         return (int) argbEvaluator.evaluate(animatedValue, startColor, endColor);
-    }
-
-    public static void animateToAlpha(float alpha, final View view) {
-        if (!Settings.getInstance(view.getContext()).showAnimations()) {
-            return;
-        }
-        view.animate().setInterpolator(SubsamplingScaleImageView.Companion.getInterpolator()).alpha(alpha).start();
     }
 
     //fade Toolbar title text change

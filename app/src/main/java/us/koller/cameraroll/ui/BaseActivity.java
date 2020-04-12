@@ -221,8 +221,4 @@ public abstract class BaseActivity extends AppCompatActivity {
     public IntentFilter getBroadcastIntentFilter() {
         return new IntentFilter();
     }
-
-    boolean showAnimations() {
-        return Settings.getInstance(this).showAnimations();
-    }
 }
