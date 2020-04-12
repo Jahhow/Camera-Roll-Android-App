@@ -81,15 +81,15 @@
     <string name="move_file">Move %1$d file</string>
     <string name="move_files">Move %1$d files</string>
     <string name="delete_file">Delete %1$d file</string>
-    <string name="paste_error">You can\'t paste files here!</string>
+    <string name="paste_error">You can\'t paste files here</string>
     <!--SettingsActivity-->
     <string name="appearance">Appearance</string>
     <string name="theme">Theme</string>
     <string name="style">Style</string>
     <string name="column_count">Column Count</string>
     <string name="other">Other</string>
-    <string name="media_retriever">MediaRetriever</string>
-    <string name="media_retriever_summary">Manually search the storage for media instead of relying on the MediaStore API. This might help if you are missing some pictures.</string>
+    <string name="media_retriever">Media Retriever</string>
+    <string name="media_retriever_summary">Turning on this might help if you are missing some pictures</string>
     <string name="show_videos">Show Videos</string>
     <string name="show_videos_summary">Show videos in gallery</string>
     <string name="maximum_brightness">Maximum Brightness</string>
@@ -113,13 +113,13 @@
     <string name="save_edit">Save</string>
     <string name="export">Export</string>
     <string name="editing_file_format_not_supported">This file format is not supported for editing</string>
-    <string name="success">Success!</string>
+    <string name="success">Success</string>
     <string name="aspect_ratio_free">Free</string>
     <string name="aspect_ratio_original">Original</string>
     <string name="aspect_ratio_square">Square</string>
-    <string name="aspect_ratio_3_2" translatable="false">3:2</string>
-    <string name="aspect_ratio_4_3" translatable="false">4:3</string>
-    <string name="aspect_ratio_16_9" translatable="false">16:9</string>
+    <string name="aspect_ratio_3_2">3:2</string>
+    <string name="aspect_ratio_4_3">4:3</string>
+    <string name="aspect_ratio_16_9">16:9</string>
     <!--ExifEditorActivity-->
     <string name="exif_editor">Exif Editor</string>
     <string name="edit_exif">edit Exif</string>
