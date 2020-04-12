@@ -17,6 +17,8 @@
     </string-array>
 
     <!--Style preference-->
+    <integer name="DEFAULT_STYLE">@integer/STYLE_NESTED_RECYCLER_VIEW_VALUE</integer>
+
     <integer name="STYLE_PARALLAX_VALUE">0</integer>
     <integer name="STYLE_CARDS_VALUE">2</integer>
     <integer name="STYLE_NESTED_RECYCLER_VIEW_VALUE">4</integer>

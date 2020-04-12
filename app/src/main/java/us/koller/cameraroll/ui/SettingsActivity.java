@@ -387,7 +387,8 @@ public class SettingsActivity extends ThemeableActivity {
             }
 
             Settings settings = Settings.getInstance(getActivity());
-            if (preference.getKey().equals(getString(R.string.pref_key_theme))) {
+            String key = preference.getKey();
+            if (key.equals(getString(R.string.pref_key_theme))) {
                 String themeValue = (String) o;
                 settings.setTheme(themeValue);
 
@@ -396,23 +397,22 @@ public class SettingsActivity extends ThemeableActivity {
 
                 //update Activities
                 getActivity().recreate();
-            } else if (preference.getKey().equals(getString(R.string.pref_key_style))) {
+            } else if (key.equals(getString(R.string.pref_key_style))) {
                 settings.setStyle((int) o);
                 String style_name = Settings.Utils.getStyleName(getActivity(), (int) o);
                 preference.setSummary(style_name);
-
-            } else if (preference.getKey().equals(getString(R.string.pref_key_column_count))) {
+            } else if (key.equals(getString(R.string.pref_key_column_count))) {
                 settings.setColumnCount((int) o);
                 preference.setSummary(String.valueOf(o));
-            } else if (preference.getKey().equals(getString(R.string.pref_key_media_retriever))) {
+            } else if (key.equals(getString(R.string.pref_key_media_retriever))) {
                 settings.useStorageRetriever((boolean) o);
-            } else if (preference.getKey().equals(getString(R.string.pref_key_camera_shortcut))) {
+            } else if (key.equals(getString(R.string.pref_key_camera_shortcut))) {
                 settings.setCameraShortcut((boolean) o);
-            } else if (preference.getKey().equals(getString(R.string.pref_key_animations))) {
+            } else if (key.equals(getString(R.string.pref_key_animations))) {
                 settings.showAnimations((boolean) o);
-            } else if (preference.getKey().equals(getString(R.string.pref_key_show_videos))) {
+            } else if (key.equals(getString(R.string.pref_key_show_videos))) {
                 settings.showVideos((boolean) o);
-            } else if (preference.getKey().equals(getString(R.string.pref_key_max_brightness))) {
+            } else if (key.equals(getString(R.string.pref_key_max_brightness))) {
                 settings.setMaxBrightness((boolean) o);
             }
             return true;

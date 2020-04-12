@@ -21,7 +21,7 @@
 
         <!--suppress AndroidElementNotAllowed -->
         <us.koller.cameraroll.preferences.StylePreference
-            android:defaultValue="@integer/STYLE_PARALLAX_VALUE"
+            android:defaultValue="@integer/DEFAULT_STYLE"
             android:key="@string/pref_key_style"
             android:title="@string/style" />
 
