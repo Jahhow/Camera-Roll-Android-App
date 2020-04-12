@@ -87,8 +87,6 @@
     <string name="other">Overig</string>
     <string name="media_retriever">MediaDoorzoeker</string>
     <string name="media_retriever_summary">Handmatig zoeken naar media op de opslag in plaats van via de MediaStore API. Dit kan helpen als er afbeeldingen ontbreken.</string>
-    <string name="use_8_bit_color">8-bit-kleuren</string>
-    <string name="use_8_bit_color_summary">8-bit-kleuren gebruiken bij het tonen van afbeeldingen. Hierdoor kan het laden langer duren en het geheugengebruik van de app neemt toe.</string>
     <string name="show_animations">Animaties tonen</string>
     <string name="show_animations_summary">SharedElementTransition en PageTransformer uitschakelen</string>
     <string name="show_videos">Video\'s tonen</string>

@@ -33,7 +33,6 @@ public class Settings {
     private int sort_album_by;
     private boolean hiddenFolders;
     private boolean showVideos;
-    private boolean use8BitColor;
     private boolean cameraShortcut;
     private Uri removableStorageTreeUri;
     private boolean virtualDirectories;
@@ -88,10 +87,6 @@ public class Settings {
 
         hiddenFolders = sharedPreferences.getBoolean
                 (PREF_KEY_HIDDEN_FOLDERS, false);
-
-        use8BitColor = sharedPreferences.getBoolean(
-                context.getString(R.string.pref_key_8_bit_color),
-                true);
 
         cameraShortcut = sharedPreferences.getBoolean(
                 context.getString(R.string.pref_key_camera_shortcut),
@@ -227,14 +222,6 @@ public class Settings {
         this.hiddenFolders = hiddenFolders;
         saveBoolean(context, PREF_KEY_HIDDEN_FOLDERS, hiddenFolders);
         return hiddenFolders;
-    }
-
-    public boolean use8BitColor() {
-        return use8BitColor;
-    }
-
-    public void use8BitColor(boolean use8BitColor) {
-        this.use8BitColor = use8BitColor;
     }
 
     public boolean getCameraShortcut() {

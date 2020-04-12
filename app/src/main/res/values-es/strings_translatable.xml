@@ -87,8 +87,6 @@
     <string name="other">Otros</string>
     <string name="media_retriever">Recuperación de archivos</string>
     <string name="media_retriever_summary">Busque manualmente el almacenamiento en lugar de depender de la API de MediaStore. Esto podría ayudarle si le falta alguna imagen.</string>
-    <string name="use_8_bit_color">Color de 8-Bits</string>
-    <string name="use_8_bit_color_summary">Utilice Color de 8-Bits al mostrar las imágenes. Las imágenes pueden tardar más en cargarse. Esto también aumenta la cantidad de memoria que se utiliza cuando la aplicación se está ejecutando.</string>
     <string name="show_animations">Mostrar animaciones</string>
     <string name="show_animations_summary">Desactivar SharedElementTransition y PageTransformer</string>
     <string name="show_videos">Mostrar videos</string>

@@ -106,8 +106,6 @@
     <string name="successfully_renamed_file">Перейменовано</string>
     <string name="theme">Тема</string>
     <string name="undo">Відмінити</string>
-    <string name="use_8_bit_color">8-біт колір</string>
-    <string name="use_8_bit_color_summary">Використовувати 8-біт палітру для відображення фотографій. Це вплине на швидкість показу фотографій, а також збільшить споживання ОЗУ.</string>
     <string name="video">Відео</string>
     <string name="virtual_album_created">Вірт. альбом %1$s створено</string>
     <string name="virtual_album_deleted">Вірт. альбом %1$s видалено</string>

@@ -86,8 +86,6 @@
     <string name="other">Ostalo</string>
     <string name="media_retriever">MediaRetriever</string>
     <string name="media_retriever_summary">Ručno pretražite pohranu umjesto oslanjanja na MediaStore Api. Ovo može pomoći ako vam fale neke fotografije.</string>
-    <string name="use_8_bit_color">8-Bit boja</string>
-    <string name="use_8_bit_color_summary">Koristite 8-Bit boju, prilikom prikaza fotografija. Fotografije će se duže učitavati. Ovo također povećava količinu memorije koju će aplikacija koristiti dok se izvodi.</string>
     <!--EditImageActivity-->
     <string name="rotate">Rotiraj</string>
     <string name="restore">Vrati</string>

@@ -85,8 +85,6 @@
     <string name="other">Autres</string>
     <string name="media_retriever">MediaRetriever</string>
     <string name="media_retriever_summary">Rechercher manuellement des medias sur le stockage au lieu d\'utiliser l\'API MediaStore. Ceci peut aider si des fichiers sont manquants.</string>
-    <string name="use_8_bit_color">Couleurs 8-Bit</string>
-    <string name="use_8_bit_color_summary">Utiliser des couleurs 8-Bit lors de l\'affichage des images. Les images peuvent mettre plus de temps à charger. Cela accroît également la quantité de mémoire lorsque l\'application est utilisée.</string>
     <!--EditImageActivity-->
     <string name="rotate">tourner</string>
     <string name="restore">Restore</string>

@@ -87,8 +87,6 @@
     <string name="other">Іншыя</string>
     <string name="media_retriever">MediaRetriever</string>
     <string name="media_retriever_summary">Самастойны пошук мыдыя замест выкарыстання MediaStore API. Гэта можа дапамагчы, калі нейкія відарысы нябачныя.</string>
-    <string name="use_8_bit_color">8-біт колер</string>
-    <string name="use_8_bit_color_summary">Выкарыстоўваць 8-біт колер для адлюстравання відарысаў. Відарысы могуць загружацца даўжэй. Таксама гэта можа павялічыць выкарыстанне памяці падчас работы праграмы.</string>
     <string name="show_animations">Паказваць анімацыі</string>
     <string name="show_animations_summary">Адключае анімацыі выбару і гартання відарысаў</string>
     <string name="show_videos">Паказваць відэа</string>

@@ -14,8 +14,6 @@ import com.davemorrissey.labs.subscaleview.ImageRegionDecoder;
 
 import java.io.InputStream;
 
-import us.koller.cameraroll.data.Settings;
-
 //inspired by https://gist.github.com/davemorrissey/e2781ba5b966c9e95539
 //simple ImageRegionDecoder to have control over Bitmap.Config
 public class CustomRegionDecoder implements ImageRegionDecoder {
@@ -30,8 +28,6 @@ public class CustomRegionDecoder implements ImageRegionDecoder {
         InputStream inputStream = context.getContentResolver().openInputStream(uri);
         decoder = BitmapRegionDecoder.newInstance(inputStream, false);
         options = new BitmapFactory.Options();
-        boolean use8BitColor = Settings.getInstance(context).use8BitColor();
-        options.inPreferredConfig = use8BitColor ? Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565;
         return new Point(this.decoder.getWidth(), this.decoder.getHeight());
     }
 

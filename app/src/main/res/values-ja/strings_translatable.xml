@@ -86,8 +86,6 @@
     <string name="other">その他</string>
     <string name="media_retriever">メディア取得</string>
     <string name="media_retriever_summary">メディアストレージ API に頼らず、手動でストレージのメディアを検索します。 これは写真が見つからない場合に役立ちます。</string>
-    <string name="use_8_bit_color">8-ビット カラー</string>
-    <string name="use_8_bit_color_summary">画像を表示する時に 8-ビット カラーを使用します。 画像の読み込みに時間がかかることがあります。 また、アプリの実行中に使用されるメモリの量が増加します。</string>
     <!--EditImageActivity-->
     <string name="rotate">回転</string>
     <string name="restore">復元</string>

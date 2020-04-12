@@ -88,8 +88,6 @@
     <string name="other">Egyéb</string>
     <string name="media_retriever">MediaRetriever használata</string>
     <string name="media_retriever_summary">Média keresése a MediaStore API megkerülésével. Ez akkor lehet hasznos, ha néhány kép nem jelenik meg.</string>
-    <string name="use_8_bit_color">8 bites szín</string>
-    <string name="use_8_bit_color_summary">8 bites színek használata a képek megjelenítéséhez. Ezzel a betöltés lassabb lehet, valamint az alkalmazás több használt memóriát is használ.</string>
     <string name="show_animations">Animációk</string>
     <string name="show_animations_summary">SharedElementTransition és PageTransformer animációk engedélyezése.</string>
     <string name="show_videos">Videók</string>

@@ -85,8 +85,6 @@
     <string name="other">Други</string>
     <string name="media_retriever">MediaRetriever</string>
     <string name="media_retriever_summary">Алтернативен начин на сканиране за снимки. Тази опция може да помогне в случай, че липсват снимки.</string>
-    <string name="use_8_bit_color">8-Bit цвят</string>
-    <string name="use_8_bit_color_summary">Използвай 8-Bit цвят при показване на снимки. Зареждането на снимките може да отнеме повече времем, както и повече памет.</string>
     <!--EditImageActivity-->
     <string name="rotate">Завърти</string>
     <string name="restore">Възтанови</string>

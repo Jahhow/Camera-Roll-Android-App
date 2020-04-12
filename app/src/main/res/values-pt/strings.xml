@@ -86,8 +86,6 @@
     <string name="other">Outras</string>
     <string name="media_retriever">MediaRetriever</string>
     <string name="media_retriever_summary">Varrer o armazenamento de mídia manualmente ao invés de confiar na API MediaStore. Isso pode resolver problemas com fotos faltando.</string>
-    <string name="use_8_bit_color">Cores em 8-Bits</string>
-    <string name="use_8_bit_color_summary">Usar Cores em 8-Bits ao exibir imagens. As imagens podem demorar mais para carregar. Também pode fazer o app usar mais memória quando em execução.</string>
     <!--EditImageActivity-->
     <string name="rotate">Girar</string>
     <string name="restore">Restaurar</string>

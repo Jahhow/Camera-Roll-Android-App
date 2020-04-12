@@ -87,8 +87,6 @@
     <string name="other">Jiný</string>
     <string name="media_retriever">MediaRetriever</string>
     <string name="media_retriever_summary">Nespoléhat na MediaStore API, ale ručně vyhledat média v úložišti. Může to pomoct, pokud postrádáte nějaké obrázky.</string>
-    <string name="use_8_bit_color">8 bitové barvy</string>
-    <string name="use_8_bit_color_summary">Při zobrazování obrázků použít 8 bitové barvy. Obrázky mohou být načítány déle. Tato volba také zvětší požadavky na používanou paměť při běhu aplikace.</string>
     <string name="show_animations">Zobrazovat animace</string>
     <string name="show_animations_summary">Zakázat SharedElementTransition a PageTransformer</string>
     <string name="show_videos">Zobrazovat videa</string>

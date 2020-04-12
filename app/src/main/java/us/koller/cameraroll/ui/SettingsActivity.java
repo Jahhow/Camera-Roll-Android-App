@@ -136,12 +136,8 @@ public class SettingsActivity extends ThemeableActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                break;
-            default:
-                break;
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -218,7 +214,6 @@ public class SettingsActivity extends ThemeableActivity {
             initColumnCountPref(settings.getRealColumnCount());
             initShowVideos(settings.showVideos());
             initMediaRetrieverPref(settings.useStorageRetriever());
-            init8BitColorPref(settings.use8BitColor());
             initCameraShortcutPref(settings.getCameraShortcut());
             initAnimationsPref(settings.showAnimations());
             initMaxBrightnessPref(settings.isMaxBrightness());
@@ -307,14 +302,6 @@ public class SettingsActivity extends ThemeableActivity {
 
             mediaRetrieverPref.setChecked(storageRetriever);
             mediaRetrieverPref.setOnPreferenceChangeListener(this);
-        }
-
-        private void init8BitColorPref(boolean use8BitColor) {
-            TwoStatePreference use8BitColorPref =
-                    (TwoStatePreference) findPreference(getString(R.string.pref_key_8_bit_color));
-
-            use8BitColorPref.setChecked(use8BitColor);
-            use8BitColorPref.setOnPreferenceChangeListener(this);
         }
 
         private void initCameraShortcutPref(boolean cameraShortcut) {
@@ -419,8 +406,6 @@ public class SettingsActivity extends ThemeableActivity {
                 preference.setSummary(String.valueOf(o));
             } else if (preference.getKey().equals(getString(R.string.pref_key_media_retriever))) {
                 settings.useStorageRetriever((boolean) o);
-            } else if (preference.getKey().equals(getString(R.string.pref_key_8_bit_color))) {
-                settings.use8BitColor((boolean) o);
             } else if (preference.getKey().equals(getString(R.string.pref_key_camera_shortcut))) {
                 settings.setCameraShortcut((boolean) o);
             } else if (preference.getKey().equals(getString(R.string.pref_key_animations))) {
