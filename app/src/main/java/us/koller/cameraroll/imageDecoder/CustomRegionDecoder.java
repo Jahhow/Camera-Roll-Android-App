@@ -34,7 +34,7 @@ public class CustomRegionDecoder implements ImageRegionDecoder {
     @Override
     @NonNull
     public Bitmap decodeRegion(@NonNull Rect rect, int sampleSize) {
-        synchronized (this.decoderLock) {
+        synchronized (decoderLock) {
             options.inSampleSize = sampleSize;
             Bitmap bitmap = this.decoder.decodeRegion(rect, options);
             if (bitmap == null) {

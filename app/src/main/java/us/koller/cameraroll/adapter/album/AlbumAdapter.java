@@ -142,9 +142,9 @@ public class AlbumAdapter extends AbstractRecyclerViewAdapter<Album> {
                     onToggleItemSelection(albumItemHolder);
                 } else {
                     //Log.d(TAG, "onClick: " + getData().getPath());
-                /*int[] a = new int[2];
-                itemView.getLocationOnScreen(a);
-                albumItem.itemViewBound = new Rect(a[0], a[1], a[0] + itemView.getWidth(), a[1] + itemView.getHeight());*/
+                    /*int[] a = new int[2];
+                    itemView.getLocationOnScreen(a);
+                    albumItem.itemViewBound = new Rect(a[0], a[1], a[0] + itemView.getWidth(), a[1] + itemView.getHeight());*/
                     Context context = itemView.getContext();
                     Intent intent = new Intent(context, ItemActivity.class);
                     intent.putExtra(ItemActivity.ALBUM_ITEM, albumItem);

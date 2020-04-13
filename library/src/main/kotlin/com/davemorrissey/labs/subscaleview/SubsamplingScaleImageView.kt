@@ -18,10 +18,7 @@ import androidx.annotation.AnyThread
 import androidx.annotation.CallSuper
 import androidx.annotation.FloatRange
 import androidx.exifinterface.media.ExifInterface
-import java.io.File
-import java.io.UnsupportedEncodingException
 import java.lang.ref.WeakReference
-import java.net.URLDecoder
 import java.util.*
 import java.util.concurrent.locks.ReentrantReadWriteLock
 
@@ -115,7 +112,6 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
     private var detector: GestureDetector? = null
 
     protected var regionDecoder: ImageRegionDecoder? = null
-    private val decoderLock = ReentrantReadWriteLock(true)
 
     private var sCenterStart = PointF(0f, 0f)
     private var vCenterStart = PointF(0f, 0f)
@@ -148,6 +144,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
     private var objectMatrix = Matrix()
 
     private val density = resources.displayMetrics.density
+    private val tasks = LinkedList<AsyncTask<Void, Void, *>>()
 
     init {
         setMinimumDpi(160)
@@ -1187,6 +1184,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         override fun onPostExecute(info: IntArray?) {
             val view = viewRef.get()
             if (view != null) {
+                view.tasks.remove(this)
                 if (decoder != null && info?.size == 3) {
                     view.onInit(decoder!!, info[0], info[1], info[2])
                 } else {
@@ -1227,15 +1225,10 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                 val tile = tileRef.get()
                 if (decoder != null && tile != null && view != null && decoder.isReady() && tile.visible) {
                     //view.debug("TileLoadTask.doInBackground, tile.sRect=${tile.sRect}, tile.sampleSize=${tile.sampleSize}")
-                    view.decoderLock.readLock().lock()
-                    try {
-                        if (decoder.isReady()) {
-                            return decoder.decodeRegion(tile.sRect, tile.sampleSize)
-                        } else {
-                            tile.loading = false
-                        }
-                    } finally {
-                        view.decoderLock.readLock().unlock()
+                    if (decoder.isReady()) {
+                        return decoder.decodeRegion(tile.sRect, tile.sampleSize)
+                    } else {
+                        tile.loading = false
                     }
                 } else {
                     tile?.loading = false
@@ -1256,23 +1249,26 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         override fun onPostExecute(bitmap: Bitmap?) {
             val view = viewRef.get()
             val tile = tileRef.get()
-            if (view != null && tile != null) {
-                if (bitmap != null) {
-                    tile.bitmap = bitmap
-                    tile.loading = false
-                    view.onTileLoaded()
-                } else if (exception?.cause is OutOfMemoryError) {
-                    //view.debug("exception?.cause is OutOfMemoryError")
-                    if (!view.recycleOtherSampleSize) {
-                        view.recycleOtherSampleSize = true
-                        view.refreshRequiredTiles(true)
-                    } else if (!view.recycleOtherTiles) {
-                        view.recycleOtherTiles = true
-                        view.refreshRequiredTiles(true)
-                    } else {
-                        view.onImageEventListener?.onImageLoadError(exception)
-                    }
-                } else view.onImageEventListener?.onImageLoadError(exception)
+            if (view != null) {
+                view.tasks.remove(this)
+                if (tile != null) {
+                    if (bitmap != null) {
+                        tile.bitmap = bitmap
+                        tile.loading = false
+                        view.onTileLoaded()
+                    } else if (exception?.cause is OutOfMemoryError) {
+                        //view.debug("exception?.cause is OutOfMemoryError")
+                        if (!view.recycleOtherSampleSize) {
+                            view.recycleOtherSampleSize = true
+                            view.refreshRequiredTiles(true)
+                        } else if (!view.recycleOtherTiles) {
+                            view.recycleOtherTiles = true
+                            view.refreshRequiredTiles(true)
+                        } else {
+                            view.onImageEventListener?.onImageLoadError(exception)
+                        }
+                    } else view.onImageEventListener?.onImageLoadError(exception)
+                }
             }
         }
     }
@@ -1310,7 +1306,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                 if (uri != null && decoderFactory != null && view != null) {
                     //view.debug("BitmapLoadTask.doInBackground")
                     bitmap = decoderFactory.make().decode(view.context, uri, view.orientationDegrees)
-                    view.debug("BitmapLoadTask done ${uri.lastPathSegment}. isPreview: $isPreview")
+                    //view.debug("BitmapLoadTask done ${uri.lastPathSegment}. isPreview: $isPreview")
                 }
             } catch (e: Exception) {
                 //Log.e(TAG, "Failed to load bitmap", e)
@@ -1324,12 +1320,13 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
         override fun onPostExecute(result: Unit?) {
             val view = viewRef.get()
             if (view != null) {
+                view.tasks.remove(this)
                 //view.debug("onPostExecute bitmap ${if (bitmap == null) '=' else '!'}= null")
                 //view.debug("onPostExecute exception ${if (exception == null) '=' else '!'}= null")
                 if (isPreview) {
                     if (view.bitmap == null)
                         if (bitmap != null) {
-                            view.debug("Preview Loaded")
+                            //view.debug("Preview Loaded")
                             view.bitmap = bitmap
                             view.invalidate()
                         }
@@ -1361,6 +1358,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
 
     private fun execute(asyncTask: AsyncTask<Void, Void, *>) {
         asyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        tasks.add(asyncTask)
     }
 
     fun setScaleAndCenter(scale: Float, sCenter: PointF) {
@@ -1400,6 +1398,13 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
 
     fun recycle() {
         reset(true)
+        try {
+            while (true) {
+                val cancel = tasks.pop().cancel(true)
+                if (cancel) debug("tasks canceled")
+            }
+        } catch (e: NoSuchElementException) {
+        }
         bitmapPaint = null
         debugTextPaint = null
         debugLinePaint = null
@@ -1656,7 +1661,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(context: Context,
                 }
                 val scaledSWidth = scaleEnd * sWidth
                 val scaledSHeight = scaleEnd * sHeight
-                ////debug("scaledSWidth $scaledSWidth, scaledSHeight $scaledSHeight")
+                //debug("scaledSWidth $scaledSWidth, scaledSHeight $scaledSHeight")
 
                 var finishEdges2 = 0
                 if (scaledSWidth < width) {

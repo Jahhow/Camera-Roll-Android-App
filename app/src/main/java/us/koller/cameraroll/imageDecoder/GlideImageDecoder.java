@@ -8,7 +8,6 @@ import android.util.DisplayMetrics;
 import androidx.annotation.NonNull;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.Rotate;
 import com.bumptech.glide.request.RequestOptions;
 import com.davemorrissey.labs.subscaleview.ImageDecoder;
@@ -28,11 +27,10 @@ public class GlideImageDecoder implements ImageDecoder {
                     .asBitmap()
                     .fitCenter()
                     .load(uri)
-                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                     .apply(new RequestOptions().transform(new Rotate(-orientationAngle)))
-                    .submit(px, px).get();
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
+                    .submit(px, px)
+                    .get();
+        } catch (ExecutionException | InterruptedException ignored) {
         }
         //Log.i(TAG, "error");
         return null;

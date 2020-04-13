@@ -7,7 +7,6 @@ import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.net.Uri;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -19,6 +18,7 @@ public class RAWImageRegionDecoder implements ImageRegionDecoder {
     private static final String TAG = RAWImageRegionDecoder.class.getSimpleName();
     private Context context;
     private Uri uri;
+    private final Object bitmapLock = new Object();
     private Bitmap bitmap = null;
 
     @Override
@@ -37,8 +37,10 @@ public class RAWImageRegionDecoder implements ImageRegionDecoder {
     @NonNull
     public Bitmap decodeRegion(@NonNull Rect rect, int sampleSize) throws IOException {
         //Log.i(TAG, "decodeRegion");
-        if (bitmap == null) {
-            bitmap = BitmapFactory.decodeStream(context.getContentResolver().openInputStream(uri));
+        synchronized (bitmapLock) {
+            if (bitmap == null) {
+                bitmap = BitmapFactory.decodeStream(context.getContentResolver().openInputStream(uri));
+            }
         }
         float scale = 1f / sampleSize;
         Matrix matrix = new Matrix();
@@ -53,7 +55,9 @@ public class RAWImageRegionDecoder implements ImageRegionDecoder {
 
     @Override
     public void recycle() {
-        bitmap.recycle();
-        bitmap = null;
+        synchronized (bitmapLock) {
+            bitmap.recycle();
+            bitmap = null;
+        }
     }
 }

@@ -31,6 +31,7 @@ import android.view.ViewTreeObserver;
 import android.view.WindowInsets;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
@@ -214,7 +215,7 @@ public class AlbumActivity extends ThemeableActivity
             //private float scrollY = 0.0f;
 
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 if (recyclerViewAdapter.isSelectorModeActive()
                         || pick_photos) {
@@ -959,9 +960,7 @@ public class AlbumActivity extends ThemeableActivity
     public void onBackPressed() {
         if (recyclerView != null && recyclerViewAdapter.onBackPressed()) {
             animateFab(false);
-        } /*else if (scrollToTheTop()) {
-            recyclerView.smoothScrollToPosition(0);
-        }*/ else {
+        } else {
             if (snackbar != null) {
                 snackbar.dismiss();
                 snackbar = null;
@@ -970,12 +969,8 @@ public class AlbumActivity extends ThemeableActivity
         }
     }
 
-    private boolean scrollToTheTop() {
-        return recyclerView.canScrollVertically(-1);
-    }
-
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         //outState.putParcelable(ALBUM, album);
         if (recyclerView != null) {
